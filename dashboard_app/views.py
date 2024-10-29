@@ -26,8 +26,9 @@ from PIL import Image  # Pillow library for image processing
 @csrf_exempt
 def login_view(request):
     if request.method == "POST":
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        data = json.loads(request.body)
+        email = data.get('email')
+        password = data.get('password')
         
         # Use parameterized query to prevent SQL injection
         query = "SELECT admin_id, admin_name, email, password FROM vtpartner.admintbl WHERE email = '"+str(email)+"' AND password = '"+str(password)+"'"
@@ -56,7 +57,6 @@ def login_view(request):
                 },
             }
             return JsonResponse(response_data, status=200)
-
         else:
             return JsonResponse({'message': 'Invalid credentials, please try again'}, status=401)
 
