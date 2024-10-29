@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-%$w3*@00r2^t+e!q4sy-d_^!7)1j4axp=-(iigv9t*q5t*qxff
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['vtpartner.org','www.vtpartner.org','localhost','77.37.47.156']
+ALLOWED_HOSTS = ['vtpartner.org','www.vtpartner.org','localhost','77.37.47.156','http://localhost:3004']
 
 
 # Application definition
@@ -57,6 +57,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "https://www.vtpartner.org",
     "https://vtpartner.org",
+    'http://localhost:3004'
 ]
 
 ROOT_URLCONF = 'vtpartner_backend.urls'
