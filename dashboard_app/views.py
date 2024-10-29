@@ -52,7 +52,7 @@ def login_view(request):
             return JsonResponse({'message': 'No Data Found'}, status=404)
 
     # If not a POST request, you can return a different response
-    return JsonResponse({'message': 'Method not allowed'}, status=405)
+    return JsonResponse({'message': 'Method not allowed'}, status=500)
     
     
 def execute_raw_query(query, params=None,):
