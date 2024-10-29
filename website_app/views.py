@@ -22,6 +22,7 @@ from PIL import Image  # Pillow library for image processing
 from django.db import connection, DatabaseError
 
 # Create your views here.
+mapKey = "AIzaSyAAlmEtjJOpSaJ7YVkMKwdSuMTbTx39l_o"
 
 # Utility function to check for missing fields
 def check_missing_fields(fields):
@@ -172,7 +173,394 @@ def all_allowed_cities(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def all_vehicles(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get("category_id")
 
+            # Check for missing fields
+            required_fields = {"category_id": category_id}
+            missing_fields = check_missing_fields(required_fields)
+
+            if missing_fields:
+                print(f"Missing required fields: {', '.join(missing_fields)}")
+                return JsonResponse(
+                    {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                    status=400
+                )
+
+            # SQL query to get vehicle details
+            query = """
+                SELECT vehicle_id, vehicle_name, weight, vehicle_types_tbl.vehicle_type_id, 
+                       vehicle_types_tbl.vehicle_type_name, description, image, size_image
+                FROM vtpartner.vehiclestbl
+                JOIN vtpartner.vehicle_types_tbl ON vehiclestbl.vehicle_type_id = vehicle_types_tbl.vehicle_type_id
+                WHERE category_id = %s
+                ORDER BY vehicle_id DESC
+            """
+            values = [category_id]
+
+            # Execute query
+            result = select_query(query, values)
+
+            # Check if result is empty
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Prepare vehicle details response
+            vehicle_details = [
+                {
+                    "vehicle_id": row[0],
+                    "vehicle_name": row[1],
+                    "weight": row[2],
+                    "vehicle_type_id": row[3],
+                    "vehicle_type_name": row[4],
+                    "description": row[5],
+                    "image": row[6],
+                    "size_image": row[7],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"vehicle_details": vehicle_details}, status=200)
+
+        except ValueError as err:
+            return JsonResponse({"message": str(err)}, status=404)
+        
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def all_vehicles_with_price(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get("category_id")
+            city_id = data.get("city_id")
+
+            # Check for missing fields
+            required_fields = {"category_id": category_id, "city_id": city_id}
+            missing_fields = check_missing_fields(required_fields)
+
+            if missing_fields:
+                print(f"Missing required fields: {', '.join(missing_fields)}")
+                return JsonResponse(
+                    {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                    status=400
+                )
+
+            # SQL query to get vehicle details with price
+            query = """
+                SELECT 
+                    v.vehicle_id,
+                    v.vehicle_name,
+                    v.weight,
+                    vt.vehicle_type_id,
+                    vt.vehicle_type_name,
+                    v.description,
+                    v.image,
+                    v.size_image,
+                    vc.starting_price_per_km
+                FROM 
+                    vtpartner.vehiclestbl v
+                JOIN 
+                    vtpartner.vehicle_types_tbl vt ON v.vehicle_type_id = vt.vehicle_type_id
+                LEFT JOIN 
+                    vtpartner.vehicle_city_wise_price_tbl vc ON v.vehicle_id = vc.vehicle_id 
+                WHERE 
+                    v.category_id = %s AND vc.city_id = %s
+                ORDER BY 
+                    v.vehicle_id DESC
+            """
+            values = [category_id, city_id]
+
+            # Execute query
+            result = select_query(query, values)
+
+            # Check if result is empty
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Prepare vehicle details response
+            vehicle_details = [
+                {
+                    "vehicle_id": row[0],
+                    "vehicle_name": row[1],
+                    "weight": row[2],
+                    "vehicle_type_id": row[3],
+                    "vehicle_type_name": row[4],
+                    "description": row[5],
+                    "image": row[6],
+                    "size_image": row[7],
+                    "starting_price_per_km": row[8],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"vehicle_details": vehicle_details}, status=200)
+
+        except ValueError as err:
+            return JsonResponse({"message": str(err)}, status=404)
+        
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def all_sub_categories(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get("category_id")
+
+            # Check for missing fields
+            required_fields = {"category_id": category_id}
+            missing_fields = check_missing_fields(required_fields)
+
+            if missing_fields:
+                return JsonResponse(
+                    {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                    status=400
+                )
+
+            # SQL query to get subcategories
+            query = """
+                SELECT 
+                    sub_cat_id,
+                    sub_cat_name,
+                    cat_id,
+                    image,
+                    epoch_time
+                FROM 
+                    vtpartner.sub_categorytbl 
+                WHERE 
+                    cat_id = %s 
+                ORDER BY 
+                    sub_cat_id DESC
+            """
+            values = [category_id]
+
+            # Execute query
+            result = select_query(query, values)
+
+            # Check if result is empty
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Prepare subcategories response
+            sub_categories_details = [
+                {
+                    "sub_cat_id": row[0],
+                    "sub_cat_name": row[1],
+                    "cat_id": row[2],
+                    "image": row[3],
+                    "epoch_time": row[4],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"sub_categories_details": sub_categories_details}, status=200)
+
+        except ValueError as err:
+            return JsonResponse({"message": str(err)}, status=404)
+        
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def all_other_services(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            sub_cat_id = data.get("sub_cat_id")
+
+            # Check for missing fields
+            required_fields = {"sub_cat_id": sub_cat_id}
+            missing_fields = check_missing_fields(required_fields)
+
+            if missing_fields:
+                return JsonResponse(
+                    {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                    status=400
+                )
+
+            # SQL query to get other services
+            query = """
+                SELECT 
+                    service_id,
+                    service_name,
+                    sub_cat_id,
+                    service_image,
+                    time_updated
+                FROM 
+                    vtpartner.other_servicestbl 
+                WHERE 
+                    sub_cat_id = %s 
+                ORDER BY 
+                    sub_cat_id DESC
+            """
+            values = [sub_cat_id]
+
+            # Execute query
+            result = select_query(query, values)
+
+            # Check if result is empty
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Prepare other services response
+            other_services_details = [
+                {
+                    "service_id": row[0],
+                    "service_name": row[1],
+                    "sub_cat_id": row[2],
+                    "service_image": row[3],
+                    "time_updated": row[4],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"other_services_details": other_services_details}, status=200)
+
+        except ValueError as err:
+            return JsonResponse({"message": str(err)}, status=404)
+        
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def all_delivery_gallery_images(request):
+    if request.method == "POST":
+        try:
+            # SQL query to get delivery gallery images
+            query = """
+                SELECT 
+                    gallery_id,
+                    image_url,
+                    category_type,
+                    epoch
+                FROM 
+                    vtpartner.service_gallerytbl,
+                    vtpartner.category_type_tbl 
+                WHERE 
+                    service_gallerytbl.category_type_id = category_type_tbl.cat_type_id 
+                    AND service_gallerytbl.category_type_id = '1' 
+                ORDER BY 
+                    gallery_id ASC
+            """
+
+            # Execute query
+            result = select_query(query)
+
+            # Check if result is empty
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Prepare gallery data response
+            gallery_data_delivery = [
+                {
+                    "gallery_id": row[0],
+                    "image_url": row[1],
+                    "category_type": row[2],
+                    "epoch": row[3],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"gallery_data_delivery": gallery_data_delivery}, status=200)
+
+        except ValueError as err:
+            return JsonResponse({"message": str(err)}, status=404)
+        
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def all_services_gallery_images(request):
+    if request.method == "POST":
+        try:
+            # SQL query to get service gallery images
+            query = """
+                SELECT 
+                    gallery_id,
+                    image_url,
+                    category_type,
+                    epoch
+                FROM 
+                    vtpartner.service_gallerytbl,
+                    vtpartner.category_type_tbl 
+                WHERE 
+                    service_gallerytbl.category_type_id = category_type_tbl.cat_type_id 
+                    AND service_gallerytbl.category_type_id = '2' 
+                ORDER BY 
+                    gallery_id ASC
+            """
+
+            # Execute query
+            result = select_query(query)
+
+            # Check if result is empty
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Prepare gallery data response
+            gallery_data_services = [
+                {
+                    "gallery_id": row[0],
+                    "image_url": row[1],
+                    "category_type": row[2],
+                    "epoch": row[3],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"gallery_data_services": gallery_data_services}, status=200)
+
+        except ValueError as err:
+            return JsonResponse({"message": str(err)}, status=404)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def distance(request):
+    if request.method == "GET":
+        origins = request.GET.get("origins")
+        destinations = request.GET.get("destinations")
+        api_key = mapKey  # Make sure to define mapKey somewhere in your settings or context
+
+        try:
+            response = requests.get(
+                f"https://maps.googleapis.com/maps/api/distancematrix/json?origins=place_id:{origins}&destinations=place_id:{destinations}&units=metric&key={api_key}"
+            )
+            response_data = response.json()
+
+            return JsonResponse(response_data, status=200)
+
+        except Exception as error:
+            print("Error fetching distance data:", error)
+            return JsonResponse({"error": "Error fetching distance data"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 def select_query(query, params=None):
     """
