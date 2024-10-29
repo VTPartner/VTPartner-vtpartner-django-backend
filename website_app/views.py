@@ -29,6 +29,71 @@ def check_missing_fields(fields):
     missing_fields = [field for field, value in fields.items() if not value]
     return missing_fields if missing_fields else None
 
+#Common Functions
+def select_query(query, params=None):
+    """
+    Executes a parameterized SQL select query and returns the result.
+    
+    Args:
+        query (str): The SQL query to execute.
+        params (list or tuple): Parameters to substitute into the query.
+
+    Returns:
+        list: Rows from the query result.
+
+    Raises:
+        ValueError: If no data is found.
+        DatabaseError: For database-specific errors.
+    """
+    try:
+        print("Select_Query::=>", query)
+        print("Params::", params)
+        
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
+            result = cursor.fetchall()
+
+            if not result:
+                raise ValueError("No Data Found")  # Custom error when no results are found
+
+            return result
+
+    except ValueError as e:
+        print(f"Error: {e}")
+        raise  # Re-raise to be handled by calling function
+    
+    except DatabaseError as e:
+        print("DatabaseError executing query:", e)
+        raise  # Re-raise to be handled by calling function
+
+    except Exception as e:
+        print("Unexpected error:", e)
+        raise  # Re-raise for unexpected errors
+
+
+def update_query(query, params):
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        return cursor.rowcount
+
+def insert_query(query, params):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
+
+            # If the query has a RETURNING clause, fetch the returned rows
+            if cursor.description:
+                return cursor.fetchall()  # Fetch all returned rows if any
+            else:
+                return cursor.rowcount  # Return number of affected rows
+    except IntegrityError as e:
+        print("Error: Failed to insert data due to integrity error", e)
+        raise
+    except Exception as e:
+        print("Error executing query:", e)
+        raise
+    
+
 @csrf_exempt
 def fare_result(request):
     if request.method == "POST":
@@ -562,43 +627,68 @@ def distance(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-def select_query(query, params=None):
-    """
-    Executes a parameterized SQL select query and returns the result.
-    
-    Args:
-        query (str): The SQL query to execute.
-        params (list or tuple): Parameters to substitute into the query.
-
-    Returns:
-        list: Rows from the query result.
-
-    Raises:
-        ValueError: If no data is found.
-        DatabaseError: For database-specific errors.
-    """
+def add_new_enquiry(request):
     try:
-        print("Select_Query::=>", query)
-        print("Params::", params)
-        
-        with connection.cursor() as cursor:
-            cursor.execute(query, params)
-            result = cursor.fetchall()
+        data = request.data
 
-            if not result:
-                raise ValueError("No Data Found")  # Custom error when no results are found
+        # List of required fields
+        required_fields = {
+            "category_id": data.get("category_id"),
+            "sub_cat_id": data.get("sub_cat_id"),
+            "service_id": data.get("service_id"),
+            "vehicle_id": data.get("vehicle_id"),
+            "city_id": data.get("city_id"),
+            "name": data.get("name"),
+            "mobile_no": data.get("mobile_no"),
+            "source_type": data.get("source_type"),
+        }
 
-            return result
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
 
-    except ValueError as e:
-        print(f"Error: {e}")
-        raise  # Re-raise to be handled by calling function
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Validating to avoid duplication
+        query_duplicate_check = """
+            SELECT COUNT(*) FROM vtpartner.enquirytbl 
+            WHERE name ILIKE %s AND category_id = %s
+        """
+        values_duplicate_check = [data['name'], data['category_id']]
+
+        result = select_query(query_duplicate_check, values_duplicate_check)
+
+        # Check if the result is greater than 0 to determine if the enquiry already exists
+        if result[0]['count'] > 0:
+            return JsonResponse({"message": "Enquiry Request already exists"}, status=409)
+
+        # If enquiry is not duplicate, proceed to insert
+        query = """
+            INSERT INTO vtpartner.enquirytbl 
+            (category_id, sub_cat_id, service_id, vehicle_id, city_id, name, mobile_no, source_type) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = [
+            data['category_id'],
+            data['sub_cat_id'],
+            data['service_id'],
+            data['vehicle_id'],
+            data['city_id'],
+            data['name'],
+            data['mobile_no'],
+            data['source_type'],
+        ]
+        row_count = insert_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+
+    except Exception as err:
+        print("Error executing add new enquiry query", err)
+        return JsonResponse({"message": "Error executing add new enquiry query"}, status=500)
     
-    except DatabaseError as e:
-        print("DatabaseError executing query:", e)
-        raise  # Re-raise to be handled by calling function
-
-    except Exception as e:
-        print("Unexpected error:", e)
-        raise  # Re-raise for unexpected errors
 
