@@ -572,7 +572,16 @@ def service_types(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"services_type_details": result}, status=200)
+            # Map each row to a dictionary with appropriate keys
+            services_type_details = [
+                {
+                    "cat_type_id": row['cat_type_id'],
+                    "category_type": row['category_type']
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"services_type_details": services_type_details}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
@@ -607,7 +616,21 @@ def all_services(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"services_details": result}, status=200)
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "category_id": row['category_id'],
+                    "category_name": row['category_name'],
+                    "category_type_id": row['category_type_id'],
+                    "category_image": row['category_image'],
+                    "category_type": row['category_type'],
+                    "epoch": row['epoch'],
+                    "description": row['description'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"services_details": services_details}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
@@ -727,7 +750,16 @@ def vehicle_types(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"vehicle_type_details": result}, status=200)
+            # Map each row to a dictionary with appropriate keys
+            vehicle_type_details = [
+                {
+                    "vehicle_type_id": row['vehicle_type_id'],
+                    "vehicle_type_name": row['vehicle_type_name'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"vehicle_type_details": vehicle_type_details}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
@@ -769,7 +801,22 @@ def all_vehicles(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"vehicle_details": result}, status=200)
+            # Map each row to a dictionary with appropriate keys
+            vehicle_details = [
+                {
+                    "vehicle_id": row['vehicle_id'],
+                    "vehicle_name": row['vehicle_name'],
+                    "weight": row['weight'],
+                    "vehicle_type_id": row['vehicle_type_id'],
+                    "vehicle_type_name": row['vehicle_type_name'],
+                    "description": row['description'],
+                    "image": row['image'],
+                    "size_image": row['size_image'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"vehicle_details": vehicle_details}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
@@ -956,7 +1003,24 @@ def vehicle_prices(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"vehicle_price_details": result}, status=200)
+            # Map each row to a dictionary for a clearer JSON response
+            vehicle_price_details = [
+                {
+                    "price_id": row['price_id'],
+                    "city_id": row['city_id'],
+                    "vehicle_id": row['vehicle_id'],
+                    "starting_price_per_km": row['starting_price_per_km'],
+                    "minimum_time": row['minimum_time'],
+                    "price_type_id": row['price_type_id'],
+                    "city_name": row['city_name'],
+                    "price_type": row['price_type'],
+                    "bg_image": row['bg_image'],
+                    "time_created_at": row['time_created_at'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"vehicle_price_details": vehicle_price_details}, status=200)
 
         except Exception as err:
             print("Error executing vehicle_prices query:", err)
@@ -977,7 +1041,16 @@ def vehicle_price_types(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"vehicle_price_types": result}, status=200)
+            # Map each row to a dictionary for a clearer JSON response
+            vehicle_price_types = [
+                {
+                    "price_type_id": row['price_type_id'],
+                    "price_type": row['price_type'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"vehicle_price_types": vehicle_price_types}, status=200)
 
         except Exception as err:
             print("Error executing vehicle_price_types query:", err)
@@ -1156,12 +1229,22 @@ def all_sub_categories(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"sub_categories_details": result}, status=200)
+            # Map each row to a dictionary for clearer response
+            sub_categories_details = [
+                {
+                    "sub_cat_id": row['sub_cat_id'],
+                    "sub_cat_name": row['sub_cat_name'],
+                    "cat_id": row['cat_id'],
+                    "image": row['image'],
+                    "epoch_time": row['epoch_time'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"sub_categories_details": sub_categories_details}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
-            if "No Data Found" in str(err):
-                return JsonResponse({"message": "No Data Found"}, status=404)
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
@@ -1306,7 +1389,7 @@ def all_other_services(request):
                 SELECT service_id, service_name, sub_cat_id, service_image, time_updated 
                 FROM vtpartner.other_servicestbl 
                 WHERE sub_cat_id = %s 
-                ORDER BY sub_cat_id DESC
+                ORDER BY service_id DESC  -- Changed to order by service_id for better clarity
             """
             values = (sub_cat_id,)
             result = select_query(query, values)  # Assuming select_query is defined
@@ -1314,7 +1397,19 @@ def all_other_services(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"other_services_details": result}, status=200)
+            # Map each row to a dictionary for clearer response
+            other_services_details = [
+                {
+                    "service_id": row['service_id'],
+                    "service_name": row['service_name'],
+                    "sub_cat_id": row['sub_cat_id'],
+                    "service_image": row['service_image'],
+                    "time_updated": row['time_updated'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"other_services_details": other_services_details}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
@@ -1481,12 +1576,33 @@ def all_enquiries(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"all_enquiries_details": result}, status=200)
+            # Map each row to a structured format for clarity
+            all_enquiries_details = [
+                {
+                    "enquiry_id": row['enquiry_id'],
+                    "category_id": row['category_id'],
+                    "sub_cat_id": row['sub_cat_id'],
+                    "service_id": row['service_id'],
+                    "vehicle_id": row['vehicle_id'],
+                    "city_id": row['city_id'],
+                    "name": row['name'],
+                    "mobile_no": row['mobile_no'],
+                    "time_at": row['time_at'],
+                    "source_type": row['source_type'],
+                    "status": row['status'],
+                    "category_name": row['category_name'],
+                    "sub_cat_name": row['sub_cat_name'],
+                    "service_name": row['service_name'],
+                    "city_name": row['city_name'],
+                    "vehicle_name": row['vehicle_name'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"all_enquiries_details": all_enquiries_details}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
-            if str(err) == "No Data Found":
-                return JsonResponse({"message": "No Data Found"}, status=404)
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
@@ -1514,9 +1630,10 @@ def all_gallery_images(request):
 
             query = """
                 SELECT gallery_id, image_url, category_type, epoch 
-                FROM vtpartner.service_gallerytbl, vtpartner.category_type_tbl 
-                WHERE service_gallerytbl.category_type_id = category_type_tbl.cat_type_id 
-                  AND service_gallerytbl.category_type_id = %s
+                FROM vtpartner.service_gallerytbl
+                JOIN vtpartner.category_type_tbl 
+                ON service_gallerytbl.category_type_id = category_type_tbl.cat_type_id 
+                WHERE service_gallerytbl.category_type_id = %s
             """
             values = (category_type_id,)
 
@@ -1525,12 +1642,21 @@ def all_gallery_images(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"gallery_images_data": result}, status=200)
+            # Map each row to a structured format for clarity
+            gallery_images_data = [
+                {
+                    "gallery_id": row['gallery_id'],
+                    "image_url": row['image_url'],
+                    "category_type": row['category_type'],
+                    "epoch": row['epoch'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"gallery_images_data": gallery_images_data}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
-            if str(err) == "No Data Found":
-                return JsonResponse({"message": "No Data Found"}, status=404)
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
@@ -1628,7 +1754,7 @@ def enquiries_all(request):
                        enquirytbl.service_id, enquirytbl.vehicle_id, enquirytbl.city_id,
                        name, mobile_no, enquirytbl.time_at, source_type, enquirytbl.status,
                        category_name, sub_cat_name, service_name, city_name, vehicle_name,
-                       enquirytbl.status, category_type
+                       category_type
                 FROM vtpartner.enquirytbl
                 LEFT JOIN vtpartner.categorytbl ON enquirytbl.category_id = categorytbl.category_id
                 LEFT JOIN vtpartner.sub_categorytbl ON enquirytbl.sub_cat_id = sub_categorytbl.sub_cat_id
@@ -1646,7 +1772,31 @@ def enquiries_all(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"all_enquiries_details": result}, status=200)
+            # Structure the response data for better clarity
+            enquiries_data = [
+                {
+                    "enquiry_id": row['enquiry_id'],
+                    "category_id": row['category_id'],
+                    "sub_cat_id": row['sub_cat_id'],
+                    "service_id": row['service_id'],
+                    "vehicle_id": row['vehicle_id'],
+                    "city_id": row['city_id'],
+                    "name": row['name'],
+                    "mobile_no": row['mobile_no'],
+                    "time_at": row['time_at'],
+                    "source_type": row['source_type'],
+                    "status": row['status'],
+                    "category_name": row['category_name'],
+                    "sub_cat_name": row['sub_cat_name'],
+                    "service_name": row['service_name'],
+                    "city_name": row['city_name'],
+                    "vehicle_name": row['vehicle_name'],
+                    "category_type": row['category_type'],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"all_enquiries_details": enquiries_data}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
@@ -2017,7 +2167,7 @@ def check_handyman_existence(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-@csrf_exempt
+@csrf_exempt  # Disable CSRF protection for this view
 def all_goods_drivers(request):
     if request.method == "POST":
         try:
@@ -2049,18 +2199,74 @@ def all_goods_drivers(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"all_goods_drivers": result}, status=200)
+            # Map each row to the same column names from the database
+            mapped_results = [
+                {
+                    "goods_driver_id": row["goods_driver_id"],
+                    "driver_first_name": row["driver_first_name"],
+                    "profile_pic": row["profile_pic"],
+                    "is_online": row["is_online"],
+                    "ratings": row["ratings"],
+                    "mobile_no": row["mobile_no"],
+                    "registration_date": row["registration_date"],
+                    "time": row["time"],
+                    "r_lat": row["r_lat"],
+                    "r_lng": row["r_lng"],
+                    "current_lat": row["current_lat"],
+                    "current_lng": row["current_lng"],
+                    "status": row["status"],
+                    "recent_online_pic": row["recent_online_pic"],
+                    "is_verified": row["is_verified"],
+                    "category_id": row["category_id"],
+                    "vehicle_id": row["vehicle_id"],
+                    "city_id": row["city_id"],
+                    "aadhar_no": row["aadhar_no"],
+                    "pan_card_no": row["pan_card_no"],
+                    "house_no": row["house_no"],
+                    "city_name": row["city_name"],
+                    "full_address": row["full_address"],
+                    "gender": row["gender"],
+                    "owner_id": row["owner_id"],
+                    "aadhar_card_front": row["aadhar_card_front"],
+                    "aadhar_card_back": row["aadhar_card_back"],
+                    "pan_card_front": row["pan_card_front"],
+                    "pan_card_back": row["pan_card_back"],
+                    "license_front": row["license_front"],
+                    "license_back": row["license_back"],
+                    "insurance_image": row["insurance_image"],
+                    "noc_image": row["noc_image"],
+                    "pollution_certificate_image": row["pollution_certificate_image"],
+                    "rc_image": row["rc_image"],
+                    "vehicle_image": row["vehicle_image"],
+                    "vehicle_plate_image": row["vehicle_plate_image"],
+                    "category_name": row["category_name"],
+                    "vehicle_name": row["vehicle_name"],
+                    "category_type": row["category_type"],
+                    "driving_license_no": row["driving_license_no"],
+                    "vehicle_plate_no": row["vehicle_plate_no"],
+                    "rc_no": row["rc_no"],
+                    "insurance_no": row["insurance_no"],
+                    "noc_no": row["noc_no"],
+                    "owner_photo": row["owner_photo"],
+                    "owner_name": row["owner_name"],
+                    "owner_mobile_no": row["owner_mobile_no"],
+                    "owner_house_no": row["owner_house_no"],
+                    "owner_city_name": row["owner_city_name"],
+                    "owner_address": row["owner_address"],
+                    "owner_profile_photo": row["owner_profile_photo"],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"all_goods_drivers": mapped_results}, status=200)
 
         except Exception as err:
-            print("Error executing query", err)
-            if str(err) == "No Data Found":
-                return JsonResponse({"message": "No Data Found"}, status=404)
-            else:
-                return JsonResponse({"message": "Internal Server Error"}, status=500)
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-@csrf_exempt
+@csrf_exempt  # Disable CSRF protection for this view
 def all_cab_drivers(request):
     if request.method == "POST":
         try:
@@ -2092,18 +2298,74 @@ def all_cab_drivers(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"all_cab_drivers": result}, status=200)
+            # Map each row to keep the original column names
+            mapped_results = [
+                {
+                    "cab_driver_id": row["cab_driver_id"],
+                    "driver_first_name": row["driver_first_name"],
+                    "profile_pic": row["profile_pic"],
+                    "is_online": row["is_online"],
+                    "ratings": row["ratings"],
+                    "mobile_no": row["mobile_no"],
+                    "registration_date": row["registration_date"],
+                    "time": row["time"],
+                    "r_lat": row["r_lat"],
+                    "r_lng": row["r_lng"],
+                    "current_lat": row["current_lat"],
+                    "current_lng": row["current_lng"],
+                    "status": row["status"],
+                    "recent_online_pic": row["recent_online_pic"],
+                    "is_verified": row["is_verified"],
+                    "category_id": row["category_id"],
+                    "vehicle_id": row["vehicle_id"],
+                    "city_id": row["city_id"],
+                    "aadhar_no": row["aadhar_no"],
+                    "pan_card_no": row["pan_card_no"],
+                    "house_no": row["house_no"],
+                    "city_name": row["city_name"],
+                    "full_address": row["full_address"],
+                    "gender": row["gender"],
+                    "owner_id": row["owner_id"],
+                    "aadhar_card_front": row["aadhar_card_front"],
+                    "aadhar_card_back": row["aadhar_card_back"],
+                    "pan_card_front": row["pan_card_front"],
+                    "pan_card_back": row["pan_card_back"],
+                    "license_front": row["license_front"],
+                    "license_back": row["license_back"],
+                    "insurance_image": row["insurance_image"],
+                    "noc_image": row["noc_image"],
+                    "pollution_certificate_image": row["pollution_certificate_image"],
+                    "rc_image": row["rc_image"],
+                    "vehicle_image": row["vehicle_image"],
+                    "vehicle_plate_image": row["vehicle_plate_image"],
+                    "category_name": row["category_name"],
+                    "vehicle_name": row["vehicle_name"],
+                    "category_type": row["category_type"],
+                    "driving_license_no": row["driving_license_no"],
+                    "vehicle_plate_no": row["vehicle_plate_no"],
+                    "rc_no": row["rc_no"],
+                    "insurance_no": row["insurance_no"],
+                    "noc_no": row["noc_no"],
+                    "owner_photo": row["owner_photo"],
+                    "owner_name": row["owner_name"],
+                    "owner_mobile_no": row["owner_mobile_no"],
+                    "owner_house_no": row["owner_house_no"],
+                    "owner_city_name": row["owner_city_name"],
+                    "owner_address": row["owner_address"],
+                    "owner_profile_photo": row["owner_profile_photo"],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"all_cab_drivers": mapped_results}, status=200)
 
         except Exception as err:
-            print("Error executing query", err)
-            if str(err) == "No Data Found":
-                return JsonResponse({"message": "No Data Found"}, status=404)
-            else:
-                return JsonResponse({"message": "Internal Server Error"}, status=500)
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-@csrf_exempt
+@csrf_exempt  # Disable CSRF protection for this view
 def all_jcb_crane_drivers(request):
     if request.method == "POST":
         try:
@@ -2135,14 +2397,70 @@ def all_jcb_crane_drivers(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"all_jcb_crane_drivers": result}, status=200)
+            # Map each row to keep the original column names
+            mapped_results = [
+                {
+                    "jcb_crane_driver_id": row["jcb_crane_driver_id"],
+                    "driver_name": row["driver_name"],
+                    "profile_pic": row["profile_pic"],
+                    "is_online": row["is_online"],
+                    "ratings": row["ratings"],
+                    "mobile_no": row["mobile_no"],
+                    "registration_date": row["registration_date"],
+                    "time": row["time"],
+                    "r_lat": row["r_lat"],
+                    "r_lng": row["r_lng"],
+                    "current_lat": row["current_lat"],
+                    "current_lng": row["current_lng"],
+                    "status": row["status"],
+                    "recent_online_pic": row["recent_online_pic"],
+                    "is_verified": row["is_verified"],
+                    "category_id": row["category_id"],
+                    "vehicle_id": row["vehicle_id"],
+                    "city_id": row["city_id"],
+                    "aadhar_no": row["aadhar_no"],
+                    "pan_card_no": row["pan_card_no"],
+                    "house_no": row["house_no"],
+                    "city_name": row["city_name"],
+                    "full_address": row["full_address"],
+                    "gender": row["gender"],
+                    "owner_id": row["owner_id"],
+                    "aadhar_card_front": row["aadhar_card_front"],
+                    "aadhar_card_back": row["aadhar_card_back"],
+                    "pan_card_front": row["pan_card_front"],
+                    "pan_card_back": row["pan_card_back"],
+                    "license_front": row["license_front"],
+                    "license_back": row["license_back"],
+                    "insurance_image": row["insurance_image"],
+                    "noc_image": row["noc_image"],
+                    "pollution_certificate_image": row["pollution_certificate_image"],
+                    "rc_image": row["rc_image"],
+                    "vehicle_image": row["vehicle_image"],
+                    "vehicle_plate_image": row["vehicle_plate_image"],
+                    "category_name": row["category_name"],
+                    "vehicle_name": row["vehicle_name"],
+                    "category_type": row["category_type"],
+                    "driving_license_no": row["driving_license_no"],
+                    "vehicle_plate_no": row["vehicle_plate_no"],
+                    "rc_no": row["rc_no"],
+                    "insurance_no": row["insurance_no"],
+                    "noc_no": row["noc_no"],
+                    "owner_photo": row["owner_photo"],
+                    "owner_name": row["owner_name"],
+                    "owner_mobile_no": row["owner_mobile_no"],
+                    "owner_house_no": row["owner_house_no"],
+                    "owner_city_name": row["owner_city_name"],
+                    "owner_address": row["owner_address"],
+                    "owner_profile_photo": row["owner_profile_photo"],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"all_jcb_crane_drivers": mapped_results}, status=200)
 
         except Exception as err:
-            print("Error executing query", err)
-            if str(err) == "No Data Found":
-                return JsonResponse({"message": "No Data Found"}, status=404)
-            else:
-                return JsonResponse({"message": "Internal Server Error"}, status=500)
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
