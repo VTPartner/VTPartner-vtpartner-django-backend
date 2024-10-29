@@ -5,5 +5,5 @@ app_name = 'dashboard_app'
 
 urlpatterns = [
     #Admin Login
-    path('',views.login_view,name='login'),
+    path('api/',views.login_view,name='login'),
 ]
