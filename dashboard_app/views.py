@@ -49,7 +49,7 @@ def login_view(request):
             }
             return JsonResponse(response_data, status=200)
         else:
-            return JsonResponse({'message': 'Invalid credentials, please try again'}, status=401)
+            return JsonResponse({'message': 'No Data Found'}, status=404)
 
     # If not a POST request, you can return a different response
     return JsonResponse({'message': 'Method not allowed'}, status=405)
