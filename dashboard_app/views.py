@@ -292,7 +292,22 @@ def all_allowed_cities(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"cities": result}, status=200)
+            # Map the results to a list of dictionaries with meaningful keys
+            cities = [
+                {
+                    "city_id": row[0],
+                    "city_name": row[1],
+                    "pincode": row[2],
+                    "bg_image": row[3],
+                    "time": row[4],
+                    "pincode_until": row[5],
+                    "description": row[6],
+                    "status": row[7],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"cities": cities}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
