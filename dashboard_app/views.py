@@ -188,7 +188,7 @@ def login_view(request):
         password = data.get('password')
         
         # Use parameterized query to prevent SQL injection
-        query = "SELECT admin_id, admin_name, email, password FROM vtpartner.admintbl WHERE email = '"+str(email)+"' AND password = '"+str(password)+"'"
+        query = "SELECT admin_id, admin_name, email, password,admin_role FROM vtpartner.admintbl WHERE email = '"+str(email)+"' AND password = '"+str(password)+"'"
         user_data = execute_raw_query_fetch_one(query)  # Pass parameters as a tuple
         
         if user_data:
@@ -199,8 +199,9 @@ def login_view(request):
             response_data = {
                 'token': 'your_generated_jwt_token_here',  # You need to generate a JWT token
                 'user': {
-                    'admin_id': user_data[0],
-                    'admin_name': user_data[1],
+                    'id': user_data[0],
+                    'role':user_data[3],
+                    'name': user_data[1],
                     'email': user_data[2],
                 },
             }
