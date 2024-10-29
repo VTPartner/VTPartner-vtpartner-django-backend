@@ -214,7 +214,8 @@ def login_view(request):
 @csrf_exempt
 def all_branches(request):
     if request.method == "POST":
-        admin_id = request.POST.get("admin_id")
+        data = json.loads(request.body)
+        admin_id = data.get("admin_id")
 
         # Verify token
         # token_verified = verify_token(request)  # Adjust this function as per your implementation
