@@ -7,6 +7,8 @@ urlpatterns = [
     #Admin Login
     path('login',views.login_view,name='login'),
     #Admin Login
+    path('upload',views.upload_images,name='upload'),
+    #Admin Login
     path('all_branches',views.all_branches,name='all_branches'),
     #Admin Login
     path('all_allowed_cities',views.all_allowed_cities,name='all_allowed_cities'),
