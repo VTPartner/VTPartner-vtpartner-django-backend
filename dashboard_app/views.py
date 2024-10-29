@@ -19,6 +19,7 @@ import re
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import IntegrityError
+from django.conf import settings
 
 
 from PIL import Image  # Pillow library for image processing
@@ -139,7 +140,37 @@ def insert_query(query, params):
     except Exception as e:
         print("Error executing query:", e)
         raise
-    
+
+def upload_images(uploaded_image):
+    # Generate a unique identifier for the image
+    unique_identifier = str(uuid.uuid4())
+
+    # Extract the file extension from the uploaded image
+    file_extension = mimetypes.guess_extension(uploaded_image.content_type)
+
+    # Construct the custom image name with the unique identifier and original extension
+    custom_image_name = f'img_{unique_identifier}{file_extension}'
+    # Assuming you have a MEDIA_ROOT where the images will be stored
+    file_path = os.path.join(settings.MEDIA_ROOT, custom_image_name)
+
+    # Open the uploaded image using Pillow
+    img = Image.open(uploaded_image)
+    img_resized = img.resize((300, 300))
+    # Save the resized image
+    img_resized.save(file_path)
+
+    # Assuming you have a MEDIA_URL configured
+    image_url = os.path.join(settings.MEDIA_URL, custom_image_name)
+    print(f'Uploaded Image URL: {image_url}')
+    return image_url
+
+def epochToDateTime(epoch):
+    datetime_obj = datetime.utcfromtimestamp(epoch)
+    gmt_plus_0530 = pytz.timezone('Asia/Kolkata')
+    datetime_obj_gmt_plus_0530 = datetime_obj.replace(tzinfo=pytz.utc).astimezone(gmt_plus_0530)
+    deliveryEpoch = datetime_obj_gmt_plus_0530.strftime('%Y-%m-%d %I:%M:%S %p')
+    return deliveryEpoch
+
 # Create your views here.
 @csrf_exempt
 def login_view(request):

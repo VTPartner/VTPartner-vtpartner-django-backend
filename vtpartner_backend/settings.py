@@ -139,7 +139,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL = 'http://vtpartner.org/media/'
+MEDIA_URL = 'https://vtpartner.org/media/'
 MEDIA_ROOT = '/var/www/vtpartner/media/'
 #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
 
