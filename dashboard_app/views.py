@@ -16,11 +16,14 @@ import requests
 import json
 import time
 import re
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt
 
 
 from PIL import Image  # Pillow library for image processing
 
 # Create your views here.
+@csrf_exempt
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get('email')
