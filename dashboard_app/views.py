@@ -244,9 +244,23 @@ def all_branches(request):
 
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
+            
+            # Map the results to a list of dictionaries with meaningful keys
+            branches = [
+                {
+                    "branch_id": row[0],
+                    "branch_name": row[1],
+                    "location": row[2],
+                    "city_id": row[3],
+                    "reg_date": row[4],
+                    "creation_time": row[5],
+                    "branch_status": row[6],
+                }
+                for row in result
+            ]
 
             # Return user branch data
-            return JsonResponse({"branches": result}, status=200)
+            return JsonResponse({"branches": branches}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
