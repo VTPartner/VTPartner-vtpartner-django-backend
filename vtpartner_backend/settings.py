@@ -130,5 +130,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = 'http://vtpartner.org/media/'
 MEDIA_ROOT = '/var/www/vtpartner/media/'
-
-NEW_MEDIA = ''
