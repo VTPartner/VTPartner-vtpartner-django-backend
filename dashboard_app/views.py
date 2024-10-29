@@ -199,8 +199,8 @@ def login_view(request):
             response_data = {
                 'token': 'your_generated_jwt_token_here',  # You need to generate a JWT token
                 'user': {
-                    'id': user_data[0],
-                    'name': user_data[1],
+                    'admin_id': user_data[0],
+                    'admin_name': user_data[1],
                     'email': user_data[2],
                 },
             }
