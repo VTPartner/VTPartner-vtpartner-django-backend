@@ -30,8 +30,8 @@ def login_view(request):
         password = request.POST.get('password')
         
         # Use parameterized query to prevent SQL injection
-        query = "SELECT admin_id, admin_name, email, password FROM vtpartner.admintbl WHERE email = %s AND password = %s"
-        user_data = execute_raw_query_fetch_one(query, (email, password))  # Pass parameters as a tuple
+        query = "SELECT admin_id, admin_name, email, password FROM vtpartner.admintbl WHERE email = '"+str(email)+"' AND password = '"+str(password)+"'"
+        user_data = execute_raw_query_fetch_one(query)  # Pass parameters as a tuple
         
         if user_data:
             # User is authorized
