@@ -427,11 +427,9 @@ def all_allowed_pincodes(request):
                     creation_time, 
                     allowed_pincodes_tbl.status 
                 FROM 
-                    vtpartner.allowed_pincodes_tbl, 
-                    vtpartner.available_citys_tbl 
+                    vtpartner.allowed_pincodes_tbl 
                 WHERE 
-                    available_citys_tbl.city_id = allowed_pincodes_tbl.city_id 
-                    AND allowed_pincodes_tbl.city_id = %s 
+                    allowed_pincodes_tbl.city_id = %s 
                 ORDER BY 
                     pincode_id DESC
             """
@@ -440,7 +438,18 @@ def all_allowed_pincodes(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"pincodes": result}, status=200)
+            # Map the results to a list of dictionaries
+            pincodes = [
+                {
+                    "pincode_id": row[0],
+                    "pincode": row[1],
+                    "creation_time": row[2],
+                    "status": row[3],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"pincodes": pincodes}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
