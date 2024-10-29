@@ -37,15 +37,6 @@ def login_view(request):
         if user_data:
             # User is authorized
             print('User is Authorized')
-            request.session['usrname'] = user_data[0]
-            request.session['username'] = user_data[1]
-            request.session['password'] = user_data[2]
-            request.session['userid'] = user_data[3]
-            request.session['is_logged_in'] = True
-            
-            # Setting the session to expire after one day (86400 seconds)
-            request.session.set_expiry(86400)
-            print('All Session Data Saved') 
             
             # Create response data
             response_data = {
