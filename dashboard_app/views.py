@@ -1768,7 +1768,7 @@ def enquiries_all(request):
             values = []
 
             result = select_query(query)  # Assuming select_query is defined
-
+            print("result::",result)
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
