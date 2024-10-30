@@ -729,7 +729,6 @@ def edit_service(request):
             category_id = data.get("category_id")
             category_name = data.get("category_name")
             category_type_id = data.get("category_type_id")
-            # category_image = data.get("category_image")
             category_image = data.get("category_image")
             description = data.get("description")
             
@@ -750,8 +749,7 @@ def edit_service(request):
                 print(f"Missing required fields: {', '.join(missing_fields)}")
                 return JsonResponse({"message": f"Missing required fields: {', '.join(missing_fields)}"}, status=400)
 
-            if category_image:
-                category_image = upload_images2(category_image)
+            
             # Validate to avoid duplication
             query_duplicate_check = """
                 SELECT COUNT(*) FROM vtpartner.categorytbl WHERE category_name ILIKE %s AND category_id != %s
