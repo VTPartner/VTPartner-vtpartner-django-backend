@@ -172,6 +172,7 @@ def upload_image(request):
         fs = FileSystemStorage()
         filename = fs.save(file.name, file)
         file_url = fs.url(filename)
+        print("file_url::",file_url)
         return JsonResponse({'image_url': file_url})
     else:
         return JsonResponse({'error': 'Invalid request'})
