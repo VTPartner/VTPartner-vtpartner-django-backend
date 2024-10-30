@@ -545,7 +545,7 @@ def add_new_pincode(request):
             result = select_query(query_duplicate_check, values_duplicate_check)
 
             # Check if the result is greater than 0 to determine if the pincode already exists
-            if result[0]['count'] > 0:
+            if result[0][0] > 0:
                 return JsonResponse({"message": "Pincode already exists"}, status=409)
 
             # If pincode is not duplicate, proceed to insert
@@ -596,7 +596,7 @@ def edit_pincode(request):
             result = select_query(query_duplicate_check, values_duplicate_check)
 
             # Check if the result is greater than 0 to determine if the pincode already exists
-            if result[0]['count'] > 0:
+            if result[0][0] > 0:
                 return JsonResponse({"message": "Pincode already exists"}, status=409)
 
             # Update the pincode
@@ -725,7 +725,7 @@ def add_service(request):
             """
             result = select_query(query_duplicate_check, [category_name])  # Assuming select_query is defined
 
-            if result and result[0]['count'] > 0:
+            if result and result[0][0] > 0:
                 return JsonResponse({"message": "Service Name already exists"}, status=409)
 
             # If not duplicate, proceed to insert
@@ -927,7 +927,7 @@ def add_vehicle(request):
             result = select_query(query_duplicate_check, [vehicle_name])  # Assuming select_query is defined
 
             # Check if the result is greater than 0 to determine if the vehicle name already exists
-            if result and result[0]['count'] > 0:
+            if result and result[0][0] > 0:
                 return JsonResponse({"message": "Vehicle Name already exists"}, status=409)
 
             # If vehicle name is not duplicate, proceed to insert
@@ -998,7 +998,7 @@ def edit_vehicle(request):
             result = select_query(query_duplicate_check, [vehicle_name, vehicle_id])  # Assuming select_query is defined
 
             # Check if the result is greater than 0 to determine if the vehicle name already exists
-            if result and result[0]['count'] > 0:
+            if result and result[0][0] > 0:
                 return JsonResponse({"message": "Vehicle Name already exists"}, status=409)
 
             # If vehicle name is not duplicate, proceed to update
@@ -1348,7 +1348,7 @@ def add_sub_category(request):
             result = select_query(query_duplicate_check, values_duplicate_check)  # Assuming select_query is defined
 
             # Check if the result is greater than 0 to determine if the sub-category already exists
-            if result and result[0]['count'] > 0:
+            if result and result[0][0] > 0:
                 return JsonResponse({"message": "Sub Category Name already exists"}, status=409)
 
             # Proceed to insert the new sub-category
@@ -1406,7 +1406,7 @@ def edit_sub_category(request):
             result = select_query(query_duplicate_check, values_duplicate_check)  # Assuming select_query is defined
 
             # Check if the result is greater than 0 to determine if the sub-category already exists
-            if result and result[0]['count'] > 0:
+            if result and result[0][0] > 0:
                 return JsonResponse({"message": "Sub Category Name already exists"}, status=409)
 
             # Proceed to update the sub-category
@@ -1517,7 +1517,7 @@ def add_other_service(request):
             result = select_query(query_duplicate_check, values_duplicate_check)  # Assuming select_query is defined
 
             # Check if the result is greater than 0 to determine if the service name already exists
-            if result and result[0]['count'] > 0:
+            if result and result[0][0] > 0:
                 return JsonResponse({"message": "Service Name already exists"}, status=409)
 
             # If service name is not duplicate, proceed to insert
@@ -1576,7 +1576,7 @@ def edit_other_service(request):
             result = select_query(query_duplicate_check, values_duplicate_check)  # Assuming select_query is defined
 
             # Check if the result is greater than 0 to determine if the service name already exists
-            if result and result[0]['count'] > 0:
+            if result and result[0][0] > 0:
                 return JsonResponse({"message": "Service Name already exists"}, status=409)
 
             # If service name is not duplicate, proceed to update

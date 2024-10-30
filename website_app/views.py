@@ -27,6 +27,7 @@ mapKey = "AIzaSyAAlmEtjJOpSaJ7YVkMKwdSuMTbTx39l_o"
 # Utility function to check for missing fields
 def check_missing_fields(fields):
     missing_fields = [field for field, value in fields.items() if not value]
+    print("missing_fields::",missing_fields)
     return missing_fields if missing_fields else None
 
 #Common Functions
