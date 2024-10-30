@@ -141,11 +141,13 @@ def insert_query(query, params):
         print("Error executing query:", e)
         raise
 
+@csrf_exempt
 def upload_images(request):
     try:
         if request.method == "POST":
             data = json.loads(request.body)
             uploaded_image = data.get("vtPartnerImage")
+            print("uploaded_image_file_path=>",uploaded_image)
             # Generate a unique identifier for the image
             unique_identifier = str(uuid.uuid4())
 
