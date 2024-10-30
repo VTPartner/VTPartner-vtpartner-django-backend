@@ -145,8 +145,8 @@ def insert_query(query, params):
 def upload_images(request):
     try:
         if request.method == "POST":
-            data = json.loads(request.body)
-            uploaded_image = data.get("vtPartnerImage")
+            # Access the uploaded image file from request.FILES
+            uploaded_image = request.FILES.get("vtPartnerImage")
             print("uploaded_image_file_path=>",uploaded_image)
             # Generate a unique identifier for the image
             unique_identifier = str(uuid.uuid4())
@@ -169,7 +169,7 @@ def upload_images(request):
             image_url = os.path.join(settings.MEDIA_URL, custom_image_name)
             print(f'Uploaded Image URL: {image_url}')
     except Exception as err:
-            print("Error executing query:", err)
+            print("Error Uploading Image:", err)
             return JsonResponse({"message": "An error occurred"}, status=500)
     return JsonResponse({"image_url": image_url}, status=200)
     
