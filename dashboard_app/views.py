@@ -724,6 +724,7 @@ def edit_service(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)  # Parse JSON request body
+            print("data::",data)
             category_id = data.get("category_id")
             category_name = data.get("category_name")
             category_type_id = data.get("category_type_id")
