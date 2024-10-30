@@ -756,7 +756,7 @@ def edit_service(request):
             """
             result = select_query(query_duplicate_check, [category_name, category_id])  # Assuming select_query is defined
 
-            if result and result[0]['count'] > 0:
+            if result and result[0][0] > 0:
                 return JsonResponse({"message": "Service Name already exists"}, status=409)
 
             # If not duplicate, proceed to update
