@@ -391,9 +391,15 @@ def update_allowed_city(request):
             }
 
             # Check for missing fields
-            missing_fields = [field for field, value in required_fields.items() if value is None]
+             # Use the utility function to check for missing fields
+            missing_fields = check_missing_fields(required_fields)
+    
+            # If there are missing fields, return an error response
             if missing_fields:
-                return JsonResponse({"message": f"Missing required fields: {', '.join(missing_fields)}"}, status=400)
+                return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
 
             query = """
                 UPDATE vtpartner.available_citys_tbl 
