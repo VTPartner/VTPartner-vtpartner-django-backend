@@ -165,18 +165,19 @@ def upload_images2(uploaded_image):
     print(f'Uploaded Image URL: {image_url}')
     return image_url
 
-
 @csrf_exempt
 def upload_images(request):
     if request.method == "POST":
-        # Debugging
-        print("Files in request:", request.FILES)  # Log the files received
+        # Debugging: Log the contents of request.FILES
+        print("Files in request:", request.FILES)
 
         # Access the uploaded image file from request.FILES
-        uploaded_image = request.FILES.get("vtPartnerImage")
+        uploaded_images = request.FILES.getlist("vtPartnerImage")  # Get a list of files
 
-        if uploaded_image is None:
+        if not uploaded_images:
             return JsonResponse({"message": "No image provided"}, status=400)
+
+        uploaded_image = uploaded_images[0]  # Get the first image file
 
         try:
             # Check if uploaded_image has a size
