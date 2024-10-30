@@ -722,6 +722,8 @@ def add_service(request):
 @csrf_exempt  # Disable CSRF protection for this view
 def edit_service(request):
     if request.method == "POST":
+        data = json.loads(request.body)  # Parse JSON request body
+        print("data::",data)
         try:
             data = json.loads(request.body)  # Parse JSON request body
             print("data::",data)
