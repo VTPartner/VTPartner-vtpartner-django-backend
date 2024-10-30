@@ -169,17 +169,20 @@ def upload_images2(uploaded_image):
 @csrf_exempt
 def upload_images(request):
     if request.method == "POST":
-        # Access the uploaded image file from request.FILES
-        print("Files in request:", request.FILES)  # Debugging line
-        uploaded_image = request.FILES.get("vtPartnerImage")
-        
         # Debugging
-        print("uploaded_image_file_path=>", uploaded_image)
+        print("Files in request:", request.FILES)  # Log the files received
+
+        # Access the uploaded image file from request.FILES
+        uploaded_image = request.FILES.get("vtPartnerImage")
 
         if uploaded_image is None:
             return JsonResponse({"message": "No image provided"}, status=400)
 
         try:
+            # Check if uploaded_image has a size
+            if uploaded_image.size == 0:
+                return JsonResponse({"message": "Uploaded file is empty"}, status=400)
+
             # Open and verify the uploaded image
             img = Image.open(uploaded_image)
             img.verify()  # Verify that it is an image
@@ -199,7 +202,7 @@ def upload_images(request):
             print(f'Uploaded Image URL: {image_url}')
 
             return JsonResponse({"image_url": image_url}, status=200)
-        
+
         except Exception as img_err:
             print("Error processing image:", img_err)
             return JsonResponse({"message": "Invalid image file"}, status=400)
