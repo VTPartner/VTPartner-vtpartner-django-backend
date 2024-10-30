@@ -170,6 +170,7 @@ def upload_images2(uploaded_image):
 def upload_images(request):
     if request.method == "POST":
         # Access the uploaded image file from request.FILES
+        print("Files in request:", request.FILES)  # Debugging line
         uploaded_image = request.FILES.get("vtPartnerImage")
         
         # Debugging
