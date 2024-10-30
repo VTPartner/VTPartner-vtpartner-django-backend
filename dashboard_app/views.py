@@ -141,6 +141,30 @@ def insert_query(query, params):
         print("Error executing query:", e)
         raise
 
+def upload_images2(uploaded_image):
+    # Generate a unique identifier for the image
+    unique_identifier = str(uuid.uuid4())
+
+    # Extract the file extension from the uploaded image
+    file_extension = mimetypes.guess_extension(uploaded_image.content_type)
+
+    # Construct the custom image name with the unique identifier and original extension
+    custom_image_name = f'img_{unique_identifier}{file_extension}'
+    # Assuming you have a MEDIA_ROOT where the images will be stored
+    file_path = os.path.join(settings.MEDIA_ROOT, custom_image_name)
+
+    # Open the uploaded image using Pillow
+    img = Image.open(uploaded_image)
+    img_resized = img.resize((300, 300))
+    # Save the resized image
+    img_resized.save(file_path)
+
+    # Assuming you have a MEDIA_URL configured
+    image_url = os.path.join(settings.MEDIA_URL, custom_image_name)
+    print(f'Uploaded Image URL: {image_url}')
+    return image_url
+
+
 @csrf_exempt
 def upload_images(request):
     if request.method == "POST":
@@ -702,8 +726,11 @@ def edit_service(request):
             category_id = data.get("category_id")
             category_name = data.get("category_name")
             category_type_id = data.get("category_type_id")
-            category_image = data.get("category_image")
+            # category_image = data.get("category_image")
+            category_image = request.FILE.get("category_image")
             description = data.get("description")
+            
+            
 
             # List of required fields
             required_fields = {
@@ -720,6 +747,8 @@ def edit_service(request):
                 print(f"Missing required fields: {', '.join(missing_fields)}")
                 return JsonResponse({"message": f"Missing required fields: {', '.join(missing_fields)}"}, status=400)
 
+            if category_image:
+                category_image = upload_images2(category_image)
             # Validate to avoid duplication
             query_duplicate_check = """
                 SELECT COUNT(*) FROM vtpartner.categorytbl WHERE category_name ILIKE %s AND category_id != %s
