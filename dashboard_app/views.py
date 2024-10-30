@@ -142,6 +142,7 @@ def insert_query(query, params):
         raise
 
 def upload_images2(uploaded_image):
+    print("uploaded_image::::",uploaded_image)
     # Generate a unique identifier for the image
     unique_identifier = str(uuid.uuid4())
 
