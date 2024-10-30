@@ -143,38 +143,42 @@ def insert_query(query, params):
 
 @csrf_exempt
 def upload_images(request):
-    try:
-        if request.method == "POST":
-            uploaded_image = request.FILES.get("vtPartnerImage")
-            print("uploaded_image_file_path=>", uploaded_image)
+    if request.method == "POST":
+        # Access the uploaded image file from request.FILES
+        uploaded_image = request.FILES.get("vtPartnerImage")
+        
+        # Debugging
+        print("uploaded_image_file_path=>", uploaded_image)
 
-            if uploaded_image is None:
-                return JsonResponse({"message": "No image provided"}, status=400)
+        if uploaded_image is None:
+            return JsonResponse({"message": "No image provided"}, status=400)
 
-            try:
-                # Open the uploaded image using Pillow
-                img = Image.open(uploaded_image)
-                img.verify()  # Verify that it is an image
-                img_resized = img.resize((300, 300))
+        try:
+            # Open and verify the uploaded image
+            img = Image.open(uploaded_image)
+            img.verify()  # Verify that it is an image
+            img_resized = img.resize((300, 300))
 
-                # Save the resized image
-                unique_identifier = str(uuid.uuid4())
-                file_extension = mimetypes.guess_extension(uploaded_image.content_type) or ".jpg"
-                custom_image_name = f'img_{unique_identifier}{file_extension}'
-                file_path = os.path.join(settings.MEDIA_ROOT, custom_image_name)
-                img_resized.save(file_path)
+            # Construct the file path for saving the image
+            unique_identifier = str(uuid.uuid4())
+            file_extension = mimetypes.guess_extension(uploaded_image.content_type) or ".jpg"
+            custom_image_name = f'img_{unique_identifier}{file_extension}'
+            file_path = os.path.join(settings.MEDIA_ROOT, custom_image_name)
 
-                # Assuming you have a MEDIA_URL configured
-                image_url = os.path.join(settings.MEDIA_URL, custom_image_name)
-                return JsonResponse({"image_url": image_url}, status=200)
+            # Save the resized image
+            img_resized.save(file_path)
 
-            except Exception as img_err:
-                print("Error processing image:", img_err)
-                return JsonResponse({"message": "Invalid image file"}, status=400)
+            # Assuming you have MEDIA_URL configured
+            image_url = os.path.join(settings.MEDIA_URL, custom_image_name)
+            print(f'Uploaded Image URL: {image_url}')
 
-    except Exception as err:
-        print("Error Uploading Image:", err)
-        return JsonResponse({"message": "An error occurred"}, status=500)
+            return JsonResponse({"image_url": image_url}, status=200)
+        
+        except Exception as img_err:
+            print("Error processing image:", img_err)
+            return JsonResponse({"message": "Invalid image file"}, status=400)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 
 def epochToDateTime(epoch):
