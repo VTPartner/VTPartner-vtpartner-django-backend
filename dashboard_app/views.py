@@ -20,7 +20,7 @@ from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import IntegrityError
 from django.conf import settings
-
+from django.core.files.storage import FileSystemStorage
 
 from PIL import Image  # Pillow library for image processing
 
@@ -165,6 +165,17 @@ def upload_images2(uploaded_image):
     print(f'Uploaded Image URL: {image_url}')
     return image_url
 
+@csrf_exempt
+def upload_image(request):
+    if request.method == 'POST':
+        file = request.FILES['image']  # Assuming the file is named 'image' in the form data
+        fs = FileSystemStorage()
+        filename = fs.save(file.name, file)
+        file_url = fs.url(filename)
+        return JsonResponse({'image_url': file_url})
+    else:
+        return JsonResponse({'error': 'Invalid request'})
+    
 @csrf_exempt
 def upload_images(request):
     if request.method == "POST":
