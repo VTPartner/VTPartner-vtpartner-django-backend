@@ -2164,7 +2164,7 @@ def check_handyman_existence(request):
             return JsonResponse({
                 "message": "An error occurred while checking handyman existence.",
                 "exists": False,
-            }, status=500)
+            }, status=200)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
