@@ -727,7 +727,7 @@ def edit_service(request):
             category_name = data.get("category_name")
             category_type_id = data.get("category_type_id")
             # category_image = data.get("category_image")
-            category_image = request.FILE.get("category_image")
+            category_image = data.get("category_image")
             description = data.get("description")
             
             
