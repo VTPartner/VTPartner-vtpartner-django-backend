@@ -584,8 +584,8 @@ def service_types(request):
             # Map each row to a dictionary with appropriate keys
             services_type_details = [
                 {
-                    "cat_type_id": row['cat_type_id'],
-                    "category_type": row['category_type']
+                    "cat_type_id": row[0],
+                    "category_type": row[1]
                 }
                 for row in result
             ]
@@ -628,13 +628,13 @@ def all_services(request):
             # Map each row to a dictionary with appropriate keys
             services_details = [
                 {
-                    "category_id": row['category_id'],
-                    "category_name": row['category_name'],
-                    "category_type_id": row['category_type_id'],
-                    "category_image": row['category_image'],
-                    "category_type": row['category_type'],
-                    "epoch": row['epoch'],
-                    "description": row['description'],
+                    "category_id": row[0],
+                    "category_name": row[1],
+                    "category_type_id": row[2],
+                    "category_image": row[3],
+                    "category_type": row[4],
+                    "epoch": row[5],
+                    "description": row[6],
                 }
                 for row in result
             ]
@@ -762,8 +762,8 @@ def vehicle_types(request):
             # Map each row to a dictionary with appropriate keys
             vehicle_type_details = [
                 {
-                    "vehicle_type_id": row['vehicle_type_id'],
-                    "vehicle_type_name": row['vehicle_type_name'],
+                    "vehicle_type_id": row[0],
+                    "vehicle_type_name": row[1],
                 }
                 for row in result
             ]
@@ -813,14 +813,14 @@ def all_vehicles(request):
             # Map each row to a dictionary with appropriate keys
             vehicle_details = [
                 {
-                    "vehicle_id": row['vehicle_id'],
-                    "vehicle_name": row['vehicle_name'],
-                    "weight": row['weight'],
-                    "vehicle_type_id": row['vehicle_type_id'],
-                    "vehicle_type_name": row['vehicle_type_name'],
-                    "description": row['description'],
-                    "image": row['image'],
-                    "size_image": row['size_image'],
+                    "vehicle_id": row[0],
+                    "vehicle_name": row[1],
+                    "weight": row[2],
+                    "vehicle_type_id": row[3],
+                    "vehicle_type_name": row[4],
+                    "description": row[5],
+                    "image": row[6],
+                    "size_image": row[7],
                 }
                 for row in result
             ]
@@ -1015,16 +1015,16 @@ def vehicle_prices(request):
             # Map each row to a dictionary for a clearer JSON response
             vehicle_price_details = [
                 {
-                    "price_id": row['price_id'],
-                    "city_id": row['city_id'],
-                    "vehicle_id": row['vehicle_id'],
-                    "starting_price_per_km": row['starting_price_per_km'],
-                    "minimum_time": row['minimum_time'],
-                    "price_type_id": row['price_type_id'],
-                    "city_name": row['city_name'],
-                    "price_type": row['price_type'],
-                    "bg_image": row['bg_image'],
-                    "time_created_at": row['time_created_at'],
+                    "price_id": row[0],
+                    "city_id": row[1],
+                    "vehicle_id": row[2],
+                    "starting_price_per_km": row[3],
+                    "minimum_time": row[4],
+                    "price_type_id": row[5],
+                    "city_name": row[6],
+                    "price_type": row[7],
+                    "bg_image": row[8],
+                    "time_created_at": row[9],
                 }
                 for row in result
             ]
@@ -1053,8 +1053,8 @@ def vehicle_price_types(request):
             # Map each row to a dictionary for a clearer JSON response
             vehicle_price_types = [
                 {
-                    "price_type_id": row['price_type_id'],
-                    "price_type": row['price_type'],
+                    "price_type_id": row[0],
+                    "price_type": row[1],
                 }
                 for row in result
             ]
@@ -1241,11 +1241,11 @@ def all_sub_categories(request):
             # Map each row to a dictionary for clearer response
             sub_categories_details = [
                 {
-                    "sub_cat_id": row['sub_cat_id'],
-                    "sub_cat_name": row['sub_cat_name'],
-                    "cat_id": row['cat_id'],
-                    "image": row['image'],
-                    "epoch_time": row['epoch_time'],
+                    "sub_cat_id": row[0],
+                    "sub_cat_name": row[1],
+                    "cat_id": row[2],
+                    "image": row[3],
+                    "epoch_time": row[4],
                 }
                 for row in result
             ]
@@ -1409,11 +1409,11 @@ def all_other_services(request):
             # Map each row to a dictionary for clearer response
             other_services_details = [
                 {
-                    "service_id": row['service_id'],
-                    "service_name": row['service_name'],
-                    "sub_cat_id": row['sub_cat_id'],
-                    "service_image": row['service_image'],
-                    "time_updated": row['time_updated'],
+                    "service_id": row[0],
+                    "service_name": row[1],
+                    "sub_cat_id": row[2],
+                    "service_image": row[3],
+                    "time_updated": row[4],
                 }
                 for row in result
             ]
@@ -1588,22 +1588,22 @@ def all_enquiries(request):
             # Map each row to a structured format for clarity
             all_enquiries_details = [
                 {
-                    "enquiry_id": row['enquiry_id'],
-                    "category_id": row['category_id'],
-                    "sub_cat_id": row['sub_cat_id'],
-                    "service_id": row['service_id'],
-                    "vehicle_id": row['vehicle_id'],
-                    "city_id": row['city_id'],
-                    "name": row['name'],
-                    "mobile_no": row['mobile_no'],
-                    "time_at": row['time_at'],
-                    "source_type": row['source_type'],
-                    "status": row['status'],
-                    "category_name": row['category_name'],
-                    "sub_cat_name": row['sub_cat_name'],
-                    "service_name": row['service_name'],
-                    "city_name": row['city_name'],
-                    "vehicle_name": row['vehicle_name'],
+                    "enquiry_id": row[0],
+                    "category_id": row[1],
+                    "sub_cat_id": row[2],
+                    "service_id": row[3],
+                    "vehicle_id": row[4],
+                    "city_id": row[5],
+                    "name": row[6],
+                    "mobile_no": row[7],
+                    "time_at": row[8],
+                    "source_type": row[9],
+                    "status": row[10],
+                    "category_name": row[11],
+                    "sub_cat_name": row[12],
+                    "service_name": row[13],
+                    "city_name": row[14],
+                    "vehicle_name": row[15],
                 }
                 for row in result
             ]
@@ -1654,10 +1654,10 @@ def all_gallery_images(request):
             # Map each row to a structured format for clarity
             gallery_images_data = [
                 {
-                    "gallery_id": row['gallery_id'],
-                    "image_url": row['image_url'],
-                    "category_type": row['category_type'],
-                    "epoch": row['epoch'],
+                    "gallery_id": row[0],
+                    "image_url": row[1],
+                    "category_type": row[2],
+                    "epoch": row[3],
                 }
                 for row in result
             ]
@@ -2100,7 +2100,8 @@ def check_driver_existence(request):
             print("Error checking driver existence:", error)
             return JsonResponse({
                 "message": "An error occurred while checking driver existence.",
-            }, status=500)
+                "exists": False,
+            }, status=200)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
@@ -2212,58 +2213,58 @@ def all_goods_drivers(request):
             # Map each row to the same column names from the database
             mapped_results = [
                 {
-                    "goods_driver_id": row["goods_driver_id"],
-                    "driver_first_name": row["driver_first_name"],
-                    "profile_pic": row["profile_pic"],
-                    "is_online": row["is_online"],
-                    "ratings": row["ratings"],
-                    "mobile_no": row["mobile_no"],
-                    "registration_date": row["registration_date"],
-                    "time": row["time"],
-                    "r_lat": row["r_lat"],
-                    "r_lng": row["r_lng"],
-                    "current_lat": row["current_lat"],
-                    "current_lng": row["current_lng"],
-                    "status": row["status"],
-                    "recent_online_pic": row["recent_online_pic"],
-                    "is_verified": row["is_verified"],
-                    "category_id": row["category_id"],
-                    "vehicle_id": row["vehicle_id"],
-                    "city_id": row["city_id"],
-                    "aadhar_no": row["aadhar_no"],
-                    "pan_card_no": row["pan_card_no"],
-                    "house_no": row["house_no"],
-                    "city_name": row["city_name"],
-                    "full_address": row["full_address"],
-                    "gender": row["gender"],
-                    "owner_id": row["owner_id"],
-                    "aadhar_card_front": row["aadhar_card_front"],
-                    "aadhar_card_back": row["aadhar_card_back"],
-                    "pan_card_front": row["pan_card_front"],
-                    "pan_card_back": row["pan_card_back"],
-                    "license_front": row["license_front"],
-                    "license_back": row["license_back"],
-                    "insurance_image": row["insurance_image"],
-                    "noc_image": row["noc_image"],
-                    "pollution_certificate_image": row["pollution_certificate_image"],
-                    "rc_image": row["rc_image"],
-                    "vehicle_image": row["vehicle_image"],
-                    "vehicle_plate_image": row["vehicle_plate_image"],
-                    "category_name": row["category_name"],
-                    "vehicle_name": row["vehicle_name"],
-                    "category_type": row["category_type"],
-                    "driving_license_no": row["driving_license_no"],
-                    "vehicle_plate_no": row["vehicle_plate_no"],
-                    "rc_no": row["rc_no"],
-                    "insurance_no": row["insurance_no"],
-                    "noc_no": row["noc_no"],
-                    "owner_photo": row["owner_photo"],
-                    "owner_name": row["owner_name"],
-                    "owner_mobile_no": row["owner_mobile_no"],
-                    "owner_house_no": row["owner_house_no"],
-                    "owner_city_name": row["owner_city_name"],
-                    "owner_address": row["owner_address"],
-                    "owner_profile_photo": row["owner_profile_photo"],
+                    "goods_driver_id": row[0],
+                    "driver_first_name": row[1],
+                    "profile_pic": row[2],
+                    "is_online": row[3],
+                    "ratings": row[4],
+                    "mobile_no": row[5],
+                    "registration_date": row[6],
+                    "time": row[7],
+                    "r_lat": row[8],
+                    "r_lng": row[9],
+                    "current_lat": row[10],
+                    "current_lng": row[11],
+                    "status": row[12],
+                    "recent_online_pic": row[13],
+                    "is_verified": row[14],
+                    "category_id": row[15],
+                    "vehicle_id": row[16],
+                    "city_id": row[17],
+                    "aadhar_no": row[18],
+                    "pan_card_no": row[19],
+                    "house_no": row[20],
+                    "city_name": row[21],
+                    "full_address": row[22],
+                    "gender": row[23],
+                    "owner_id": row[24],
+                    "aadhar_card_front": row[25],
+                    "aadhar_card_back": row[26],
+                    "pan_card_front": row[27],
+                    "pan_card_back": row[28],
+                    "license_front": row[29],
+                    "license_back": row[30],
+                    "insurance_image": row[31],
+                    "noc_image": row[32],
+                    "pollution_certificate_image": row[33],
+                    "rc_image": row[34],
+                    "vehicle_image": row[35],
+                    "vehicle_plate_image": row[36],
+                    "category_name": row[37],
+                    "vehicle_name": row[38],
+                    "category_type": row[39],
+                    "driving_license_no": row[40],
+                    "vehicle_plate_no": row[41],
+                    "rc_no": row[42],
+                    "insurance_no": row[43],
+                    "noc_no": row[44],
+                    "owner_photo": row[45],
+                    "owner_name": row[46],
+                    "owner_mobile_no": row[47],
+                    "owner_house_no": row[48],
+                    "owner_city_name": row[49],
+                    "owner_address": row[50],
+                    "owner_profile_photo": row[51],
                 }
                 for row in result
             ]
@@ -2311,58 +2312,58 @@ def all_cab_drivers(request):
             # Map each row to keep the original column names
             mapped_results = [
                 {
-                    "cab_driver_id": row["cab_driver_id"],
-                    "driver_first_name": row["driver_first_name"],
-                    "profile_pic": row["profile_pic"],
-                    "is_online": row["is_online"],
-                    "ratings": row["ratings"],
-                    "mobile_no": row["mobile_no"],
-                    "registration_date": row["registration_date"],
-                    "time": row["time"],
-                    "r_lat": row["r_lat"],
-                    "r_lng": row["r_lng"],
-                    "current_lat": row["current_lat"],
-                    "current_lng": row["current_lng"],
-                    "status": row["status"],
-                    "recent_online_pic": row["recent_online_pic"],
-                    "is_verified": row["is_verified"],
-                    "category_id": row["category_id"],
-                    "vehicle_id": row["vehicle_id"],
-                    "city_id": row["city_id"],
-                    "aadhar_no": row["aadhar_no"],
-                    "pan_card_no": row["pan_card_no"],
-                    "house_no": row["house_no"],
-                    "city_name": row["city_name"],
-                    "full_address": row["full_address"],
-                    "gender": row["gender"],
-                    "owner_id": row["owner_id"],
-                    "aadhar_card_front": row["aadhar_card_front"],
-                    "aadhar_card_back": row["aadhar_card_back"],
-                    "pan_card_front": row["pan_card_front"],
-                    "pan_card_back": row["pan_card_back"],
-                    "license_front": row["license_front"],
-                    "license_back": row["license_back"],
-                    "insurance_image": row["insurance_image"],
-                    "noc_image": row["noc_image"],
-                    "pollution_certificate_image": row["pollution_certificate_image"],
-                    "rc_image": row["rc_image"],
-                    "vehicle_image": row["vehicle_image"],
-                    "vehicle_plate_image": row["vehicle_plate_image"],
-                    "category_name": row["category_name"],
-                    "vehicle_name": row["vehicle_name"],
-                    "category_type": row["category_type"],
-                    "driving_license_no": row["driving_license_no"],
-                    "vehicle_plate_no": row["vehicle_plate_no"],
-                    "rc_no": row["rc_no"],
-                    "insurance_no": row["insurance_no"],
-                    "noc_no": row["noc_no"],
-                    "owner_photo": row["owner_photo"],
-                    "owner_name": row["owner_name"],
-                    "owner_mobile_no": row["owner_mobile_no"],
-                    "owner_house_no": row["owner_house_no"],
-                    "owner_city_name": row["owner_city_name"],
-                    "owner_address": row["owner_address"],
-                    "owner_profile_photo": row["owner_profile_photo"],
+                    "cab_driver_id":  row[0],
+                    "driver_first_name":  row[1],
+                    "profile_pic":  row[2],
+                    "is_online":  row[3],
+                    "ratings":  row[4],
+                    "mobile_no":  row[5],
+                    "registration_date":  row[6],
+                    "time":  row[7],
+                    "r_lat":  row[8],
+                    "r_lng":  row[9],
+                    "current_lat": row[10],
+                    "current_lng": row[11],
+                    "status": row[12],
+                    "recent_online_pic": row[13],
+                    "is_verified": row[14],
+                    "category_id": row[15],
+                    "vehicle_id": row[16],
+                    "city_id": row[17],
+                    "aadhar_no": row[18],
+                    "pan_card_no": row[19],
+                    "house_no": row[20],
+                    "city_name": row[21],
+                    "full_address": row[22],
+                    "gender": row[23],
+                    "owner_id": row[24],
+                    "aadhar_card_front": row[25],
+                    "aadhar_card_back": row[26],
+                    "pan_card_front": row[27],
+                    "pan_card_back": row[28],
+                    "license_front": row[29],
+                    "license_back": row[30],
+                    "insurance_image": row[31],
+                    "noc_image": row[32],
+                    "pollution_certificate_image": row[33],
+                    "rc_image": row[34],
+                    "vehicle_image": row[35],
+                    "vehicle_plate_image": row[36],
+                    "category_name": row[37],
+                    "vehicle_name": row[38],
+                    "category_type": row[39],
+                    "driving_license_no": row[40],
+                    "vehicle_plate_no": row[41],
+                    "rc_no": row[42],
+                    "insurance_no": row[43],
+                    "noc_no": row[44],
+                    "owner_photo": row[45],
+                    "owner_name": row[46],
+                    "owner_mobile_no": row[47],
+                    "owner_house_no": row[48],
+                    "owner_city_name": row[49],
+                    "owner_address": row[50],
+                    "owner_profile_photo": row[51],
                 }
                 for row in result
             ]
@@ -2410,58 +2411,58 @@ def all_jcb_crane_drivers(request):
             # Map each row to keep the original column names
             mapped_results = [
                 {
-                    "jcb_crane_driver_id": row["jcb_crane_driver_id"],
-                    "driver_name": row["driver_name"],
-                    "profile_pic": row["profile_pic"],
-                    "is_online": row["is_online"],
-                    "ratings": row["ratings"],
-                    "mobile_no": row["mobile_no"],
-                    "registration_date": row["registration_date"],
-                    "time": row["time"],
-                    "r_lat": row["r_lat"],
-                    "r_lng": row["r_lng"],
-                    "current_lat": row["current_lat"],
-                    "current_lng": row["current_lng"],
-                    "status": row["status"],
-                    "recent_online_pic": row["recent_online_pic"],
-                    "is_verified": row["is_verified"],
-                    "category_id": row["category_id"],
-                    "vehicle_id": row["vehicle_id"],
-                    "city_id": row["city_id"],
-                    "aadhar_no": row["aadhar_no"],
-                    "pan_card_no": row["pan_card_no"],
-                    "house_no": row["house_no"],
-                    "city_name": row["city_name"],
-                    "full_address": row["full_address"],
-                    "gender": row["gender"],
-                    "owner_id": row["owner_id"],
-                    "aadhar_card_front": row["aadhar_card_front"],
-                    "aadhar_card_back": row["aadhar_card_back"],
-                    "pan_card_front": row["pan_card_front"],
-                    "pan_card_back": row["pan_card_back"],
-                    "license_front": row["license_front"],
-                    "license_back": row["license_back"],
-                    "insurance_image": row["insurance_image"],
-                    "noc_image": row["noc_image"],
-                    "pollution_certificate_image": row["pollution_certificate_image"],
-                    "rc_image": row["rc_image"],
-                    "vehicle_image": row["vehicle_image"],
-                    "vehicle_plate_image": row["vehicle_plate_image"],
-                    "category_name": row["category_name"],
-                    "vehicle_name": row["vehicle_name"],
-                    "category_type": row["category_type"],
-                    "driving_license_no": row["driving_license_no"],
-                    "vehicle_plate_no": row["vehicle_plate_no"],
-                    "rc_no": row["rc_no"],
-                    "insurance_no": row["insurance_no"],
-                    "noc_no": row["noc_no"],
-                    "owner_photo": row["owner_photo"],
-                    "owner_name": row["owner_name"],
-                    "owner_mobile_no": row["owner_mobile_no"],
-                    "owner_house_no": row["owner_house_no"],
-                    "owner_city_name": row["owner_city_name"],
-                    "owner_address": row["owner_address"],
-                    "owner_profile_photo": row["owner_profile_photo"],
+                    "jcb_crane_driver_id":  row[0],
+                    "driver_name":  row[1],
+                    "profile_pic":  row[2],
+                    "is_online":  row[3],
+                    "ratings":  row[4],
+                    "mobile_no":  row[5],
+                    "registration_date":  row[6],
+                    "time":  row[7],
+                    "r_lat":  row[8],
+                    "r_lng":  row[9],
+                    "current_lat": row[10],
+                    "current_lng": row[11],
+                    "status": row[12],
+                    "recent_online_pic": row[13],
+                    "is_verified": row[14],
+                    "category_id": row[15],
+                    "vehicle_id": row[16],
+                    "city_id": row[17],
+                    "aadhar_no": row[18],
+                    "pan_card_no": row[19],
+                    "house_no": row[20],
+                    "city_name": row[21],
+                    "full_address": row[22],
+                    "gender": row[23],
+                    "owner_id": row[24],
+                    "aadhar_card_front": row[25],
+                    "aadhar_card_back": row[26],
+                    "pan_card_front": row[27],
+                    "pan_card_back": row[28],
+                    "license_front": row[29],
+                    "license_back": row[30],
+                    "insurance_image": row[31],
+                    "noc_image": row[32],
+                    "pollution_certificate_image": row[33],
+                    "rc_image": row[34],
+                    "vehicle_image": row[35],
+                    "vehicle_plate_image": row[36],
+                    "category_name": row[37],
+                    "vehicle_name": row[38],
+                    "category_type": row[39],
+                    "driving_license_no": row[40],
+                    "vehicle_plate_no": row[41],
+                    "rc_no": row[42],
+                    "insurance_no": row[43],
+                    "noc_no": row[44],
+                    "owner_photo": row[45],
+                    "owner_name": row[46],
+                    "owner_mobile_no": row[47],
+                    "owner_house_no": row[48],
+                    "owner_city_name": row[49],
+                    "owner_address": row[50],
+                    "owner_profile_photo": row[51],
                 }
                 for row in result
             ]
@@ -2473,6 +2474,7 @@ def all_jcb_crane_drivers(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 @csrf_exempt
 def all_handy_man(request):
@@ -2494,19 +2496,54 @@ def all_handy_man(request):
                 ORDER BY handyman_id DESC
             """
 
-            result = select_query(query)
+            result = select_query(query)  # Assuming select_query returns a list of tuples
 
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            return JsonResponse({"all_handy_man_details": result}, status=200)
+            # Map the results to a list of dictionaries
+            mapped_results = []
+            for row in result:
+                mapped_results.append({
+                    "handyman_id": row[0],
+                    "name": row[1],
+                    "profile_pic": row[2],
+                    "is_online": row[3],
+                    "ratings": row[4],
+                    "mobile_no": row[5],
+                    "registration_date": row[6],
+                    "time": row[7],
+                    "r_lat": row[8],
+                    "r_lng": row[9],
+                    "current_lat": row[10],
+                    "current_lng": row[11],
+                    "status": row[12],
+                    "recent_online_pic": row[13],
+                    "is_verified": row[14],
+                    "category_id": row[15],
+                    "sub_cat_id": row[16],
+                    "service_id": row[17],
+                    "city_id": row[18],
+                    "aadhar_no": row[19],
+                    "pan_card_no": row[20],
+                    "house_no": row[21],
+                    "city_name": row[22],
+                    "full_address": row[23],
+                    "gender": row[24],
+                    "aadhar_card_front": row[25],
+                    "aadhar_card_back": row[26],
+                    "pan_card_front": row[27],
+                    "pan_card_back": row[28],
+                    "sub_cat_name": row[29],
+                    "service_name": row[30],
+                    "category_name": row[31]
+                })
+
+            return JsonResponse({"all_handy_man_details": mapped_results}, status=200)
 
         except Exception as err:
-            print("Error executing query", err)
-            if str(err) == "No Data Found":
-                return JsonResponse({"message": "No Data Found"}, status=404)
-            else:
-                return JsonResponse({"message": "Internal Server Error"}, status=500)
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
