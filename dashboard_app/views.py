@@ -1768,30 +1768,30 @@ def enquiries_all(request):
             values = []
 
             result = select_query(query)  # Assuming select_query is defined
-            print("result::",result)
+            
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Structure the response data for better clarity
             enquiries_data = [
                 {
-                    "enquiry_id": row['enquiry_id'],
-                    "category_id": row['category_id'],
-                    "sub_cat_id": row['sub_cat_id'],
-                    "service_id": row['service_id'],
-                    "vehicle_id": row['vehicle_id'],
-                    "city_id": row['city_id'],
-                    "name": row['name'],
-                    "mobile_no": row['mobile_no'],
-                    "time_at": row['time_at'],
-                    "source_type": row['source_type'],
-                    "status": row['status'],
-                    "category_name": row['category_name'],
-                    "sub_cat_name": row['sub_cat_name'],
-                    "service_name": row['service_name'],
-                    "city_name": row['city_name'],
-                    "vehicle_name": row['vehicle_name'],
-                    "category_type": row['category_type'],
+                    "enquiry_id": row[0],
+                    "category_id": row[1],
+                    "sub_cat_id": row[2],
+                    "service_id": row[3],
+                    "vehicle_id": row[4],
+                    "city_id": row[5],
+                    "name": row[6],
+                    "mobile_no": row[7],
+                    "time_at": row[8],
+                    "source_type": row[9],
+                    "status": row[10],
+                    "category_name": row[11],
+                    "sub_cat_name": row[12],
+                    "service_name": row[13],
+                    "city_name": row[14],
+                    "vehicle_name": row[15],
+                    "category_type": row[16],
                 }
                 for row in result
             ]
