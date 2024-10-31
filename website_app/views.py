@@ -628,6 +628,7 @@ def distance(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
 def add_new_enquiry(request):
     try:
         data = request.data
