@@ -631,7 +631,7 @@ def distance(request):
 @csrf_exempt
 def add_new_enquiry(request):
     try:
-        data = request.data
+        data = json.loads(request.body)
 
         # List of required fields
         required_fields = {
