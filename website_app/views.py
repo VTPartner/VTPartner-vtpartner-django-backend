@@ -823,38 +823,78 @@ def add_new_estimation_request(request):
         print("Error executing add new estimation request query", err)
         return JsonResponse({"message": "Error executing add new estimation request query"}, status=500)
 
+import json
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.db import connection
+
+# Define your Google Maps API key
+mapKey = 'YOUR_GOOGLE_MAPS_API_KEY'  # Replace with your actual API key
+
 @csrf_exempt
 def check_allowed_pincode(request):
-    if request.method == 'POST':
+    if request.method == "POST":
+        data = json.loads(request.body)
+        pickup_place_id = data.get("pickupPlaceId")
+        drop_place_id = data.get("dropPlaceId")
+        city_id = data.get("city_id")  # Get city_id from the request payload
+
+        # Check if both place IDs and city_id are provided
+        if not pickup_place_id or not drop_place_id or not city_id:
+            return JsonResponse({"error": "pickupPlaceId, dropPlaceId, and city_id are required."}, status=400)
+
         try:
-            data = json.loads(request.body)
-            pincode = data.get("pincode")
-            city_id = data.get("city_id")
+            # Fetch details for both pickup and drop locations using Google Maps API
+            pickup_response = requests.get(
+                f"https://maps.googleapis.com/maps/api/place/details/json?place_id={pickup_place_id}&key={mapKey}"
+            )
+            drop_response = requests.get(
+                f"https://maps.googleapis.com/maps/api/place/details/json?place_id={drop_place_id}&key={mapKey}"
+            )
 
-            # Check for missing fields
-            if not pincode or not city_id:
-                return JsonResponse(
-                    {"message": "Pincode and city_id are required."},
-                    status=400
-                )
+            pickup_data = pickup_response.json()
+            drop_data = drop_response.json()
 
-            # Query to check if the given pincode is allowed
-            query = """
-                SELECT COUNT(*) 
-                FROM vtpartner.allowed_pincodes_tbl 
-                WHERE pincode = %s AND city_id = %s AND status = 1
-            """
-            values = [pincode, city_id]
-            result = select_query(query, values)
+            # Initialize pincodes
+            pickup_pincode = None
+            drop_pincode = None
 
-            # Check if any record is found
-            if result[0][0] > 0:
-                return JsonResponse({"allowed": True}, status=200)
+            # Extract pincode from pickup location
+            if pickup_data['status'] == 'OK':
+                for component in pickup_data['result']['address_components']:
+                    if 'postal_code' in component['types']:
+                        pickup_pincode = component['long_name']
+                        break
+
+            # Extract pincode from drop location
+            if drop_data['status'] == 'OK':
+                for component in drop_data['result']['address_components']:
+                    if 'postal_code' in component['types']:
+                        drop_pincode = component['long_name']
+                        break
+
+            # Check if both pincodes exist in the allowed_pincodes_tbl with status 1
+            with connection.cursor() as cursor:
+                query = """
+                    SELECT COUNT(*) 
+                    FROM vtpartner.allowed_pincodes_tbl 
+                    WHERE pincode = %s AND city_id = %s AND status = 1
+                """
+                cursor.execute(query, [pickup_pincode, city_id])
+                allowed_pickup_count = cursor.fetchone()[0]
+
+                cursor.execute(query, [drop_pincode, city_id])
+                allowed_drop_count = cursor.fetchone()[0]
+
+            # Check if both pincodes are allowed
+            if allowed_pickup_count > 0 and allowed_drop_count > 0:
+                return JsonResponse({"message": "Both pincodes are allowed."}, status=200)
             else:
-                return JsonResponse({"allowed": False}, status=200)
+                return JsonResponse({"error": "One or both pincodes are not allowed."}, status=404)
 
-        except Exception as err:
-            print("Error checking allowed pincode", err)
-            return JsonResponse({"message": "Error checking allowed pincode"}, status=500)
-    else:
-        return JsonResponse({"message": "Invalid request method."}, status=405)
+        except Exception as e:
+            print("Error checking allowed pincodes:", e)
+            return JsonResponse({"error": "Error checking allowed pincodes"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
