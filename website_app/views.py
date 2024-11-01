@@ -823,14 +823,6 @@ def add_new_estimation_request(request):
         print("Error executing add new estimation request query", err)
         return JsonResponse({"message": "Error executing add new estimation request query"}, status=500)
 
-import json
-import requests
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.db import connection
-
-# Define your Google Maps API key
-mapKey = 'YOUR_GOOGLE_MAPS_API_KEY'  # Replace with your actual API key
 
 @csrf_exempt
 def check_allowed_pincode(request):
