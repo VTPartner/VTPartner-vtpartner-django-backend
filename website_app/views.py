@@ -777,6 +777,7 @@ def add_new_estimation_request(request):
         hours = data.get("hours", 0.0)
         days = data.get("days", 0)
         city_id = data.get("city_id", -1)
+        request_type = data.get("request_type")
 
         # Validating required fields (you can customize which fields are required)
         required_fields = {
@@ -799,8 +800,8 @@ def add_new_estimation_request(request):
         # Insert the new estimation request into the table
         query = """
             INSERT INTO vtpartner.estimation_request_tbl 
-            (category_id, start_address, end_address, work_description, name, mobile_no, purpose, hours, days, city_id) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (category_id, start_address, end_address, work_description, name, mobile_no, purpose, hours, days, city_id,request_type) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """
         values = [
             category_id,
@@ -813,9 +814,10 @@ def add_new_estimation_request(request):
             hours,
             days,
             city_id,
+            request_type
         ]
         row_count = insert_query(query, values)
-
+        print(f"{row_count} row(s) inserted")
         # Send success response
         return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
 
