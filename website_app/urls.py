@@ -22,6 +22,8 @@ urlpatterns = [
     path('all_services_gallery_images',views.all_services_gallery_images,name='all_services_gallery_images'),
     #Add New Enquiry
     path('add_new_enquiry',views.add_new_enquiry,name='add_new_enquiry'),
+    #Add New Drivers Enquiry
+    path('add_new_drivers_enquiry',views.add_new_drivers_enquiry,name='add_new_drivers_enquiry'),
     #Distance Calculation
     path('distance',views.distance,name='distance'),
     #Fare Results

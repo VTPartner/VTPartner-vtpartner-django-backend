@@ -698,7 +698,6 @@ def add_new_enquiry(request):
 def add_new_drivers_enquiry(request):
     try:
         data = json.loads(request.body)
-        print("jsonBody::",data)
         category_id = data.get("category_id")
         sub_cat_id = data.get("sub_cat_id")
         service_id = data.get("service_id")
