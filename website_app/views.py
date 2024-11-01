@@ -693,5 +693,74 @@ def add_new_enquiry(request):
     except Exception as err:
         print("Error executing add new enquiry query", err)
         return JsonResponse({"message": "Error executing add new enquiry query"}, status=500)
+
+@csrf_exempt
+def add_new_drivers_enquiry(request):
+    try:
+        data = json.loads(request.body)
+        category_id = data.get("category_id")
+        sub_cat_id = data.get("sub_cat_id")
+        service_id = data.get("service_id")
+        city_id = data.get("city_id")
+        name = data.get("name")
+        mobile_no = data.get("mobile_no")
+        source_type = data.get("source_type")
+        # List of required fields
+        required_fields = {
+            "category_id":category_id,
+            "sub_cat_id":sub_cat_id,
+            "service_id":service_id,
+            "city_id":city_id,
+            "name":name,
+            "mobile_no":mobile_no,
+            "source_type":source_type
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Validating to avoid duplication
+        query_duplicate_check = """
+            SELECT COUNT(*) FROM vtpartner.enquirytbl 
+            WHERE name ILIKE %s AND category_id = %s
+        """
+        values_duplicate_check = [name, category_id]
+
+        result = select_query(query_duplicate_check, values_duplicate_check)
+
+        # Check if the result is greater than 0 to determine if the enquiry already exists
+        if result[0][0] > 0:
+            return JsonResponse({"message": "Enquiry Request already exists"}, status=409)
+
+        # If enquiry is not duplicate, proceed to insert
+        query = """
+            INSERT INTO vtpartner.enquirytbl 
+            (category_id, vehicle_id, city_id, name, mobile_no, source_type,sub_cat_id,service_id) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        values = [
+            category_id,
+            city_id,
+            name,
+            mobile_no,
+            source_type,
+            sub_cat_id,
+            service_id
+        ]
+        row_count = insert_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+
+    except Exception as err:
+        print("Error executing add new enquiry query", err)
+        return JsonResponse({"message": "Error executing add new enquiry query"}, status=500)
     
 
