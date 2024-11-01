@@ -675,7 +675,7 @@ def add_new_enquiry(request):
         query = """
             INSERT INTO vtpartner.enquirytbl 
             (category_id, vehicle_id, city_id, name, mobile_no, source_type) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
         values = [
             category_id,
