@@ -742,8 +742,8 @@ def add_new_drivers_enquiry(request):
         # If enquiry is not duplicate, proceed to insert
         query = """
             INSERT INTO vtpartner.enquirytbl 
-            (category_id, vehicle_id, city_id, name, mobile_no, source_type,sub_cat_id,service_id) 
-            VALUES (%s, %s, %s, %s, %s, %s)
+            (category_id, city_id, name, mobile_no, source_type,sub_cat_id,service_id) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         values = [
             category_id,
