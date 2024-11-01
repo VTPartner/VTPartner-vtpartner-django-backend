@@ -619,7 +619,7 @@ def distance(request):
                 f"https://maps.googleapis.com/maps/api/distancematrix/json?origins=place_id:{origins}&destinations=place_id:{destinations}&units=metric&key={api_key}"
             )
             response_data = response.json()
-
+            print("response_data::",response_data)
             return JsonResponse(response_data, status=200)
 
         except Exception as error:
