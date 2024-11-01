@@ -22,7 +22,7 @@ from PIL import Image  # Pillow library for image processing
 from django.db import connection, DatabaseError
 
 # Create your views here.
-mapKey = "AIzaSyAAlmEtjJOpSaJ7YVkMKwdSuMTbTx39l_o"
+mapKey = "AIzaSyD-vFDMqcEcgyeppWvGrAuhVymvF0Dxue0"
 
 # Utility function to check for missing fields
 def check_missing_fields(fields):
