@@ -632,17 +632,15 @@ def distance(request):
 def add_new_enquiry(request):
     try:
         data = json.loads(request.body)
-
+        category_id = data.get("category_id")
+        vehicle_id = data.get("vehicle_id")
+        city_id = data.get("city_id")
+        name = data.get("name")
+        mobile_no = data.get("mobile_no")
+        source_type = data.get("source_type")
         # List of required fields
         required_fields = {
-            "category_id": data.get("category_id"),
-            "sub_cat_id": data.get("sub_cat_id"),
-            "service_id": data.get("service_id"),
-            "vehicle_id": data.get("vehicle_id"),
-            "city_id": data.get("city_id"),
-            "name": data.get("name"),
-            "mobile_no": data.get("mobile_no"),
-            "source_type": data.get("source_type"),
+            category_id,vehicle_id,city_id,name,mobile_no,source_type
         }
 
         # Use the utility function to check for missing fields
@@ -660,29 +658,27 @@ def add_new_enquiry(request):
             SELECT COUNT(*) FROM vtpartner.enquirytbl 
             WHERE name ILIKE %s AND category_id = %s
         """
-        values_duplicate_check = [data['name'], data['category_id']]
+        values_duplicate_check = [name, category_id]
 
         result = select_query(query_duplicate_check, values_duplicate_check)
 
         # Check if the result is greater than 0 to determine if the enquiry already exists
-        if result[0]['count'] > 0:
+        if result[0][0] > 0:
             return JsonResponse({"message": "Enquiry Request already exists"}, status=409)
 
         # If enquiry is not duplicate, proceed to insert
         query = """
             INSERT INTO vtpartner.enquirytbl 
-            (category_id, sub_cat_id, service_id, vehicle_id, city_id, name, mobile_no, source_type) 
+            (category_id, vehicle_id, city_id, name, mobile_no, source_type) 
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         values = [
-            data['category_id'],
-            data['sub_cat_id'],
-            data['service_id'],
-            data['vehicle_id'],
-            data['city_id'],
-            data['name'],
-            data['mobile_no'],
-            data['source_type'],
+            category_id,
+            vehicle_id,
+            city_id,
+            name,
+            mobile_no,
+            source_type,
         ]
         row_count = insert_query(query, values)
 
