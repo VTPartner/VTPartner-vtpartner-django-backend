@@ -852,6 +852,9 @@ def check_allowed_pincode(request):
             drop_response = requests.get(
                 f"https://maps.googleapis.com/maps/api/place/details/json?place_id={drop_place_id}&key={mapKey}"
             )
+            
+            print("pickup_response::",pickup_response)
+            print("drop_response::",drop_response)
 
             pickup_data = pickup_response.json()
             drop_data = drop_response.json()
