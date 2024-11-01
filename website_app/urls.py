@@ -30,6 +30,8 @@ urlpatterns = [
     path('fare_result',views.fare_result,name='fare_result'),
     #Estimation request for Goods , driver 
     path('add_new_estimation_request',views.add_new_estimation_request,name='add_new_estimation_request'),
+    #Check Pincode is allowed or not 
+    path('check_allowed_pincode',views.check_allowed_pincode,name='check_allowed_pincode'),
     #All Services
     # path('',views.all_services,name='all_services'),
     

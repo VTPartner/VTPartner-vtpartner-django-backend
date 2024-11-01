@@ -762,10 +762,6 @@ def add_new_drivers_enquiry(request):
         print("Error executing add new enquiry query", err)
         return JsonResponse({"message": "Error executing add new enquiry query"}, status=500)
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-
 @csrf_exempt
 def add_new_estimation_request(request):
     try:
@@ -827,4 +823,38 @@ def add_new_estimation_request(request):
         print("Error executing add new estimation request query", err)
         return JsonResponse({"message": "Error executing add new estimation request query"}, status=500)
 
+@csrf_exempt
+def check_allowed_pincode(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            pincode = data.get("pincode")
+            city_id = data.get("city_id")
 
+            # Check for missing fields
+            if not pincode or not city_id:
+                return JsonResponse(
+                    {"message": "Pincode and city_id are required."},
+                    status=400
+                )
+
+            # Query to check if the given pincode is allowed
+            query = """
+                SELECT COUNT(*) 
+                FROM vtpartner.allowed_pincodes_tbl 
+                WHERE pincode = %s AND city_id = %s AND status = 1
+            """
+            values = [pincode, city_id]
+            result = select_query(query, values)
+
+            # Check if any record is found
+            if result[0][0] > 0:
+                return JsonResponse({"allowed": True}, status=200)
+            else:
+                return JsonResponse({"allowed": False}, status=200)
+
+        except Exception as err:
+            print("Error checking allowed pincode", err)
+            return JsonResponse({"message": "Error checking allowed pincode"}, status=500)
+    else:
+        return JsonResponse({"message": "Invalid request method."}, status=405)
