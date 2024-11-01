@@ -28,6 +28,8 @@ urlpatterns = [
     path('distance',views.distance,name='distance'),
     #Fare Results
     path('fare_result',views.fare_result,name='fare_result'),
+    #Estimation request for Goods , driver 
+    path('add_new_estimation_request',views.add_new_estimation_request,name='add_new_estimation_request'),
     #All Services
     # path('',views.all_services,name='all_services'),
     

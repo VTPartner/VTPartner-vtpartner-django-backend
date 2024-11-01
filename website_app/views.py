@@ -761,5 +761,70 @@ def add_new_drivers_enquiry(request):
     except Exception as err:
         print("Error executing add new enquiry query", err)
         return JsonResponse({"message": "Error executing add new enquiry query"}, status=500)
-  
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@csrf_exempt
+def add_new_estimation_request(request):
+    try:
+        data = json.loads(request.body)
+        # Extracting required fields from the request data
+        category_id = data.get("category_id", -1)  
+        start_address = data.get("start_address", "NA")
+        end_address = data.get("end_address", "NA")
+        work_description = data.get("work_description", "NA")
+        name = data.get("name", "NA")
+        mobile_no = data.get("mobile_no", "NA")
+        purpose = data.get("purpose", "NA")
+        hours = data.get("hours", 0.0)
+        days = data.get("days", 0)
+        city_id = data.get("city_id", -1)
+
+        # Validating required fields (you can customize which fields are required)
+        required_fields = {
+            "category_id": category_id,
+            "start_address": start_address,
+            "name": name,
+            "mobile_no": mobile_no,
+            "city_id": city_id,
+        }
+
+        missing_fields = [field for field, value in required_fields.items() if value is None or value == ""]
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Insert the new estimation request into the table
+        query = """
+            INSERT INTO vtpartner.estimation_request_tbl 
+            (category_id, start_address, end_address, work_description, name, mobile_no, purpose, hours, days, city_id) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = [
+            category_id,
+            start_address,
+            end_address,
+            work_description,
+            name,
+            mobile_no,
+            purpose,
+            hours,
+            days,
+            city_id,
+        ]
+        row_count = insert_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+
+    except Exception as err:
+        print("Error executing add new estimation request query", err)
+        return JsonResponse({"message": "Error executing add new estimation request query"}, status=500)
+
 
