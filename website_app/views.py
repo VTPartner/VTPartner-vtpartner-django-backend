@@ -640,7 +640,12 @@ def add_new_enquiry(request):
         source_type = data.get("source_type")
         # List of required fields
         required_fields = {
-            category_id,vehicle_id,city_id,name,mobile_no,source_type
+            "category_id":category_id,
+            "vehicle_id":vehicle_id,
+            "city_id":city_id,
+            "name":name,
+            "mobile_no":mobile_no,
+            "source_type":source_type
         }
 
         # Use the utility function to check for missing fields
