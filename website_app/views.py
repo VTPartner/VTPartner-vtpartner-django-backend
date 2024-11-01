@@ -862,9 +862,11 @@ def check_allowed_pincode(request):
 
             # Extract pincode from pickup location
             if pickup_data['status'] == 'OK':
+                print("pickup_data['result']['address_components']::",pickup_data['result']['address_components'])
                 for component in pickup_data['result']['address_components']:
                     if 'postal_code' in component['types']:
                         pickup_pincode = component['long_name']
+                        print("pickup_pincode::",pickup_pincode)
                         break
 
             # Extract pincode from drop location
