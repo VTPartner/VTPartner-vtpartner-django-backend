@@ -855,11 +855,11 @@ def check_allowed_pincode(request):
             
             print("pickup_response::",pickup_response)
             print("drop_response::",drop_response)
-            print("pickup_data['status']::",pickup_response['status'])
 
             pickup_data = pickup_response.json()
             drop_data = drop_response.json()
 
+            print("pickup_data['status']::",pickup_data['status'])
             # Initialize pincodes
             pickup_pincode = None
             drop_pincode = None
