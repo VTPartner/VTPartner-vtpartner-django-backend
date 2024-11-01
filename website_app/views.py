@@ -873,7 +873,8 @@ def check_allowed_pincode(request):
                     if 'postal_code' in component['types']:
                         drop_pincode = component['long_name']
                         break
-
+            print("pickup_pincode::",pickup_pincode)
+            print("drop_pincode::",drop_pincode)
             # Check if both pincodes exist in the allowed_pincodes_tbl with status 1
             with connection.cursor() as cursor:
                 query = """
