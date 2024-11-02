@@ -802,8 +802,8 @@ def add_new_estimation_request(request):
         # Insert the new estimation request into the table
         query = """
             INSERT INTO vtpartner.estimation_request_tbl 
-            (category_id, start_address, end_address, work_description, name, mobile_no, purpose, hours, days, city_id,request_type) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
+            (category_id, start_address, end_address, work_description, name, mobile_no, purpose, hours, days, city_id,request_type,sub_cat_id,service_id) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s,%s)
         """
         values = [
             category_id,
@@ -816,7 +816,9 @@ def add_new_estimation_request(request):
             hours,
             days,
             city_id,
-            request_type
+            request_type,
+            sub_cat_id,
+            service_id
         ]
         row_count = insert_query(query, values)
         print(f"{row_count} row(s) inserted")
