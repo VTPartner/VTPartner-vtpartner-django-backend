@@ -899,3 +899,105 @@ def check_allowed_pincode(request):
             return JsonResponse({"error": "Error checking allowed pincodes"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt  # Disable CSRF protection for this view
+def driver_form_print(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            # Extracting required fields from the request data
+            driver_id = data.get("driver_id")  
+            query = """
+                SELECT goods_driver_id, driver_first_name, profile_pic, is_online, ratings,
+                       mobile_no, goods_driverstbl.registration_date, goods_driverstbl.time,
+                       r_lat, r_lng, current_lat, current_lng, status, recent_online_pic,
+                       is_verified, goods_driverstbl.category_id, goods_driverstbl.vehicle_id,
+                       city_id, aadhar_no, pan_card_no, goods_driverstbl.house_no,
+                       goods_driverstbl.city_name, full_address, gender, goods_driverstbl.owner_id,
+                       aadhar_card_front, aadhar_card_back, pan_card_front, pan_card_back,
+                       license_front, license_back, insurance_image, noc_image,
+                       pollution_certificate_image, rc_image, vehicle_image, vehicle_plate_image,
+                       category_name, vehicle_name, category_type, driving_license_no,
+                       vehicle_plate_no, rc_no, insurance_no, noc_no,
+                       profile_photo AS owner_photo, owner_name, owner_mobile_no,
+                       owner_tbl.house_no AS owner_house_no, owner_tbl.city_name AS owner_city_name,
+                       owner_tbl.address AS owner_address, owner_tbl.profile_photo
+                FROM vtpartner.goods_driverstbl
+                LEFT JOIN vtpartner.categorytbl ON goods_driverstbl.category_id = categorytbl.category_id
+                LEFT JOIN vtpartner.category_type_tbl ON categorytbl.category_type_id = category_type_tbl.cat_type_id
+                LEFT JOIN vtpartner.vehiclestbl ON goods_driverstbl.vehicle_id = vehiclestbl.vehicle_id
+                LEFT JOIN vtpartner.owner_tbl ON owner_tbl.owner_id = goods_driverstbl.owner_id
+                WHERE goods_driver_id=%s ORDER BY goods_driver_id DESC
+            """
+
+            result = select_query(query,[driver_id])
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to the same column names from the database
+            mapped_results = [
+                {
+                    "goods_driver_id": row[0],
+                    "driver_first_name": row[1],
+                    "profile_pic": row[2],
+                    "is_online": row[3],
+                    "ratings": row[4],
+                    "mobile_no": row[5],
+                    "registration_date": row[6],
+                    "time": row[7],
+                    "r_lat": row[8],
+                    "r_lng": row[9],
+                    "current_lat": row[10],
+                    "current_lng": row[11],
+                    "status": row[12],
+                    "recent_online_pic": row[13],
+                    "is_verified": row[14],
+                    "category_id": row[15],
+                    "vehicle_id": row[16],
+                    "city_id": row[17],
+                    "aadhar_no": row[18],
+                    "pan_card_no": row[19],
+                    "house_no": row[20],
+                    "city_name": row[21],
+                    "full_address": row[22],
+                    "gender": row[23],
+                    "owner_id": row[24],
+                    "aadhar_card_front": row[25],
+                    "aadhar_card_back": row[26],
+                    "pan_card_front": row[27],
+                    "pan_card_back": row[28],
+                    "license_front": row[29],
+                    "license_back": row[30],
+                    "insurance_image": row[31],
+                    "noc_image": row[32],
+                    "pollution_certificate_image": row[33],
+                    "rc_image": row[34],
+                    "vehicle_image": row[35],
+                    "vehicle_plate_image": row[36],
+                    "category_name": row[37],
+                    "vehicle_name": row[38],
+                    "category_type": row[39],
+                    "driving_license_no": row[40],
+                    "vehicle_plate_no": row[41],
+                    "rc_no": row[42],
+                    "insurance_no": row[43],
+                    "noc_no": row[44],
+                    "owner_photo": row[45],
+                    "owner_name": row[46],
+                    "owner_mobile_no": row[47],
+                    "owner_house_no": row[48],
+                    "owner_city_name": row[49],
+                    "owner_address": row[50],
+                    "owner_profile_photo": row[51],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"goods_drivers": mapped_results}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
