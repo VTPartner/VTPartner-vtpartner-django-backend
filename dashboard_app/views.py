@@ -3018,7 +3018,7 @@ def all_faqs(request):
             """
 
             result = select_query(query,[category_id])  # Assuming select_query returns a list of tuples
-
+            print("result::",result)
             if result is None:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
