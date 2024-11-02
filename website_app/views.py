@@ -768,6 +768,8 @@ def add_new_estimation_request(request):
         data = json.loads(request.body)
         # Extracting required fields from the request data
         category_id = data.get("category_id", -1)  
+        sub_cat_id = data.get("sub_cat_id", -1)  
+        service_id = data.get("service_id", -1)  
         start_address = data.get("start_address", "NA")
         end_address = data.get("end_address", "NA")
         work_description = data.get("work_description", "NA")
