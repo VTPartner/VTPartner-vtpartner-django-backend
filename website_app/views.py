@@ -1007,3 +1007,50 @@ def driver_form_print(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def all_faqs(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get("category_id")
+            
+            # List of required fields
+            required_fields = {
+                "category_id":category_id,
+            }
+
+            # Use the utility function to check for missing fields
+            missing_fields = check_missing_fields(required_fields)
+
+            # If there are missing fields, return an error response
+            if missing_fields:
+                return JsonResponse(
+                    {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                    status=400
+                )
+            query = """
+                select faqid,question,answer,time_at from vtpartner.faqtbl where category_id=%s order by faqid desc
+            """
+
+            result = select_query(query,[category_id])  # Assuming select_query returns a list of tuples
+            print("result::",result)
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map the results to a list of dictionaries
+            mapped_results = []
+            for row in result:
+                mapped_results.append({
+                    "faq_id": row[0],
+                    "question": row[1],
+                    "answer": row[2],
+                    "time_at": row[3],
+                })
+
+            return JsonResponse({"all_faqs_details": mapped_results}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)

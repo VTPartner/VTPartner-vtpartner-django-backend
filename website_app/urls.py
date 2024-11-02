@@ -34,6 +34,8 @@ urlpatterns = [
     path('check_allowed_pincode',views.check_allowed_pincode,name='check_allowed_pincode'),
     #Driver Form Print 
     path('driver_form_print',views.driver_form_print,name='driver_form_print'),
+    #Driver Form Print 
+    path('all_faqs',views.all_faqs,name='all_faqs'),
     #All Services
     # path('',views.all_services,name='all_services'),
     
