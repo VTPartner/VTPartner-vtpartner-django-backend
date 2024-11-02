@@ -89,6 +89,8 @@ urlpatterns = [
     #Admin Login
     path('edit_handyman_details',views.edit_handyman_details,name='edit_handyman_details'),
     #Admin Login
+    path('all_faqs',views.all_faqs,name='all_faqs'),
+    #Admin Login
     path('add_new_faq',views.add_new_faq,name='add_new_faq'),
     #Admin Login
     path('edit_new_faq',views.edit_new_faq,name='edit_new_faq'),
