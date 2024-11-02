@@ -993,7 +993,7 @@ def driver_form_print(request):
                 }
                 for row in result
             ]
-
+            print("mapped_results::",mapped_results)
             return JsonResponse({"goods_drivers": mapped_results}, status=200)
 
         except Exception as err:
