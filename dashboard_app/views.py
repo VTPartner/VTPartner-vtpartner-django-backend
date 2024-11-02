@@ -104,7 +104,7 @@ def select_query(query, params=None):
             result = None
             result = cursor.fetchall()
 
-            # if not result:
+            # if result == []:
             #     raise ValueError("No Data Found")  # Custom error when no results are found
 
             return result
@@ -295,7 +295,7 @@ def all_branches(request):
             params = [admin_id]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
             
             # Map the results to a list of dictionaries with meaningful keys
@@ -342,7 +342,7 @@ def all_allowed_cities(request):
             """
             result = select_query(query)  # Assuming select_query is defined elsewhere
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map the results to a list of dictionaries with meaningful keys
@@ -494,7 +494,7 @@ def all_allowed_pincodes(request):
             """
             result = select_query(query, [city_id])
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map the results to a list of dictionaries
@@ -628,7 +628,7 @@ def service_types(request):
             """
             result = select_query(query)  # Assuming select_query is defined elsewhere
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a dictionary with appropriate keys
@@ -672,7 +672,7 @@ def all_services(request):
             """
             result = select_query(query)  # Assuming select_query is defined elsewhere
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a dictionary with appropriate keys
@@ -811,7 +811,7 @@ def vehicle_types(request):
             query = "SELECT vehicle_type_id, vehicle_type_name FROM vtpartner.vehicle_types_tbl"
             result = select_query(query)  # Assuming select_query is defined
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a dictionary with appropriate keys
@@ -862,7 +862,7 @@ def all_vehicles(request):
             """
             result = select_query(query, [category_id])  # Assuming select_query is defined
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a dictionary with appropriate keys
@@ -1064,7 +1064,7 @@ def vehicle_prices(request):
             """
             result = select_query(query, [vehicle_id])  # Assuming select_query is defined
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a dictionary for a clearer JSON response
@@ -1102,7 +1102,7 @@ def vehicle_price_types(request):
             """
             result = select_query(query)  # Assuming select_query is defined
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a dictionary for a clearer JSON response
@@ -1290,7 +1290,7 @@ def all_sub_categories(request):
             values = (category_id,)
             result = select_query(query, values)  # Assuming select_query is defined
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a dictionary for clearer response
@@ -1458,7 +1458,7 @@ def all_other_services(request):
             values = (sub_cat_id,)
             result = select_query(query, values)  # Assuming select_query is defined
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a dictionary for clearer response
@@ -1637,7 +1637,7 @@ def all_enquiries(request):
 
             result = select_query(query, values)  # Assuming select_query is defined
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a structured format for clarity
@@ -1703,7 +1703,7 @@ def all_gallery_images(request):
 
             result = select_query(query, values)  # Assuming select_query is defined
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to a structured format for clarity
@@ -1833,7 +1833,7 @@ def enquiries_all(request):
 
             result = select_query(query)  # Assuming select_query is defined
             
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Structure the response data for better clarity
@@ -2262,7 +2262,7 @@ def all_goods_drivers(request):
 
             result = select_query(query)
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to the same column names from the database
@@ -2361,7 +2361,7 @@ def all_cab_drivers(request):
 
             result = select_query(query)
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to keep the original column names
@@ -2460,7 +2460,7 @@ def all_jcb_crane_drivers(request):
 
             result = select_query(query)
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to keep the original column names
@@ -2553,7 +2553,7 @@ def all_handy_man(request):
 
             result = select_query(query)  # Assuming select_query returns a list of tuples
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map the results to a list of dictionaries

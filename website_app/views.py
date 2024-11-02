@@ -52,10 +52,11 @@ def select_query(query, params=None):
         
         with connection.cursor() as cursor:
             cursor.execute(query, params)
+            result = None
             result = cursor.fetchall()
-
-            if not result:
-                raise ValueError("No Data Found")  # Custom error when no results are found
+            
+            # if result == []:
+            #     raise ValueError("No Data Found")  # Custom error when no results are found
 
             return result
 
@@ -166,7 +167,7 @@ def all_services(request):
             result = select_query(query)
 
             # Check if result is empty
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Prepare services details response
@@ -209,7 +210,7 @@ def all_allowed_cities(request):
             result = select_query(query)
 
             # Check if result is empty
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Prepare cities response
@@ -272,7 +273,7 @@ def all_vehicles(request):
             result = select_query(query, values)
 
             # Check if result is empty
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Prepare vehicle details response
@@ -349,7 +350,7 @@ def all_vehicles_with_price(request):
             result = select_query(query, values)
 
             # Check if result is empty
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Prepare vehicle details response
@@ -417,7 +418,7 @@ def all_sub_categories(request):
             result = select_query(query, values)
 
             # Check if result is empty
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Prepare subcategories response
@@ -481,7 +482,7 @@ def all_other_services(request):
             result = select_query(query, values)
 
             # Check if result is empty
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Prepare other services response
@@ -532,7 +533,7 @@ def all_delivery_gallery_images(request):
             result = select_query(query)
 
             # Check if result is empty
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Prepare gallery data response
@@ -582,7 +583,7 @@ def all_services_gallery_images(request):
             result = select_query(query)
 
             # Check if result is empty
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Prepare gallery data response
@@ -936,7 +937,7 @@ def driver_form_print(request):
 
             result = select_query(query,[driver_id])
 
-            if not result:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map each row to the same column names from the database
