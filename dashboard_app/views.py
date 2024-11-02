@@ -2990,3 +2990,99 @@ def edit_handyman_details(request):
     except Exception as err:
         print("Error executing updating driver query", err)
         return JsonResponse({"message": "Error executing updating driver query"}, status=500)
+    
+@csrf_exempt
+def add_new_faq(request):
+    try:
+        data = json.loads(request.body)
+        category_id = data.get("category_id")
+        question = data.get("question")
+        answer = data.get("answer")
+        
+        # List of required fields
+        required_fields = {
+            "category_id":category_id,
+            "question":question,
+            "answer":answer,
+            
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        
+        query = """
+            INSERT INTO vtpartner.faqtbl 
+            (question, answer, category_id) 
+            VALUES (%s, %s, %s)
+        """
+        values = [
+            question,
+            answer,
+            category_id,
+            
+        ]
+        row_count = insert_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+
+    except Exception as err:
+        print("Error executing add new faq query", err)
+        return JsonResponse({"message": "Error executing add new faq query"}, status=500)
+    
+@csrf_exempt
+def edit_new_faq(request):
+    try:
+        data = json.loads(request.body)
+        category_id = data.get("category_id")
+        faq_id = data.get("faq_id")
+        question = data.get("question")
+        answer = data.get("answer")
+        
+        # List of required fields
+        required_fields = {
+            "category_id":category_id,
+            "question":question,
+            "answer":answer,
+            "faq_id":faq_id,
+            
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        
+        query = """
+            UPDATE vtpartner.faqtbl 
+            SET question=%s, answer=%s, category_id=%s
+            WHERE faqid=%s
+        """
+        values = [
+            question,
+            answer,
+            category_id,
+            faq_id
+        ]
+        row_count = update_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+
+    except Exception as err:
+        print("Error executing add new faq query", err)
+        return JsonResponse({"message": "Error executing add new faq query"}, status=500)

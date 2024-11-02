@@ -1005,3 +1005,4 @@ def driver_form_print(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
