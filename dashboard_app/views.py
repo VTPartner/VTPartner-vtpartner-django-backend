@@ -3019,7 +3019,7 @@ def all_faqs(request):
 
             result = select_query(query,[category_id])  # Assuming select_query returns a list of tuples
             print("result::",result)
-            if result is []:
+            if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map the results to a list of dictionaries
