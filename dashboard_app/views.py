@@ -101,10 +101,11 @@ def select_query(query, params=None):
         
         with connection.cursor() as cursor:
             cursor.execute(query, params)
+            result = None
             result = cursor.fetchall()
 
-            if not result:
-                raise ValueError("No Data Found")  # Custom error when no results are found
+            # if not result:
+            #     raise ValueError("No Data Found")  # Custom error when no results are found
 
             return result
 
@@ -3018,14 +3019,14 @@ def all_faqs(request):
 
             result = select_query(query,[category_id])  # Assuming select_query returns a list of tuples
 
-            if not result:
+            if result is None:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map the results to a list of dictionaries
             mapped_results = []
             for row in result:
                 mapped_results.append({
-                    "faqid": row[0],
+                    "faq_id": row[0],
                     "question": row[1],
                     "answer": row[2],
                     "time_at": row[3],
