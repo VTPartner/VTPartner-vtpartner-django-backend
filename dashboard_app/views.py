@@ -2937,7 +2937,7 @@ def add_driver_details(request):
                     ]
                     new_owner_result = insert_query(insert_owner_query, owner_values)
                     owner_id = new_owner_result[0][0]
-
+            print("owner_id::",owner_id)
             driver_table, name_column, driver_id_field = None, None, None
 
             # Determine the driver table and ID field based on category_id
@@ -3011,7 +3011,7 @@ def add_driver_details(request):
             ]
 
             new_driver_result = insert_query(insert_driver_query, driver_values)
-            return JsonResponse({"message": f"{new_driver_result[0][driver_id_field]} row(s) inserted"}, status=201)
+            return JsonResponse({"message": f"{new_driver_result[0][0]} row(s) inserted"}, status=201)
 
         except Exception as err:
             print("Error executing add new driver query", err)
