@@ -1972,8 +1972,8 @@ def register_agent(request):
                 except Exception as error:
                     print("Owner error::", error)
             print("owner_id::",owner_id)
-            if owner_id == None:
-                return JsonResponse({"message": "Invalid Owner Id"}, status=500)
+            # if owner_id == None:
+            #     return JsonResponse({"message": "Invalid Owner Id"}, status=500)
             # Determine driver table and related fields based on category_id
             driver_table, name_column, driver_id_field = None, None, None
 
