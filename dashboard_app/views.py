@@ -2069,9 +2069,10 @@ def register_agent(request):
                     insurance_no,
                     noc_no,
                 ]
-
+            print("insert_driver_query:",insert_driver_query)
+            print("driver_values:",driver_values)
             driver_result = insert_query(insert_driver_query, driver_values)
-
+            
             if not driver_result:
                 raise Exception("Failed to insert driver data")
 
