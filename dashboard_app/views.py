@@ -464,7 +464,7 @@ def add_new_allowed_city(request):
             params = [city_name, pincode, bg_image, pincode_until, description]
             row_count = insert_query(query, params)
 
-            return JsonResponse({"message": f"{row_count} rows inserted"}, status=201)
+            return JsonResponse({"message": f"{row_count} rows inserted"}, status=200)
 
         except Exception as err:
             print("Error executing add new allowed city query:", err)
