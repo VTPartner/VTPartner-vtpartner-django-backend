@@ -3130,27 +3130,46 @@ def add_driver_details(request):
 @csrf_exempt
 def edit_handyman_details(request):
     try:
-        data = request.data
-
+        data = json.loads(request.body)
+        print("body::",data)
+        handyman_id= data.get("handyman_id"),
+        agent_name= data.get("agent_name"),
+        mobile_no= data.get("mobile_no"),
+        gender= data.get("gender"),
+        aadhar_no= data.get("aadhar_no"),
+        pan_no= data.get("pan_no"),
+        city_id= data.get("city_id"),
+        city_name= data.get("city_name"),
+        house_no= data.get("house_no"),
+        address= data.get("address"),
+        category_id= data.get("category_id"),
+        sub_cat_id= data.get("sub_cat_id"),
+        service_id= data.get("service_id"),
+        agent_photo_url= data.get("agent_photo_url"),
+        aadhar_card_front_url= data.get("aadhar_card_front_url"),
+        aadhar_card_back_url= data.get("aadhar_card_back_url"),
+        pan_card_front_url= data.get("pan_card_front_url"),
+        pan_card_back_url= data.get("pan_card_back_url"),
+        
         required_fields = {
-            "handyman_id": data.get("handyman_id"),
-            "agent_name": data.get("agent_name"),
-            "mobile_no": data.get("mobile_no"),
-            "gender": data.get("gender"),
-            "aadhar_no": data.get("aadhar_no"),
-            "pan_no": data.get("pan_no"),
-            "city_id": data.get("city_id"),
-            "city_name": data.get("city_name"),
-            "house_no": data.get("house_no"),
-            "address": data.get("address"),
-            "category_id": data.get("category_id"),
-            "sub_cat_id": data.get("sub_cat_id"),
-            "service_id": data.get("service_id"),
-            "agent_photo_url": data.get("agent_photo_url"),
-            "aadhar_card_front_url": data.get("aadhar_card_front_url"),
-            "aadhar_card_back_url": data.get("aadhar_card_back_url"),
-            "pan_card_front_url": data.get("pan_card_front_url"),
-            "pan_card_back_url": data.get("pan_card_back_url"),
+            "handyman_id": handyman_id,
+            "agent_name": agent_name,
+            "mobile_no": mobile_no,
+            "gender": gender,
+            "aadhar_no": aadhar_no,
+            "pan_no": pan_no,
+            "city_id": city_id,
+            "city_name": city_name,
+            "house_no": house_no,
+            "address": address,
+            "category_id": category_id,
+            "sub_cat_id": sub_cat_id,
+            "service_id": service_id,
+            "agent_photo_url": agent_photo_url,
+            "aadhar_card_front_url": aadhar_card_front_url,
+            "aadhar_card_back_url": aadhar_card_back_url,
+            "pan_card_front_url": pan_card_front_url,
+            "pan_card_back_url": pan_card_back_url,
         }
 
         missing_fields = check_missing_fields(required_fields)
@@ -3187,14 +3206,24 @@ def edit_handyman_details(request):
         """
 
         driver_values = [
-            data['agent_name'], data['mobile_no'], data['gender'], 
-            data['aadhar_no'], data['pan_no'], data['city_name'], 
-            data['house_no'], data['address'], data['agent_photo_url'], 
-            data['aadhar_card_front_url'], data['aadhar_card_back_url'], 
-            data['pan_card_front_url'], data['pan_card_back_url'], 
-            data['category_id'], data['city_id'], 
-            data['sub_cat_id'], data['service_id'], 
-            data['handyman_id']
+            agent_name,
+            mobile_no,
+            gender,
+            aadhar_no,
+            pan_no,
+            city_name,
+            house_no,
+            address,
+            agent_photo_url,
+            aadhar_card_front_url,
+            aadhar_card_back_url,
+            pan_card_front_url,
+            pan_card_back_url,
+            category_id,
+            city_id,
+            sub_cat_id,
+            service_id,
+            handyman_id,
         ]
 
         row_count = update_query(update_driver_query, driver_values)
