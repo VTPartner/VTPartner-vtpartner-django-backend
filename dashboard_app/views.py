@@ -1952,7 +1952,7 @@ def register_agent(request):
 
                     if owner_result:
                         # Owner exists, get the existing owner ID
-                        owner_id = owner_result[0]['owner_id']
+                        owner_id = owner_result[0][0]
                 except Exception as error:
                     print("Owner error::", error)
                     # Insert owner data into owner_tbl if it does not exist
@@ -1965,7 +1965,7 @@ def register_agent(request):
                     new_owner_result = insert_query(insert_owner_query, owner_values)
 
                     if new_owner_result:
-                        owner_id = new_owner_result[0]['owner_id']
+                        owner_id = new_owner_result[0][0]
                     else:
                         raise Exception("Failed to retrieve owner ID from insert operation")
 
@@ -2073,7 +2073,7 @@ def register_agent(request):
             driver_result = insert_query(insert_driver_query, driver_values)
 
             if driver_result:
-                driver_id = driver_result[0][driver_id_field]
+                driver_id = driver_result[0][0]
             else:
                 raise Exception("Failed to retrieve driver ID from insert operation")
 
