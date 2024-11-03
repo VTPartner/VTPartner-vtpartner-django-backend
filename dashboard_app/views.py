@@ -2040,13 +2040,13 @@ def register_agent(request):
                         pan_card_back, license_front, license_back,
                         insurance_image, noc_image, pollution_certificate_image,
                         rc_image, vehicle_image, category_id, vehicle_id, city_id,
-                        owner_id, vehicle_plate_image, status,
+                        owner_id, vehicle_plate_image,
                         driving_license_no, vehicle_plate_no, rc_no,
-                        insurance_no, noc_no
+                        insurance_no, noc_no,status
                     ) 
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s, %s, 1, %s, %s, %s, %s)
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s,'1')
                     RETURNING {driver_id_field}
                 """
                 driver_values = [
