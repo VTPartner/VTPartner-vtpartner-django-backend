@@ -3343,7 +3343,7 @@ def update_jcb_crane_driver_status(request):
             )
 
         # Prepare the update query and values
-        update_query = """
+        query = """
             UPDATE vtpartner.jcb_crane_driverstbl
             SET 
                 status = %s
@@ -3356,7 +3356,7 @@ def update_jcb_crane_driver_status(request):
             jcb_crane_driver_id,
         ]
 
-        row_count = update_query(update_query, update_values)
+        row_count = update_query(query, update_values)
 
         return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
@@ -3387,7 +3387,7 @@ def update_cab_driver_status(request):
             )
 
         # Prepare the update query and values
-        update_query = """
+        query = """
             UPDATE vtpartner.cab_driverstbl
             SET 
                 status = %s
@@ -3400,7 +3400,7 @@ def update_cab_driver_status(request):
             cab_driver_id,
         ]
 
-        row_count = update_query(update_query, update_values)
+        row_count = update_query(query, update_values)
 
         return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
@@ -3431,7 +3431,7 @@ def update_goods_driver_status(request):
             )
 
         # Prepare the update query and values
-        update_query = """
+        query = """
             UPDATE vtpartner.goods_driverstbl
             SET 
                 status = %s
@@ -3444,7 +3444,7 @@ def update_goods_driver_status(request):
             goods_driver_id,
         ]
 
-        row_count = update_query(update_query, update_values)
+        row_count = update_query(query, update_values)
 
         return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
