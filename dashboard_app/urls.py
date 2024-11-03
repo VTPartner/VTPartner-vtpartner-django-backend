@@ -95,5 +95,11 @@ urlpatterns = [
     #Admin Login
     path('edit_new_faq',views.edit_new_faq,name='edit_new_faq'),
     #Admin Login
+    path('all_estimations',views.all_estimations,name='all_estimations'),
+    #Admin Login
+    path('delete_estimation',views.delete_estimation,name='delete_estimation'),
+    #Admin Login
+    path('delete_enquiry',views.delete_enquiry,name='delete_enquiry'),
+    #Admin Login
     # path('login',views.login_view,name='login'),
 ]

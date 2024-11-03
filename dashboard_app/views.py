@@ -126,6 +126,11 @@ def update_query(query, params):
         cursor.execute(query, params)
         return cursor.rowcount
 
+def delete_query(query, params):
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        return cursor.rowcount
+
 def insert_query(query, params):
     try:
         with connection.cursor() as cursor:
@@ -2530,7 +2535,6 @@ def all_jcb_crane_drivers(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-
 @csrf_exempt
 def all_handy_man(request):
     if request.method == "POST":
@@ -3136,3 +3140,162 @@ def edit_new_faq(request):
     except Exception as err:
         print("Error executing add new faq query", err)
         return JsonResponse({"message": "Error executing add new faq query"}, status=500)
+
+@csrf_exempt
+def all_estimations(request):
+    if request.method == "POST":
+        try:
+            query = """
+                SELECT 
+                    er.request_id,
+                    er.category_id,
+                    cat.category_name,
+                    cat.category_image,
+                    cat.description AS category_description,
+                    er.start_address,
+                    er.end_address,
+                    er.work_description,
+                    er.name,
+                    er.mobile_no,
+                    er.purpose,
+                    er.hours,
+                    er.days,
+                    er.request_date,
+                    er.request_time,
+                    er.city_id,
+                    er.request_type,
+                    er.sub_cat_id,
+                    sub.sub_cat_name,
+                    sub.image AS sub_category_image,
+                    er.service_id,
+                    serv.service_name,
+                    serv.service_image AS service_image
+                FROM 
+                    vtpartner.estimation_request_tbl er
+                LEFT JOIN 
+                    vtpartner.categorytbl cat ON er.category_id = cat.category_id
+                LEFT JOIN 
+                    vtpartner.sub_categorytbl sub ON er.sub_cat_id = sub.sub_cat_id
+                LEFT JOIN 
+                    vtpartner.other_servicestbl serv ON er.service_id = serv.service_id;
+            """
+
+            result = select_query(query)  # Assuming select_query returns a list of tuples
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+                     # Map the results to a list of dictionaries
+            mapped_results = []
+            for row in result:
+                mapped_results.append({
+                    "request_id": row[0],
+                    "category_id": row[1],
+                    "category_name": row[2],
+                    "category_image": row[3],
+                    "category_description": row[4],
+                    "start_address": row[5],
+                    "end_address": row[6],
+                    "work_description": row[7],
+                    "name": row[8],
+                    "mobile_no": row[9],
+                    "purpose": row[10],
+                    "hours": row[11],
+                    "days": row[12],
+                    "request_date": row[13],
+                    "request_time": row[14],
+                    "city_id": row[15],
+                    "request_type": row[16],
+                    "sub_cat_id": row[17],
+                    "sub_cat_name": row[18],
+                    "sub_category_image": row[19],
+                    "service_id": row[20],
+                    "service_name": row[21],
+                    "service_image": row[22]
+                })
+
+            return JsonResponse({"all_estimations_details": mapped_results}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+    
+@csrf_exempt
+def delete_estimation(request):
+    try:
+        data = json.loads(request.body)
+        request_id = data.get("request_id")
+        
+        
+        # List of required fields
+        required_fields = {
+            "request_id":request_id,
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        
+        query = """
+            DELETE from vtpartner.estimation_request_tbl 
+            WHERE request_id=%s
+        """
+        values = [
+            request_id,
+        ]
+        row_count = delete_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+
+    except Exception as err:
+        print("Error executing deleting query estimation_request_tbl", err)
+        return JsonResponse({"message": "Error executing deleting query"}, status=500)
+   
+@csrf_exempt
+def delete_enquiry(request):
+    try:
+        data = json.loads(request.body)
+        enquiry_id = data.get("enquiry_id")
+        
+        
+        # List of required fields
+        required_fields = {
+            "enquiry_id":enquiry_id,
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        
+        query = """
+            DELETE from vtpartner.enquirytbl 
+            WHERE enquiry_id=%s
+        """
+        values = [
+            enquiry_id,
+        ]
+        row_count = delete_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+
+    except Exception as err:
+        print("Error executing deleting query enquirytbl", err)
+        return JsonResponse({"message": "Error executing deleting query"}, status=500)
