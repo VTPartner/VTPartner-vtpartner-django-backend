@@ -1972,7 +1972,7 @@ def register_agent(request):
                             owner_id = owner_result[0][0]
                             
                     
-                    
+            
                 except Exception as error:
                     print("Owner error::", error)
                     # Insert owner data into owner_tbl if it does not exist
@@ -1988,7 +1988,8 @@ def register_agent(request):
                         owner_id = new_owner_result[0][0]
                     else:
                         raise Exception("Failed to retrieve owner ID from insert operation")
-
+            if owner_id == None:
+                return JsonResponse({"message": "Invalid Owner Id"}, status=500)
             # Determine driver table and related fields based on category_id
             driver_table, name_column, driver_id_field = None, None, None
 
