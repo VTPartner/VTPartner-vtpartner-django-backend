@@ -1947,47 +1947,31 @@ def register_agent(request):
             owner_id = None
             if owner_name and owner_mobile_no:
                 try:
+                    # Check if owner already exists based on mobile number
                     check_owner_query = "SELECT owner_id FROM vtpartner.owner_tbl WHERE owner_mobile_no = %s"
                     owner_result = select_query(check_owner_query, [owner_mobile_no])
-                    print("owner_result::",owner_result)
+            
                     if owner_result:
                         # Owner exists, get the existing owner ID
                         owner_id = owner_result[0][0]
-                    print("owner_id::",owner_id)
-                    if owner_result == []:
+                    else:
+                        # Insert new owner if not found
                         insert_owner_query = """
-                        INSERT INTO vtpartner.owner_tbl (
-                            owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
-                        ) VALUES (%s, %s, %s, %s, %s, %s) RETURNING owner_id
-                    """
+                            INSERT INTO vtpartner.owner_tbl (
+                                owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
+                            ) VALUES (%s, %s, %s, %s, %s, %s) RETURNING owner_id
+                        """
                         owner_values = [owner_name, owner_mobile_no, owner_house_no, owner_city_name, owner_address, owner_photo_url]
                         new_owner_result = insert_query(insert_owner_query, owner_values)
-
+            
                         if new_owner_result:
                             owner_id = new_owner_result[0][0]
                         else:
                             raise Exception("Failed to retrieve owner ID from insert operation")
-                        if owner_result:
-                            # Owner exists, get the existing owner ID
-                            owner_id = owner_result[0][0]
-                            
-                    
             
                 except Exception as error:
                     print("Owner error::", error)
-                    # Insert owner data into owner_tbl if it does not exist
-                    insert_owner_query = """
-                        INSERT INTO vtpartner.owner_tbl (
-                            owner_name, owner_mobile_no, house_no, city_name, address, profile_photo
-                        ) VALUES (%s, %s, %s, %s, %s, %s) RETURNING owner_id
-                    """
-                    owner_values = [owner_name, owner_mobile_no, owner_house_no, owner_city_name, owner_address, owner_photo_url]
-                    new_owner_result = insert_query(insert_owner_query, owner_values)
 
-                    if new_owner_result:
-                        owner_id = new_owner_result[0][0]
-                    else:
-                        raise Exception("Failed to retrieve owner ID from insert operation")
             if owner_id == None:
                 return JsonResponse({"message": "Invalid Owner Id"}, status=500)
             # Determine driver table and related fields based on category_id
