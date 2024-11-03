@@ -2083,12 +2083,12 @@ def register_agent(request):
             if optional_documents:
                 insert_document_query = f"""
                     INSERT INTO vtpartner.documents_vehicle_verified_tbl (
-                         {driver_id_field}, document_name, file_url
+                         {driver_id_field}, document_name, document_image_url
                     ) VALUES (%s, %s, %s)
                 """
 
                 for doc in optional_documents:
-                    document_values = (driver_id, doc.get("document_name"), doc.get("file_url"))
+                    document_values = (driver_id, doc.get("other"), doc.get("imageUrl"))
                     insert_query(insert_document_query, document_values)
 
             return JsonResponse({"message": "Registration successful"}, status=201)
