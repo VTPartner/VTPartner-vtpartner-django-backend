@@ -2077,12 +2077,13 @@ def register_agent(request):
                 raise Exception("Failed to insert driver data")
 
             driver_id = driver_result[0][0]
+            print("driver_id::",driver_id)
 
             # Insert optional documents if they exist
             if optional_documents:
-                insert_document_query = """
+                insert_document_query = f"""
                     INSERT INTO vtpartner.documents_vehicle_verified_tbl (
-                        driver_id, document_name, file_url
+                         {driver_id_field}, document_name, file_url
                     ) VALUES (%s, %s, %s)
                 """
 
