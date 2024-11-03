@@ -92,8 +92,10 @@ urlpatterns = [
     path('edit_driver_details',views.edit_driver_details,name='edit_driver_details'),
     #Admin Login
     path('add_driver_details',views.add_driver_details,name='add_driver_details'),
-    #Admin Login
+    #Handyman Details
     path('edit_handyman_details',views.edit_handyman_details,name='edit_handyman_details'),
+    #ADD New Handyman Details
+    path('add_new_handyman_details',views.add_new_handyman_details,name='add_new_handyman_details'),
     #Admin Login
     path('all_faqs',views.all_faqs,name='all_faqs'),
     #Admin Login
