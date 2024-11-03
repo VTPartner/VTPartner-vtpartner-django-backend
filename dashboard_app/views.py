@@ -1984,11 +1984,11 @@ def register_agent(request):
                 driver_table = "vtpartner.jcb_crane_driverstbl"
                 name_column = "driver_name"
                 driver_id_field = "jcb_crane_driver_id"
-            elif category_id == 4:
+            elif category_id == "4":
                 driver_table = "vtpartner.other_driverstbl"
                 name_column = "driver_first_name"
                 driver_id_field = "other_driver_id"
-            elif category_id == 5:
+            elif category_id == "5":
                 driver_table = "vtpartner.handyman_servicestbl"
                 name_column = "name"
                 driver_id_field = "handyman_id"
@@ -2015,14 +2015,14 @@ def register_agent(request):
             if category_id in [4, 5]:  # Handyman Service specific columns
                 insert_driver_query = f"""
                     INSERT INTO {driver_table} (
-            {name_column}, mobile_no, gender, aadhar_no, pan_card_no,
-            city_name, house_no, full_address, profile_pic,
-            aadhar_card_front, aadhar_card_back, pan_card_front,
-            pan_card_back, category_id, city_id, sub_cat_id, service_id, status
-        ) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
-            %s, %s, %s, %s, %s, %s, %s, %s, 1)
-        RETURNING {driver_id_field}
+                        {name_column}, mobile_no, gender, aadhar_no, pan_card_no,
+                        city_name, house_no, full_address, profile_pic,
+                        aadhar_card_front, aadhar_card_back, pan_card_front,
+                        pan_card_back, category_id, city_id, sub_cat_id, service_id, status
+                    ) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s, %s, %s, 1)
+                    RETURNING {driver_id_field}
                 """
                 driver_values = [
                     *common_values,
@@ -2034,20 +2034,20 @@ def register_agent(request):
             else:  # Other categories (Goods, Cab, JCB/Crane)
                 insert_driver_query = f"""
                     INSERT INTO {driver_table} (
-                     {name_column}, mobile_no, gender, aadhar_no, pan_card_no,
-                     city_name, house_no, full_address, profile_pic,
-                     aadhar_card_front, aadhar_card_back, pan_card_front,
-                     pan_card_back, license_front, license_back,
-                     insurance_image, noc_image, pollution_certificate_image,
-                     rc_image, vehicle_image, category_id, vehicle_id, city_id,
-                     owner_id, vehicle_plate_image, status,
-                     driving_license_no, vehicle_plate_no, rc_no,
-                     insurance_no, noc_no
-                 ) 
-                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
-                     %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                     %s, %s, %s, %s, %s, %s, 1, %s, %s, %s, %s, %s)
-                 RETURNING {driver_id_field}
+                        {name_column}, mobile_no, gender, aadhar_no, pan_card_no,
+                        city_name, house_no, full_address, profile_pic,
+                        aadhar_card_front, aadhar_card_back, pan_card_front,
+                        pan_card_back, license_front, license_back,
+                        insurance_image, noc_image, pollution_certificate_image,
+                        rc_image, vehicle_image, category_id, vehicle_id, city_id,
+                        owner_id, vehicle_plate_image, status,
+                        driving_license_no, vehicle_plate_no, rc_no,
+                        insurance_no, noc_no
+                    ) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s, 1, %s, %s, %s, %s, %s)
+                    RETURNING {driver_id_field}
                 """
                 driver_values = [
                     *common_values,
@@ -2073,7 +2073,7 @@ def register_agent(request):
             driver_result = insert_query(insert_driver_query, driver_values)
 
             if driver_result:
-                driver_id = driver_result[0][0]
+                driver_id = driver_result[0][driver_id_field]
             else:
                 raise Exception("Failed to retrieve driver ID from insert operation")
 
@@ -2669,7 +2669,7 @@ def edit_driver_details(request):
                 owner_result = select_query(check_owner_query, [owner_mobile_no])
 
                 if owner_result:
-                    owner_id = owner_result[0]['owner_id']
+                    owner_id = owner_result[0][0]
                     update_owner_query = """
                         UPDATE vtpartner.owner_tbl SET 
                         house_no = %s, city_name = %s, address = %s, profile_photo = %s, owner_name = %s 
@@ -2699,19 +2699,19 @@ def edit_driver_details(request):
                         required_fields["owner_photo_url"]
                     ]
                     new_owner_result = insert_query(insert_owner_query, owner_values)
-                    owner_id = new_owner_result[0]['owner_id']
+                    owner_id = new_owner_result[0][0]
 
             # Determine the driver table and ID field based on category_id
             category_id = required_fields["category_id"]
-            if category_id == "1":
+            if category_id == 1:
                 driver_table = "vtpartner.goods_driverstbl"
                 name_column = "driver_first_name"
                 driver_id_field = "goods_driver_id"
-            elif category_id == "2":
+            elif category_id == 2:
                 driver_table = "vtpartner.cab_driverstbl"
                 name_column = "driver_first_name"
                 driver_id_field = "cab_driver_id"
-            elif category_id == "3":
+            elif category_id == 3:
                 driver_table = "vtpartner.jcb_crane_driverstbl"
                 name_column = "driver_name"
                 driver_id_field = "jcb_crane_driver_id"
@@ -2819,7 +2819,7 @@ def add_driver_details(request):
                 owner_result = select_query(check_owner_query, [owner_mobile_no])
 
                 if owner_result:
-                    owner_id = owner_result[0]['owner_id']
+                    owner_id = owner_result[0][0]
                 else:
                     insert_owner_query = """
                         INSERT INTO vtpartner.owner_tbl 
@@ -2835,21 +2835,21 @@ def add_driver_details(request):
                         required_fields["owner_photo_url"],
                     ]
                     new_owner_result = insert_query(insert_owner_query, owner_values)
-                    owner_id = new_owner_result[0]['owner_id']
+                    owner_id = new_owner_result[0][0]
 
             driver_table, name_column, driver_id_field = None, None, None
 
             # Determine the driver table and ID field based on category_id
             category_id = required_fields["category_id"]
-            if category_id == "1":
+            if category_id == 1:
                 driver_table = "vtpartner.goods_driverstbl"
                 name_column = "driver_first_name"
                 driver_id_field = "goods_driver_id"
-            elif category_id == "2":
+            elif category_id == 2:
                 driver_table = "vtpartner.cab_driverstbl"
                 name_column = "driver_first_name"
                 driver_id_field = "cab_driver_id"
-            elif category_id == "3":
+            elif category_id == 3:
                 driver_table = "vtpartner.jcb_crane_driverstbl"
                 name_column = "driver_name"
                 driver_id_field = "jcb_crane_driver_id"
