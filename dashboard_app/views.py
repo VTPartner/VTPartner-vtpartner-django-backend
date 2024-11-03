@@ -3177,7 +3177,7 @@ def all_estimations(request):
                 LEFT JOIN 
                     vtpartner.sub_categorytbl sub ON er.sub_cat_id = sub.sub_cat_id
                 LEFT JOIN 
-                    vtpartner.other_servicestbl serv ON er.service_id = serv.service_id;
+                    vtpartner.other_servicestbl serv ON er.service_id = serv.service_id ORDER BY er.request_id DESC
             """
 
             result = select_query(query)  # Assuming select_query returns a list of tuples
