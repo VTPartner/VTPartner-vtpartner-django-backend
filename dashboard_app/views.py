@@ -3342,6 +3342,112 @@ def edit_other_driver_details(request):
         return JsonResponse({"message": "Error executing updating driver query"}, status=500)
 
 @csrf_exempt
+def add_other_driver_details(request):
+    try:
+        data = json.loads(request.body)
+        print("body::",data)
+        # other_driver_id= data.get("other_driver_id"),
+        agent_name= data.get("agent_name"),
+        mobile_no= data.get("mobile_no"),
+        gender= data.get("gender"),
+        aadhar_no= data.get("aadhar_no"),
+        pan_no= data.get("pan_no"),
+        city_id= data.get("city_id"),
+        city_name= data.get("city_name"),
+        house_no= data.get("house_no"),
+        address= data.get("address"),
+        category_id= data.get("category_id"),
+        sub_cat_id= data.get("sub_cat_id"),
+        service_id= data.get("service_id"),
+        agent_photo_url= data.get("agent_photo_url"),
+        aadhar_card_front_url= data.get("aadhar_card_front_url"),
+        aadhar_card_back_url= data.get("aadhar_card_back_url"),
+        pan_card_front_url= data.get("pan_card_front_url"),
+        pan_card_back_url= data.get("pan_card_back_url"),
+        
+        required_fields = {
+            # "other_driver_id": other_driver_id,
+            "agent_name": agent_name,
+            "mobile_no": mobile_no,
+            "gender": gender,
+            "aadhar_no": aadhar_no,
+            "pan_no": pan_no,
+            "city_id": city_id,
+            "city_name": city_name,
+            "house_no": house_no,
+            "address": address,
+            "category_id": category_id,
+            "sub_cat_id": sub_cat_id,
+            "service_id": service_id,
+            "agent_photo_url": agent_photo_url,
+            "aadhar_card_front_url": aadhar_card_front_url,
+            "aadhar_card_back_url": aadhar_card_back_url,
+            "pan_card_front_url": pan_card_front_url,
+            "pan_card_back_url": pan_card_back_url,
+        }
+
+        missing_fields = check_missing_fields(required_fields)
+
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Prepare the update query and values
+        add_driver_query = """
+            INSERT INTO vtpartner.other_driverstbl
+            (
+                
+                mobile_no ,
+                gender ,
+                aadhar_no ,
+                pan_card_no ,
+                city_name ,
+                house_no ,
+                full_address ,
+                profile_pic ,
+                aadhar_card_front ,
+                aadhar_card_back ,
+                pan_card_front ,
+                pan_card_back ,
+                category_id ,
+                city_id ,
+                sub_cat_id ,
+                service_id ,
+                status ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'1')
+        """
+
+        driver_values = [
+            
+            mobile_no,
+            gender,
+            aadhar_no,
+            pan_no,
+            city_name,
+            house_no,
+            address,
+            agent_photo_url,
+            aadhar_card_front_url,
+            aadhar_card_back_url,
+            pan_card_front_url,
+            pan_card_back_url,
+            category_id,
+            city_id,
+            sub_cat_id,
+            service_id,
+            
+        ]
+
+        row_count = insert_query(add_driver_query, driver_values)
+
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing adding driver query", err)
+        return JsonResponse({"message": "Error executing adding driver query"}, status=500)
+
+@csrf_exempt
 def all_faqs(request):
     if request.method == "POST":
         try:

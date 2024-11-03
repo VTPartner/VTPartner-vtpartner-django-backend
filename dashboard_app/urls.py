@@ -86,6 +86,8 @@ urlpatterns = [
     path('all_drivers',views.all_drivers,name='all_drivers'),
     #Other Drivers Service Edit
     path('edit_other_driver_details',views.edit_other_driver_details,name='edit_other_driver_details'),
+    #Other Drivers Service Add
+    path('add_other_driver_details',views.add_other_driver_details,name='add_other_driver_details'),
     #Admin Login
     path('edit_driver_details',views.edit_driver_details,name='edit_driver_details'),
     #Admin Login
