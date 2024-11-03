@@ -3239,8 +3239,8 @@ def update_handyman_status(request):
     try:
         data = json.loads(request.body)
         print("body::",data)
-        handyman_id= data.get("handyman_id"),
-        status= data.get("status"),
+        handyman_id= str(data.get("handyman_id")),
+        status= str(data.get("status")),
         
         
         required_fields = {
