@@ -3239,8 +3239,8 @@ def update_handyman_status(request):
     try:
         data = json.loads(request.body)
         print("body::",data)
-        handyman_id= str(data.get("handyman_id")),
-        status= str(data.get("status")),
+        handyman_id= data.get("handyman_id"),
+        status= data.get("status"),
         
         
         required_fields = {
@@ -3301,7 +3301,7 @@ def update_other_driver_status(request):
             )
 
         # Prepare the update query and values
-        update_query = """
+        query = """
             UPDATE vtpartner.other_driverstbl
             SET 
                 status = %s,
@@ -3314,7 +3314,7 @@ def update_other_driver_status(request):
             other_driver_id,
         ]
 
-        row_count = update_query(update_query, update_values)
+        row_count = update_query(query, update_values)
 
         return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
