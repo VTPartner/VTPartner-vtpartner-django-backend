@@ -3235,6 +3235,227 @@ def edit_handyman_details(request):
         return JsonResponse({"message": "Error executing updating driver query"}, status=500)
 
 @csrf_exempt
+def update_handyman_status(request):
+    try:
+        data = json.loads(request.body)
+        print("body::",data)
+        handyman_id= data.get("handyman_id"),
+        status= data.get("status"),
+        
+        
+        required_fields = {
+            "handyman_id": handyman_id,
+            "status": status,
+        }
+
+        missing_fields = check_missing_fields(required_fields)
+
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Prepare the update query and values
+        update_query = """
+            UPDATE vtpartner.handyman_servicestbl
+            SET 
+                status = %s,
+            WHERE handyman_id = %s
+        """
+
+        update_values = [
+            status,
+            handyman_id,
+        ]
+
+        row_count = update_query(update_query, update_values)
+
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing updating  query", err)
+        return JsonResponse({"message": "Error executing updating  query"}, status=500)
+
+
+@csrf_exempt
+def update_other_driver_status(request):
+    try:
+        data = json.loads(request.body)
+        print("body::",data)
+        other_driver_id= data.get("other_driver_id"),
+        status= data.get("status"),
+        
+        
+        required_fields = {
+            "other_driver_id": other_driver_id,
+            "status": status,
+        }
+
+        missing_fields = check_missing_fields(required_fields)
+
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Prepare the update query and values
+        update_query = """
+            UPDATE vtpartner.other_driverstbl
+            SET 
+                status = %s,
+               
+            WHERE other_driver_id = %s
+        """
+
+        update_values = [
+            status,
+            other_driver_id,
+        ]
+
+        row_count = update_query(update_query, update_values)
+
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing updating  query", err)
+        return JsonResponse({"message": "Error executing updating  query"}, status=500)
+
+@csrf_exempt
+def update_jcb_crane_driver_status(request):
+    try:
+        data = json.loads(request.body)
+        print("body::",data)
+        jcb_crane_driver_id= data.get("jcb_crane_driver_id"),
+        status= data.get("status"),
+        
+        
+        required_fields = {
+            "jcb_crane_driver_id": jcb_crane_driver_id,
+            "status": status,
+        }
+
+        missing_fields = check_missing_fields(required_fields)
+
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Prepare the update query and values
+        update_query = """
+            UPDATE vtpartner.jcb_crane_driverstbl
+            SET 
+                status = %s,
+               
+            WHERE jcb_crane_driver_id = %s
+        """
+
+        update_values = [
+            status,
+            jcb_crane_driver_id,
+        ]
+
+        row_count = update_query(update_query, update_values)
+
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing updating  query", err)
+        return JsonResponse({"message": "Error executing updating  query"}, status=500)
+
+@csrf_exempt
+def update_cab_driver_status(request):
+    try:
+        data = json.loads(request.body)
+        print("body::",data)
+        cab_driver_id= data.get("cab_driver_id"),
+        status= data.get("status"),
+        
+        
+        required_fields = {
+            "cab_driver_id": cab_driver_id,
+            "status": status,
+        }
+
+        missing_fields = check_missing_fields(required_fields)
+
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Prepare the update query and values
+        update_query = """
+            UPDATE vtpartner.cab_driverstbl
+            SET 
+                status = %s,
+               
+            WHERE cab_driver_id = %s
+        """
+
+        update_values = [
+            status,
+            cab_driver_id,
+        ]
+
+        row_count = update_query(update_query, update_values)
+
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing updating  query", err)
+        return JsonResponse({"message": "Error executing updating  query"}, status=500)
+
+@csrf_exempt
+def update_goods_driver_status(request):
+    try:
+        data = json.loads(request.body)
+        print("body::",data)
+        goods_driver_id= data.get("goods_driver_id"),
+        status= data.get("status"),
+        
+        
+        required_fields = {
+            "goods_driver_id": goods_driver_id,
+            "status": status,
+        }
+
+        missing_fields = check_missing_fields(required_fields)
+
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        # Prepare the update query and values
+        update_query = """
+            UPDATE vtpartner.goods_driverstbl
+            SET 
+                status = %s,
+               
+            WHERE goods_driver_id = %s
+        """
+
+        update_values = [
+            status,
+            goods_driver_id,
+        ]
+
+        row_count = update_query(update_query, update_values)
+
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing updating  query", err)
+        return JsonResponse({"message": "Error executing updating  query"}, status=500)
+
+
+@csrf_exempt
 def add_new_handyman_details(request):
     try:
         data = json.loads(request.body)

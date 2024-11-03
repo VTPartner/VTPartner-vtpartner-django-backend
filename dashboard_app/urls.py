@@ -109,5 +109,15 @@ urlpatterns = [
     #Admin Login
     path('delete_enquiry',views.delete_enquiry,name='delete_enquiry'),
     #Admin Login
+    path('update_other_driver_status',views.update_other_driver_status,name='update_other_driver_status'),
+    #Admin Login
+    path('update_handyman_status',views.update_handyman_status,name='update_handyman_status'),
+    #Admin Login
+    path('update_jcb_crane_driver_status',views.update_jcb_crane_driver_status,name='update_jcb_crane_driver_status'),
+    #Admin Login
+    path('update_cab_driver_status',views.update_cab_driver_status,name='update_cab_driver_status'),
+    #Admin Login
+    path('update_goods_driver_status',views.update_goods_driver_status,name='update_goods_driver_status'),
+    #Admin Login
     # path('login',views.login_view,name='login'),
 ]
