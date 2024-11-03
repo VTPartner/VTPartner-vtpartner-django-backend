@@ -3257,7 +3257,7 @@ def update_handyman_status(request):
             )
 
         # Prepare the update query and values
-        update_query = """
+        query = """
             UPDATE vtpartner.handyman_servicestbl
             SET 
                 status = %s
@@ -3269,7 +3269,7 @@ def update_handyman_status(request):
             handyman_id,
         ]
 
-        row_count = update_query(update_query, update_values)
+        row_count = update_query(query, update_values)
 
         return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
