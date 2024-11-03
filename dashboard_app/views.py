@@ -1950,6 +1950,10 @@ def register_agent(request):
                     check_owner_query = "SELECT owner_id FROM vtpartner.owner_tbl WHERE owner_mobile_no = %s"
                     owner_result = select_query(check_owner_query, [owner_mobile_no])
                     print("owner_result::",owner_result)
+                    if owner_result:
+                        # Owner exists, get the existing owner ID
+                        owner_id = owner_result[0][0]
+                    print("owner_id::",owner_id)
                     if owner_result == []:
                         insert_owner_query = """
                         INSERT INTO vtpartner.owner_tbl (
@@ -1967,6 +1971,8 @@ def register_agent(request):
                             # Owner exists, get the existing owner ID
                             owner_id = owner_result[0][0]
                             
+                    
+                    
                 except Exception as error:
                     print("Owner error::", error)
                     # Insert owner data into owner_tbl if it does not exist
