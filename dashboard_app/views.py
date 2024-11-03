@@ -2046,7 +2046,7 @@ def register_agent(request):
                     ) 
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s, %s, 1, %s, %s, %s, %s, %s)
+                        %s, %s, %s, %s, %s, %s, 1, %s, %s, %s, %s)
                     RETURNING {driver_id_field}
                 """
                 driver_values = [
