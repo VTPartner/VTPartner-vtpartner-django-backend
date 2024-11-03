@@ -83,6 +83,8 @@ urlpatterns = [
     #Admin Login
     path('all_handy_man',views.all_handy_man,name='all_handy_man'),
     #Admin Login
+    path('all_drivers',views.all_drivers,name='all_drivers'),
+    #Admin Login
     path('edit_driver_details',views.edit_driver_details,name='edit_driver_details'),
     #Admin Login
     path('add_driver_details',views.add_driver_details,name='add_driver_details'),

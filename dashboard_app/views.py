@@ -2609,6 +2609,114 @@ def all_handy_man(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt
+def all_drivers(request):
+    if request.method == "POST":
+        try:
+            query = """
+                SELECT 
+                    other_driverstbl.other_driver_id,
+                    other_driverstbl.driver_first_name,
+                    other_driverstbl.profile_pic,
+                    other_driverstbl.is_online,
+                    other_driverstbl.ratings,
+                    other_driverstbl.mobile_no,
+                    other_driverstbl.registration_date,
+                    other_driverstbl.time,
+                    other_driverstbl.r_lat,
+                    other_driverstbl.r_lng,
+                    other_driverstbl.current_lat,
+                    other_driverstbl.current_lng,
+                    other_driverstbl.status,
+                    other_driverstbl.recent_online_pic,
+                    other_driverstbl.is_verified,
+                    other_driverstbl.category_id,
+                    other_driverstbl.sub_cat_id,
+                    other_driverstbl.service_id,
+                    other_driverstbl.city_id,
+                    other_driverstbl.aadhar_no,
+                    other_driverstbl.pan_card_no,
+                    other_driverstbl.house_no,
+                    other_driverstbl.city_name,
+                    other_driverstbl.full_address,
+                    other_driverstbl.gender,
+                    other_driverstbl.aadhar_card_front,
+                    other_driverstbl.aadhar_card_back,
+                    other_driverstbl.pan_card_front,
+                    other_driverstbl.pan_card_back,
+                    sub_categorytbl.sub_cat_name,
+                    other_servicestbl.service_name,
+                    categorytbl.category_name
+                FROM 
+                    vtpartner.other_driverstbl
+                LEFT JOIN 
+                    vtpartner.sub_categorytbl 
+ON 
+                    other_driverstbl.sub_cat_id = sub_categorytbl.sub_cat_id
+                LEFT JOIN 
+                    vtpartner.other_servicestbl 
+                ON 
+                    other_driverstbl.service_id = other_servicestbl.service_id
+                LEFT JOIN 
+                    vtpartner.categorytbl 
+                ON 
+                    other_driverstbl.category_id = categorytbl.category_id
+                ORDER BY 
+                    other_driverstbl.other_driver_id DESC;
+
+            """
+
+            result = select_query(query)  # Assuming select_query returns a list of tuples
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map the results to a list of dictionaries
+            mapped_results = []
+            for row in result:
+                mapped_results.append({
+                    "other_driver_id": row[0],
+                    "driver_first_name": row[1],
+                    "profile_pic": row[2],
+                    "is_online": row[3],
+                    "ratings": row[4],
+                    "mobile_no": row[5],
+                    "registration_date": row[6],
+                    "time": row[7],
+                    "r_lat": row[8],
+                    "r_lng": row[9],
+                    "current_lat": row[10],
+                    "current_lng": row[11],
+                    "status": row[12],
+                    "recent_online_pic": row[13],
+                    "is_verified": row[14],
+                    "category_id": row[15],
+                    "sub_cat_id": row[16],
+                    "service_id": row[17],
+                    "city_id": row[18],
+                    "aadhar_no": row[19],
+                    "pan_card_no": row[20],
+                    "house_no": row[21],
+                    "city_name": row[22],
+                    "full_address": row[23],
+                    "gender": row[24],
+                    "aadhar_card_front": row[25],
+                    "aadhar_card_back": row[26],
+                    "pan_card_front": row[27],
+                    "pan_card_back": row[28],
+                    "sub_cat_name": row[29],
+                    "service_name": row[30],
+                    "category_name": row[31]
+                })
+
+            return JsonResponse({"all_drivers_details": mapped_results}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
 def edit_driver_details(request):
     if request.method == "POST":
         try:
