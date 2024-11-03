@@ -2132,7 +2132,7 @@ def check_driver_existence(request):
 
             if result:
                 # Driver exists, return a message with their ID
-                driver_id = result[0]['goods_driver_id']
+                driver_id = result[0][0]
                 
                 # Update enquiry status
                 try:
@@ -2205,7 +2205,7 @@ def check_handyman_existence(request):
 
             if result:
                 # Handy man exists, return a message with their ID
-                handyman_id = result[0]['handyman_id'] if category_id == "5" else result[0]['other_driver_id']
+                handyman_id = result[0][0] if category_id == "5" else result[0][0]
                 
                 # Update enquiry status
                 try:
