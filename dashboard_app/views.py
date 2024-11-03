@@ -3398,7 +3398,7 @@ def add_other_driver_details(request):
         add_driver_query = """
             INSERT INTO vtpartner.other_driverstbl
             (
-                
+                driver_first_name,
                 mobile_no ,
                 gender ,
                 aadhar_no ,
@@ -3415,7 +3415,7 @@ def add_other_driver_details(request):
                 city_id ,
                 sub_cat_id ,
                 service_id ,
-                status ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'1')
+                status ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'1')
         """
 
         driver_values = [
