@@ -3260,7 +3260,7 @@ def update_handyman_status(request):
         update_query = """
             UPDATE vtpartner.handyman_servicestbl
             SET 
-                status = %s,
+                status = %s
             WHERE handyman_id = %s
         """
 
