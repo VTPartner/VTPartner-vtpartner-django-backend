@@ -2607,55 +2607,94 @@ def all_handy_man(request):
 def edit_driver_details(request):
     if request.method == "POST":
         try:
-            data = request.POST
+            data = json.loads(request.body)
+            print("req.body::", data)
+
+            # Extract fields from request body
+            driver_id= data.get("driver_id")
+            agent_name= data.get("agent_name")
+            mobile_no= data.get("mobile_no")
+            gender= data.get("gender")
+            aadhar_no= data.get("aadhar_no")
+            pan_no= data.get("pan_no")
+            city_name= data.get("city_name")
+            house_no= data.get("house_no")
+            address= data.get("address")
+            agent_photo_url= data.get("agent_photo_url")
+            aadhar_card_front_url= data.get("aadhar_card_front_url")
+            aadhar_card_back_url= data.get("aadhar_card_back_url")
+            pan_card_front_url= data.get("pan_card_front_url")
+            pan_card_back_url= data.get("pan_card_back_url")
+            license_front_url= data.get("license_front_url")
+            license_back_url= data.get("license_back_url")
+            insurance_image_url= data.get("insurance_image_url")
+            noc_image_url= data.get("noc_image_url")
+            pollution_certificate_image_url= data.get("pollution_certificate_image_url")
+            rc_image_url= data.get("rc_image_url")
+            vehicle_image_url= data.get("vehicle_image_url")
+            category_id= int(data.get("category_id"))
+            vehicle_id= data.get("vehicle_id")
+            city_id= data.get("city_id")
+            owner_name= data.get("owner_name")
+            owner_mobile_no= data.get("owner_mobile_no")
+            owner_house_no= data.get("owner_house_no")
+            owner_city_name= data.get("owner_city_name")
+            owner_address= data.get("owner_address")
+            owner_photo_url= data.get("owner_photo_url")
+            vehicle_plate_image= data.get("vehicle_plate_image")
+            driving_license_no= data.get("driving_license_no")
+            vehicle_plate_no= data.get("vehicle_plate_no")
+            rc_no= data.get("rc_no")
+            insurance_no= data.get("insurance_no")
+            noc_no= data.get("noc_no")
+            owner_id= data.get("owner_id")             # Required fields chec
+            
+            
             required_fields = {
-                "driver_id": data.get("driver_id"),
-                "agent_name": data.get("agent_name"),
-                "mobile_no": data.get("mobile_no"),
-                "gender": data.get("gender"),
-                "aadhar_no": data.get("aadhar_no"),
-                "pan_no": data.get("pan_no"),
-                "city_name": data.get("city_name"),
-                "house_no": data.get("house_no"),
-                "address": data.get("address"),
-                "agent_photo_url": data.get("agent_photo_url"),
-                "aadhar_card_front_url": data.get("aadhar_card_front_url"),
-                "aadhar_card_back_url": data.get("aadhar_card_back_url"),
-                "pan_card_front_url": data.get("pan_card_front_url"),
-                "pan_card_back_url": data.get("pan_card_back_url"),
-                "license_front_url": data.get("license_front_url"),
-                "license_back_url": data.get("license_back_url"),
-                "insurance_image_url": data.get("insurance_image_url"),
-                "noc_image_url": data.get("noc_image_url"),
-                "pollution_certificate_image_url": data.get("pollution_certificate_image_url"),
-                "rc_image_url": data.get("rc_image_url"),
-                "vehicle_image_url": data.get("vehicle_image_url"),
-                "category_id": data.get("category_id"),
-                "vehicle_id": data.get("vehicle_id"),
-                "city_id": data.get("city_id"),
-                "owner_name": data.get("owner_name"),
-                "owner_mobile_no": data.get("owner_mobile_no"),
-                "owner_house_no": data.get("owner_house_no"),
-                "owner_city_name": data.get("owner_city_name"),
-                "owner_address": data.get("owner_address"),
-                "owner_photo_url": data.get("owner_photo_url"),
-                "vehicle_plate_image": data.get("vehicle_plate_image"),
-                "driving_license_no": data.get("driving_license_no"),
-                "vehicle_plate_no": data.get("vehicle_plate_no"),
-                "rc_no": data.get("rc_no"),
-                "insurance_no": data.get("insurance_no"),
-                "noc_no": data.get("noc_no"),
-                "owner_id": data.get("owner_id"),
+                "driver_id": driver_id,
+                "agent_name": agent_name,
+                "mobile_no": mobile_no,
+                "gender": gender,
+                "aadhar_no": aadhar_no,
+                "pan_no": pan_no,
+                "city_name": city_name,
+                "house_no": house_no,
+                "address": address,
+                "agent_photo_url": agent_photo_url,
+                "aadhar_card_front_url": aadhar_card_front_url,
+                "aadhar_card_back_url": aadhar_card_back_url,
+                "pan_card_front_url": pan_card_front_url,
+                "pan_card_back_url": pan_card_back_url,
+                "license_front_url": license_front_url,
+                "license_back_url": license_back_url,
+                "insurance_image_url": insurance_image_url,
+                "noc_image_url": noc_image_url,
+                "pollution_certificate_image_url": pollution_certificate_image_url,
+                "rc_image_url": rc_image_url,
+                "vehicle_image_url": vehicle_image_url,
+                "category_id": category_id,
+                "vehicle_id": vehicle_id,
+                "city_id": city_id,
+                "owner_name": owner_name,
+                "owner_mobile_no": owner_mobile_no,
+                "owner_house_no": owner_house_no,
+                "owner_city_name": owner_city_name,
+                "owner_address": owner_address,
+                "owner_photo_url": owner_photo_url,
+                "vehicle_plate_image": vehicle_plate_image,
+                "driving_license_no": driving_license_no,
+                "vehicle_plate_no": vehicle_plate_no,
+                "rc_no": rc_no,
+                "insurance_no": insurance_no,
+                "noc_no": noc_no,
+                "owner_id": owner_id,
             }
 
             missing_fields = check_missing_fields(required_fields)
             if missing_fields:
                 return JsonResponse({"message": f"Missing required fields: {', '.join(missing_fields)}"}, status=400)
 
-            driver_id = required_fields["driver_id"]
-            owner_name = required_fields["owner_name"]
-            owner_mobile_no = required_fields["owner_mobile_no"]
-            owner_id = None
+            
 
             # Handle Owner details
             if owner_name and owner_mobile_no:
@@ -2673,10 +2712,10 @@ def edit_driver_details(request):
                         WHERE owner_id = %s
                     """
                     owner_values = [
-                        required_fields["owner_house_no"], 
-                        required_fields["owner_city_name"],
-                        required_fields["owner_address"], 
-                        required_fields["owner_photo_url"],
+                        owner_house_no,
+                        owner_city_name,
+                        owner_address,
+                        owner_photo_url,
                         owner_name, 
                         owner_id
                     ]
@@ -2690,16 +2729,16 @@ def edit_driver_details(request):
                     owner_values = [
                         owner_name, 
                         owner_mobile_no, 
-                        required_fields["owner_house_no"], 
-                        required_fields["owner_city_name"],
-                        required_fields["owner_address"], 
-                        required_fields["owner_photo_url"]
+                        owner_house_no,
+                        owner_city_name,
+                        owner_address,
+                        owner_photo_url,
                     ]
                     new_owner_result = insert_query(insert_owner_query, owner_values)
                     owner_id = new_owner_result[0][0]
 
             # Determine the driver table and ID field based on category_id
-            category_id = required_fields["category_id"]
+            
             if category_id == 1:
                 driver_table = "vtpartner.goods_driverstbl"
                 name_column = "driver_first_name"
@@ -2730,20 +2769,39 @@ def edit_driver_details(request):
             """
 
             driver_values = [
-                required_fields["agent_name"], required_fields["mobile_no"], required_fields["gender"], 
-                required_fields["aadhar_no"], required_fields["pan_no"], required_fields["city_name"],
-                required_fields["house_no"], required_fields["address"], required_fields["agent_photo_url"],
-                required_fields["aadhar_card_front_url"], required_fields["aadhar_card_back_url"],
-                required_fields["pan_card_front_url"], required_fields["pan_card_back_url"],
-                required_fields["license_front_url"], required_fields["license_back_url"],
-                required_fields["insurance_image_url"], required_fields["noc_image_url"],
-                required_fields["pollution_certificate_image_url"], required_fields["rc_image_url"],
-                required_fields["vehicle_image_url"], category_id, required_fields["vehicle_id"],
-                required_fields["city_id"], owner_id, required_fields["vehicle_plate_image"],
-                required_fields["driving_license_no"], required_fields["vehicle_plate_no"],
-                required_fields["rc_no"], required_fields["insurance_no"], required_fields["noc_no"],
+                agent_name, 
+                mobile_no, 
+                gender,
+                aadhar_no,
+                pan_no,
+                city_name,
+                house_no,
+                address,
+                agent_photo_url,
+                aadhar_card_front_url,
+                aadhar_card_back_url,
+                pan_card_front_url,
+                pan_card_back_url,
+                license_front_url,
+                license_back_url,
+                insurance_image_url,
+                noc_image_url,
+                pollution_certificate_image_url,
+                rc_image_url,
+                vehicle_image_url,
+                category_id,
+                vehicle_id,
+                city_id,
+                owner_id,
+                vehicle_plate_image,
+                driving_license_no,
+                vehicle_plate_no,
+                rc_no,
+                insurance_no,
+                noc_no,
                 driver_id
             ]
+            
 
             row_count = update_query(update_driver_query, driver_values)
 
