@@ -1903,9 +1903,9 @@ def register_agent(request):
             pollution_certificate_image_url = body.get("pollution_certificate_image_url")
             rc_image_url = body.get("rc_image_url")
             vehicle_image_url = body.get("vehicle_image_url")
-            category_id = body.get("category_id")
-            sub_cat_id = body.get("sub_cat_id")
-            service_id = body.get("service_id")
+            category_id = int(body.get("category_id", 0))  # Cast to int
+            sub_cat_id = int(body.get("sub_cat_id", 0))  # Cast to int
+            service_id = int(body.get("service_id", 0))  # Cast to int
             vehicle_id = body.get("vehicle_id")
             city_id = body.get("city_id")
             optional_documents = body.get("optionalDocuments", [])
@@ -1984,11 +1984,11 @@ def register_agent(request):
                 driver_table = "vtpartner.jcb_crane_driverstbl"
                 name_column = "driver_name"
                 driver_id_field = "jcb_crane_driver_id"
-            elif category_id == "4":
+            elif category_id == 4:
                 driver_table = "vtpartner.other_driverstbl"
                 name_column = "driver_first_name"
                 driver_id_field = "other_driver_id"
-            elif category_id == "5":
+            elif category_id == 5:
                 driver_table = "vtpartner.handyman_servicestbl"
                 name_column = "name"
                 driver_id_field = "handyman_id"
@@ -2072,33 +2072,28 @@ def register_agent(request):
 
             driver_result = insert_query(insert_driver_query, driver_values)
 
-            if driver_result:
-                driver_id = driver_result[0][driver_id_field]
-            else:
-                raise Exception("Failed to retrieve driver ID from insert operation")
+            if not driver_result:
+                raise Exception("Failed to insert driver data")
 
-            # Insert optional documents into documents_vehicle_verified_tbl if any
+            driver_id = driver_result[0][0]
+
+            # Insert optional documents if they exist
             if optional_documents:
                 insert_document_query = """
                     INSERT INTO vtpartner.documents_vehicle_verified_tbl (
-                        document_name, document_image_url, {}
+                        driver_id, document_name, file_url
                     ) VALUES (%s, %s, %s)
-                """.format(driver_id_field)
+                """
 
                 for doc in optional_documents:
-                    document_values = [doc["other"], doc["imageUrl"], driver_id]
+                    document_values = (driver_id, doc.get("document_name"), doc.get("file_url"))
                     insert_query(insert_document_query, document_values)
 
-            # Update enquiry status
-            update_query("UPDATE vtpartner.enquirytbl SET status = 2 WHERE enquiry_id = %s", [enquiry_id])
-
-            # Respond with success
-            return JsonResponse({"message": "Agent registered successfully."}, status=201)
+            return JsonResponse({"message": "Registration successful"}, status=201)
 
         except Exception as e:
-            print("Error during registration:", str(e))
-            return JsonResponse({"message": "Error during registration", "error": str(e)}, status=500)
-
+            print("Error in register_agent:", str(e))
+            return JsonResponse({"message": "Error occurred during registration"}, status=500)
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt  # Disable CSRF protection for this view
