@@ -3303,9 +3303,7 @@ def update_other_driver_status(request):
         # Prepare the update query and values
         query = """
             UPDATE vtpartner.other_driverstbl
-            SET 
-                status = %s,
-               
+            SET status = %s
             WHERE other_driver_id = %s
         """
 
@@ -3348,7 +3346,7 @@ def update_jcb_crane_driver_status(request):
         update_query = """
             UPDATE vtpartner.jcb_crane_driverstbl
             SET 
-                status = %s,
+                status = %s
                
             WHERE jcb_crane_driver_id = %s
         """
@@ -3392,7 +3390,7 @@ def update_cab_driver_status(request):
         update_query = """
             UPDATE vtpartner.cab_driverstbl
             SET 
-                status = %s,
+                status = %s
                
             WHERE cab_driver_id = %s
         """
@@ -3436,7 +3434,7 @@ def update_goods_driver_status(request):
         update_query = """
             UPDATE vtpartner.goods_driverstbl
             SET 
-                status = %s,
+                status = %s
                
             WHERE goods_driver_id = %s
         """
