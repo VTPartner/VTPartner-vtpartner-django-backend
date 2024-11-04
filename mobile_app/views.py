@@ -171,7 +171,7 @@ def login_view(request):
             query = """
             SELECT 
                 goods_driver_id, 
-                driver_first_name, 
+                driver_first_name
             FROM 
                 vtpartner.goods_driverstbl
             WHERE 
