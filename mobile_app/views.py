@@ -148,7 +148,7 @@ def login_view(request):
                 query = """
                     INSERT INTO vtpartner.customers_tbl (
                         mobile_no
-                    ) VALUES (%s, %s, %s, %s, %s, %s) RETURNING customer_id
+                    ) VALUES (%s) RETURNING customer_id
                 """
                 values = [mobile_no]
                 new_owner_result = insert_query(query, values)
