@@ -137,7 +137,7 @@ def login_view(request):
                 
         try:
             query = """
-            SELECT customer_id,customer_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,email,gst_no,gst_address FROM
+            SELECT customer_id,customer_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,email,gst_no,gst_address,pincode FROM
             vtpartner.customers_tbl WHERE mobile_no=%s
             """
             params = [mobile_no]
@@ -184,6 +184,7 @@ def login_view(request):
                     "email": row[14],
                     "gst_no": row[15],
                     "gst_address": row[16],
+                    "pincode": row[17],
                 }
                 for row in result
             ]
