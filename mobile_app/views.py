@@ -32,54 +32,6 @@ def check_missing_fields(fields):
 
 
 #Common Functions 
-def execute_raw_query(query, params=None,):
-    
-    result = []
-    try:
-        print(f"{Fore.GREEN}Query Executed: {query}{Style.RESET_ALL}")
-        with connection.cursor() as cursor:
-            cursor.execute(query, params)
-            result = cursor.fetchall()
-            print(f"Result: {result}, Result length: {len(result)}")
-        return result
-    except DatabaseError as e:
-        print(f"{Fore.RED}DatabaseError Found: {e}{Style.RESET_ALL}")
-        # Need To Handle the error appropriately, such as logging or raising a custom exception
-        # roll back transactions if needed
-        
-        return 500
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        # Handle other unexpected errors
-        return 500
-    finally:
-        # Ensure the cursor is closed to release resources
-        cursor.close()  # Note: cursor might not be defined if an exception occurs earlier
-
-def execute_raw_query_fetch_one(query, params=None,):
-    
-    result = []
-    try:
-        print(f"{Fore.GREEN}Query Executed: {query}{Style.RESET_ALL}")
-        with connection.cursor() as cursor:
-            cursor.execute(query, params)
-            result = cursor.fetchone()
-            print(f"Result: {result}")
-        return result
-    except DatabaseError as e:
-        print(f"{Fore.RED}DatabaseError Found: {e}{Style.RESET_ALL}")
-        # Need To Handle the error appropriately, such as logging or raising a custom exception
-        # roll back transactions if needed
-        
-        return 500
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        # Handle other unexpected errors
-        return 500
-    finally:
-        # Ensure the cursor is closed to release resources
-        cursor.close()  # Note: cursor might not be defined if an exception occurs earlier
-
 def select_query(query, params=None):
     """
     Executes a parameterized SQL select query and returns the result.
@@ -167,32 +119,75 @@ def login_view(request):
         data = json.loads(request.body)
         mobile_no = data.get("mobile_no")
 
+         # List of required fields
+        required_fields = {
+            "mobile_no": mobile_no,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+                
+                
         try:
             query = """
-            SELECT 
-                goods_driver_id, 
-                driver_first_name
-            FROM 
-                vtpartner.goods_driverstbl
-            WHERE 
-                mobile_no = %s
+            SELECT customer_id,customer_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,email,gst_no,gst_address FROM
+            vtpartner.customers_tbl WHERE mobile_no=%s
             """
             params = [mobile_no]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
 
             if result == []:
-                return JsonResponse({"message": "No Data Found"}, status=404)
+                #Insert if not found
+                query = """
+                    INSERT INTO vtpartner.customers_tbl (
+                        mobile_no
+                    ) VALUES (%s, %s, %s, %s, %s, %s) RETURNING customer_id
+                """
+                values = [mobile_no]
+                new_owner_result = insert_query(query, values)
+                if new_owner_result:
+                    customer_id = new_owner_result[0][0]
+                    response_value = [
+                        {
+                            "customer_id":customer_id
+                        }
+                    ]
+                    return JsonResponse({"result": response_value}, status=200)
+                else:
+                    #raise Exception("Failed to retrieve owner ID from insert operation")
+                    return JsonResponse({"message": "An error occurred"}, status=500)
             
             # Map the results to a list of dictionaries with meaningful keys
             response_value = [
                 {
-                    "goods_driver_id": row[0],
-                    "driver_first_name": row[1],
+                    "customer_id": row[0],
+                    "customer_name": row[1],
+                    "profile_pic": row[2],
+                    "is_online": row[3],
+                    "ratings": row[4],
+                    "registration_date": row[5],
+                    "time": row[6],
+                    "r_lat": row[7],
+                    "r_lng": row[8],
+                    "current_lat": row[9],
+                    "current_lng": row[10],
+                    "status": row[11],
+                    "full_address": row[12],
+                    "email": row[13],
+                    "gst_no": row[14],
+                    "gst_address": row[15],
                 }
                 for row in result
             ]
 
-            # Return user branch data
+            # Return customer response
             return JsonResponse({"results": response_value}, status=200)
 
         except Exception as err:
