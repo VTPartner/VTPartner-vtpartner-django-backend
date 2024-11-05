@@ -209,6 +209,7 @@ def customer_registration(request):
         full_address = data.get("full_address")
         purpose = data.get("purpose")
         email = data.get("email")
+        pincode = data.get("pincode")
         
         
         
@@ -221,6 +222,7 @@ def customer_registration(request):
             "full_address":full_address,
             "purpose":purpose,
             "email":email,
+            "pincode":pincode,
         }
 
         # Use the utility function to check for missing fields
@@ -236,7 +238,7 @@ def customer_registration(request):
         
         query = """
             UPDATE vtpartner.customers_tbl 
-            SET customer_name=%s, r_lat=%s, r_lng=%s, current_lat=%s, current_lng=%s, full_address=%s, purpose=%s, email=%s
+            SET customer_name=%s, r_lat=%s, r_lng=%s, current_lat=%s, current_lng=%s, full_address=%s, purpose=%s, email=%s, pincode=%s
             WHERE customer_id=%s
         """
         values = [
@@ -248,13 +250,63 @@ def customer_registration(request):
             full_address ,
             purpose ,
             email ,
+            pincode ,
             customer_id
         ]
         row_count = update_query(query, values)
 
         # Send success response
-        return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
     except Exception as err:
         print("Error executing add new faq query", err)
         return JsonResponse({"message": "Error executing add new faq query"}, status=500)
+
+@csrf_exempt 
+def all_services(request):
+    if request.method == "POST":
+        try:
+            query = """
+                SELECT 
+                    category_id, 
+                    category_name, 
+                    category_type_id, 
+                    category_image, 
+                    category_type, 
+                    epoch, 
+                    description 
+                FROM 
+                    vtpartner.categorytbl
+                JOIN 
+                    vtpartner.category_type_tbl 
+                ON 
+                    category_type_tbl.cat_type_id = categorytbl.category_type_id 
+                ORDER BY 
+                    category_id DESC
+            """
+            result = select_query(query)  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "category_id": row[0],
+                    "category_name": row[1],
+                    "category_type_id": row[2],
+                    "category_image": row[3],
+                    "category_type": row[4],
+                    "epoch": row[5],
+                    "description": row[6],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)

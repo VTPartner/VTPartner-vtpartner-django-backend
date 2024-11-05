@@ -10,4 +10,6 @@ urlpatterns = [
     path('login',views.login_view,name='login'),
     #New Customer Registration
     path('customer_registration',views.customer_registration,name='customer_registration'),
+    #All Services
+    path('all_services',views.all_services,name='all_services'),
 ]
