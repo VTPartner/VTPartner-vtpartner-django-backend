@@ -8,4 +8,6 @@ urlpatterns = [
     path('upload',views.upload_image,name='upload'),
     #Customer Login
     path('login',views.login_view,name='login'),
+    #New Customer Registration
+    path('customer_registration',views.customer_registration,name='customer_registration'),
 ]
