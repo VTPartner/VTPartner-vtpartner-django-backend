@@ -283,7 +283,7 @@ def all_services(request):
                 ON 
                     category_type_tbl.cat_type_id = categorytbl.category_type_id 
                 ORDER BY 
-                    category_id DESC
+                    category_id ASC
             """
             result = select_query(query)  # Assuming select_query is defined elsewhere
 
