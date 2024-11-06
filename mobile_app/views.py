@@ -177,34 +177,33 @@ def login_view(request):
                 except Exception as err:
                     print("Error executing query:", err)
                     return JsonResponse({"message": "An error occurred"}, status=500)
-            else:
-                    # Map the results to a list of dictionaries with meaningful keys
-                    response_value = [
-                        {
-                            "customer_id": row[0],
-                            "customer_name": row[1],
-                            "profile_pic": row[2],
-                            "is_online": row[3],
-                            "ratings": row[4],
-                            "mobile_no": row[5],
-                            "registration_date": row[6],
-                            "time": row[7],
-                            "r_lat": row[8],
-                            "r_lng": row[9],
-                            "current_lat": row[10],
-                            "current_lng": row[11],
-                            "status": row[12],
-                            "full_address": row[13],
-                            "email": row[14],
-                            "gst_no": row[15],
-                            "gst_address": row[16],
-                            "pincode": row[17],
-                        }
-                        for row in result
-                    ]
-
-                    # Return customer response
-                    return JsonResponse({"results": response_value}, status=200)
+                
+            # Map the results to a list of dictionaries with meaningful keys
+            response_value = [
+                {
+                    "customer_id": row[0],
+                    "customer_name": row[1],
+                    "profile_pic": row[2],
+                    "is_online": row[3],
+                    "ratings": row[4],
+                    "mobile_no": row[5],
+                    "registration_date": row[6],
+                    "time": row[7],
+                    "r_lat": row[8],
+                    "r_lng": row[9],
+                    "current_lat": row[10],
+                    "current_lng": row[11],
+                    "status": row[12],
+                    "full_address": row[13],
+                    "email": row[14],
+                    "gst_no": row[15],
+                    "gst_address": row[16],
+                    "pincode": row[17],
+                }
+                for row in result
+            ]
+            # Return customer response
+            return JsonResponse({"results": response_value}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
