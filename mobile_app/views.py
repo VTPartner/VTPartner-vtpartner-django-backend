@@ -157,9 +157,11 @@ def login_view(request):
                     ) VALUES (%s) RETURNING customer_id
                 """
                 values = [mobile_no]
-                new_owner_result = insert_query(query, values)
-                if new_owner_result:
-                    customer_id = new_owner_result[0][0]
+                new_result = insert_query(query, values)
+                print("new_result::",new_result)
+                if new_result:
+                    print("new_result[0][0]::",new_result[0][0])
+                    customer_id = new_result[0][0]
                     response_value = [
                         {
                             "customer_id":customer_id
