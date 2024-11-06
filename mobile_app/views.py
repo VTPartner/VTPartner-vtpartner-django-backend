@@ -155,26 +155,27 @@ def login_view(request):
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
 
             if result == []:
-                #Insert if not found
-                query = """
-                    INSERT INTO vtpartner.customers_tbl (
-                        mobile_no
-                    ) VALUES (%s) RETURNING customer_id
-                """
-                values = [mobile_no]
-                new_result = insert_query(query, values)
-                print("new_result::",new_result)
-                if new_result:
-                    print("new_result[0][0]::",new_result[0][0])
-                    customer_id = new_result[0][0]
-                    response_value = [
-                        {
-                            "customer_id":customer_id
-                        }
-                    ]
-                    return JsonResponse({"result": response_value}, status=200)
-                else:
-                    #raise Exception("Failed to retrieve owner ID from insert operation")
+                try:
+                    #Insert if not found
+                    query = """
+                        INSERT INTO vtpartner.customers_tbl (
+                            mobile_no
+                        ) VALUES (%s) RETURNING customer_id
+                    """
+                    values = [mobile_no]
+                    new_result = insert_query(query, values)
+                    print("new_result::",new_result)
+                    if new_result:
+                        print("new_result[0][0]::",new_result[0][0])
+                        customer_id = new_result[0][0]
+                        response_value = [
+                            {
+                                "customer_id":customer_id
+                            }
+                        ]
+                        return JsonResponse({"result": response_value}, status=200)
+                except Exception as err:
+                    print("Error executing query:", err)
                     return JsonResponse({"message": "An error occurred"}, status=500)
             
             # Map the results to a list of dictionaries with meaningful keys
