@@ -88,23 +88,28 @@ def delete_query(query, params):
         return cursor.rowcount
 
 def insert_query(query, params):
-    print("insert query::",query)
-    print("insert query params::",params)
+    print("Executing insert query:", query)
+    print("With parameters:", params)
     try:
         with connection.cursor() as cursor:
             cursor.execute(query, params)
-
+            
             # If the query has a RETURNING clause, fetch the returned rows
             if cursor.description:
-                return cursor.fetchall()  # Fetch all returned rows if any
+                result = cursor.fetchall()  # Fetch all returned rows if any
+                connection.commit()  # Commit after insertion
+                return result
             else:
+                connection.commit()  # Commit if only affecting rows
                 return cursor.rowcount  # Return number of affected rows
+    
     except IntegrityError as e:
-        print("Error: Failed to insert data due to integrity error", e)
+        print("Integrity Error: Failed to insert data due to integrity error", e)
         raise
     except Exception as e:
-        print("Error executing query:", e)
+        print("General Error executing query:", e)
         raise
+
 
 @csrf_exempt
 def upload_image(request):
