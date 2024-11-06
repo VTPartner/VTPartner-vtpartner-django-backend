@@ -74,16 +74,22 @@ def select_query(query, params=None):
         raise  # Re-raise for unexpected errors
 
 def update_query(query, params):
+    print("update query::",query)
+    print("update query params::",params)
     with connection.cursor() as cursor:
         cursor.execute(query, params)
         return cursor.rowcount
 
 def delete_query(query, params):
+    print("delete query::",query)
+    print("delete query params::",params)
     with connection.cursor() as cursor:
         cursor.execute(query, params)
         return cursor.rowcount
 
 def insert_query(query, params):
+    print("insert query::",query)
+    print("insert query params::",params)
     try:
         with connection.cursor() as cursor:
             cursor.execute(query, params)
