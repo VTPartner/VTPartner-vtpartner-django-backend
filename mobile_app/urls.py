@@ -12,4 +12,16 @@ urlpatterns = [
     path('customer_registration',views.customer_registration,name='customer_registration'),
     #All Services
     path('all_services',views.all_services,name='all_services'),
+    
+    
+    
+    
+    
+    
+    
+    #Goods Driver Api's URLs
+    #Login
+    path('goods_driver_login',views.goods_driver_login_view,name='goods_driver_login'),
+    #Registration 
+    path('goods_driver_registration',views.goods_driver_registration,name='goods_driver_registration'),
 ]

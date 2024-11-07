@@ -324,3 +324,291 @@ def all_services(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+#Goods Driver Api's
+@csrf_exempt
+def goods_driver_login_view(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        mobile_no = data.get("mobile_no")
+
+         # List of required fields
+        required_fields = {
+            "mobile_no": mobile_no,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+                
+                
+        try:
+            query = """
+            SELECT goods_driver_id,driver_first_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,city_id FROM
+            vtpartner.goods_driverstbl WHERE mobile_no=%s
+            """
+            params = [mobile_no]
+            result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                try:
+                    #Insert if not found
+                    query = """
+                        INSERT INTO vtpartner.goods_driverstbl (
+                            mobile_no
+                        ) VALUES (%s) RETURNING goods_driver_id
+                    """
+                    values = [mobile_no]
+                    new_result = insert_query(query, values)
+                    print("new_result::",new_result)
+                    if new_result:
+                        print("new_result[0][0]::",new_result[0][0])
+                        goods_driver_id = new_result[0][0]
+                        response_value = [
+                            {
+                                "goods_driver_id":goods_driver_id
+                            }
+                        ]
+                        return JsonResponse({"result": response_value}, status=200)
+                except Exception as err:
+                    print("Error executing query:", err)
+                    return JsonResponse({"message": "An error occurred"}, status=500)
+                
+            # Map the results to a list of dictionaries with meaningful keys
+            response_value = [
+                {
+                    "goods_driver_id": row[0],
+                    "driver_first_name": row[1],
+                    "profile_pic": row[2],
+                    "is_online": row[3],
+                    "ratings": row[4],
+                    "mobile_no": row[5],
+                    "registration_date": row[6],
+                    "time": row[7],
+                    "r_lat": row[8],
+                    "r_lng": row[9],
+                    "current_lat": row[10],
+                    "current_lng": row[11],
+                    "status": row[12],
+                    "full_address": row[13],
+                    "city_id": row[14],
+                    
+                }
+                for row in result
+            ]
+            # Return customer response
+            return JsonResponse({"results": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def goods_driver_registration(request):
+    try:
+        data = json.loads(request.body)
+        #customer_id,customer_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,email
+        goods_driver_id = data.get("goods_driver_id")
+        driver_first_name = data.get("driver_first_name")
+        profile_pic = data.get("profile_pic")
+        is_online = data.get("is_online")
+        ratings = data.get("ratings")
+        mobile_no = data.get("mobile_no")
+        registration_date = data.get("registration_date")
+        time = data.get("time")
+        r_lat = data.get("r_lat")
+        r_lng = data.get("r_lng")
+        current_lat = data.get("current_lat")
+        current_lng = data.get("current_lng")
+        recent_online_pic = data.get("recent_online_pic")
+        vehicle_id = data.get("vehicle_id")
+        city_id = data.get("city_id")
+        aadhar_no = data.get("aadhar_no")
+        pan_card_no = data.get("pan_card_no")
+        house_no = data.get("house_no")
+        city_name = data.get("city_name")
+        full_address = data.get("full_address")
+        gender = data.get("gender")
+        owner_id = data.get("owner_id")
+        aadhar_card_front = data.get("aadhar_card_front")
+        aadhar_card_back = data.get("aadhar_card_back")
+        pan_card_front = data.get("pan_card_front")
+        pan_card_back = data.get("pan_card_back")
+        license_front = data.get("license_front")
+        license_back = data.get("license_back")
+        insurance_image = data.get("insurance_image")
+        noc_image = data.get("noc_image")
+        pollution_certificate_image = data.get("pollution_certificate_image")
+        rc_image = data.get("rc_image")
+        vehicle_image = data.get("vehicle_image")
+        vehicle_plate_image = data.get("vehicle_plate_image")
+        driving_license_no = data.get("driving_license_no")
+        vehicle_plate_no = data.get("vehicle_plate_no")
+        rc_no = data.get("rc_no")
+        insurance_no = data.get("insurance_no")
+        noc_no = data.get("noc_no")
+        vehicle_fuel_type = data.get("vehicle_fuel_type")
+        
+        
+        
+        
+        # List of required fields
+        required_fields = {
+            "goods_driver_id":goods_driver_id,
+            "driver_first_name":driver_first_name,
+            "profile_pic":profile_pic,
+            "is_online":is_online,
+            "ratings":ratings,
+            "mobile_no":mobile_no,
+            "registration_date":registration_date,
+            "time":time,
+            "r_lat":r_lat,
+            "r_lng":r_lng,
+            "current_lat":current_lat,
+            "current_lng":current_lng,
+            "recent_online_pic":recent_online_pic,
+            "vehicle_id":vehicle_id,
+            "city_id":city_id,
+            "aadhar_no":aadhar_no,
+            "pan_card_no":pan_card_no,
+            "house_no":house_no,
+            "city_name":city_name,
+            "full_address":full_address,
+            "gender":gender,
+            "owner_id":owner_id,
+            "aadhar_card_front":aadhar_card_front,
+            "aadhar_card_back":aadhar_card_back,
+            "pan_card_front":pan_card_front,
+            "pan_card_back":pan_card_back,
+            "license_front":license_front,
+            "license_back":license_back,
+            "insurance_image":insurance_image,
+            "noc_image":noc_image,
+            "pollution_certificate_image":pollution_certificate_image,
+            "rc_image":rc_image,
+            "vehicle_image":vehicle_image,
+            "vehicle_plate_image":vehicle_plate_image,
+            "driving_license_no":driving_license_no,
+            "vehicle_plate_no":vehicle_plate_no,
+            "rc_no":rc_no,
+            "insurance_no":insurance_no,
+            "noc_no":noc_no,
+            "vehicle_fuel_type":vehicle_fuel_type
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        
+        query = """
+            UPDATE vtpartner.customers_tbl 
+            SET 
+            driver_first_name = %s,
+            profile_pic = %s,
+            is_online = %s,
+            ratings = %s,
+            mobile_no = %s,
+            registration_date = %s,
+            time = %s,
+            r_lat = %s,
+            r_lng = %s,
+            current_lat = %s,
+            current_lng = %s,
+            recent_online_pic = %s,
+            category_id = %s,
+            vehicle_id = %s,
+            city_id = %s,
+            aadhar_no = %s,
+            pan_card_no = %s,
+            house_no = %s,
+            city_name = %s,
+            full_address = %s,
+            gender = %s,
+            owner_id = %s,
+            aadhar_card_front = %s,
+            aadhar_card_back = %s,
+            pan_card_front = %s,
+            pan_card_back = %s,
+            license_front = %s,
+            license_back = %s,
+            insurance_image = %s,
+            noc_image = %s,
+            pollution_certificate_image = %s,
+            rc_image = %s,
+            vehicle_image = %s,
+            vehicle_plate_image = %s,
+            driving_license_no = %s,
+            vehicle_plate_no = %s,
+            rc_no = %s,
+            insurance_no = %s,
+            noc_no = %s,
+            vehicle_fuel_type = %s,
+            WHERE goods_driver_id=%s
+        """
+        values = [
+            driver_first_name,
+            profile_pic,
+            is_online,
+            ratings,
+            mobile_no,
+            registration_date,
+            time,
+            r_lat,
+            r_lng,
+            r_lat,
+            r_lng,
+            recent_online_pic,
+            '1',
+            vehicle_id,
+            city_id,
+            aadhar_no,
+            pan_card_no,
+            house_no,
+            city_name,
+            full_address,
+            gender,
+            owner_id,
+            aadhar_card_front,
+            aadhar_card_back,
+            pan_card_front,
+            pan_card_back,
+            license_front,
+            license_back,
+            insurance_image,
+            noc_image,
+            pollution_certificate_image,
+            rc_image,
+            vehicle_image,
+            vehicle_plate_image,
+            driving_license_no,
+            vehicle_plate_no,
+            rc_no,
+            insurance_no,
+            noc_no,
+            vehicle_fuel_type,
+            goods_driver_id
+        ]
+        row_count = update_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing query", err)
+        return JsonResponse({"message": "Error executing add new faq query"}, status=500)
