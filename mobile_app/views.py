@@ -669,7 +669,7 @@ def goods_driver_registration(request):
             rc_no = %s,
             insurance_no = %s,
             noc_no = %s,
-            vehicle_fuel_type = %s,
+            vehicle_fuel_type = %s
             WHERE goods_driver_id=%s
         """
         values = [
