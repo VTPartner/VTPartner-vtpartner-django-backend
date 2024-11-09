@@ -393,7 +393,7 @@ def all_vehicles(request):
                 WHERE category_id = %s
                 ORDER BY vehicle_name ASC
             """
-            result = select_query(query)  # Assuming select_query is defined elsewhere
+            result = select_query(query,[category_id])  # Assuming select_query is defined elsewhere
 
             if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
