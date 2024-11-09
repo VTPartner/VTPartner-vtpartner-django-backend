@@ -334,7 +334,7 @@ def all_cities(request):
                 city_id, 
                 city_name, 
                 pincode, 
-                bg_image, 
+                bg_image
             FROM 
                 vtpartner.available_citys_tbl 
             WHERE status ='1'
