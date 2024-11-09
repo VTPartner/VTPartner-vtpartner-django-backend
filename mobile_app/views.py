@@ -639,8 +639,6 @@ def goods_driver_registration(request):
             driver_first_name = %s,
             profile_pic = %s,
             mobile_no = %s,
-            registration_date = %s,
-            time = %s,
             r_lat = %s,
             r_lng = %s,
             current_lat = %s,
