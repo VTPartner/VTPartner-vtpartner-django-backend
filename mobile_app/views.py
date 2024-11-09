@@ -325,6 +325,46 @@ def all_services(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt 
+def all_cities(request):
+    if request.method == "POST":
+        try:
+            query = """
+                SELECT 
+                city_id, 
+                city_name, 
+                pincode, 
+                bg_image, 
+            FROM 
+                vtpartner.available_citys_tbl 
+            WHERE status ='1'
+            ORDER BY 
+                city_name ASC
+            """
+            result = select_query(query)  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            city_details = [
+                {
+                    "city_id": row[0],
+                    "city_name": row[1],
+                    "pincode": row[2],
+                    "bg_image": row[3],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": city_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 #Goods Driver Api's
 @csrf_exempt
@@ -574,7 +614,7 @@ def goods_driver_registration(request):
             r_lat,
             r_lng,
             recent_online_pic,
-            '1',
+            '0',
             vehicle_id,
             city_id,
             aadhar_no,
@@ -612,3 +652,174 @@ def goods_driver_registration(request):
     except Exception as err:
         print("Error executing query", err)
         return JsonResponse({"message": "Error executing add new faq query"}, status=500)
+
+@csrf_exempt
+def goods_driver_aadhar_details_update(request):
+    try:
+        data = json.loads(request.body)
+        #customer_id,customer_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,email
+        goods_driver_id = data.get("goods_driver_id")
+        aadhar_no = data.get("aadhar_no")
+        aadhar_card_front = data.get("aadhar_card_front")
+        aadhar_card_back = data.get("aadhar_card_back")
+       
+        
+        
+        
+        
+        # List of required fields
+        required_fields = {
+            "goods_driver_id":goods_driver_id,
+            "aadhar_no":aadhar_no,
+            "aadhar_card_front":aadhar_card_front,
+            "aadhar_card_back":aadhar_card_back,
+            
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        
+        query = """
+            UPDATE vtpartner.customers_tbl 
+            SET 
+            aadhar_no = %s,
+            aadhar_card_front = %s,
+            aadhar_card_back = %s,
+            WHERE goods_driver_id=%s
+        """
+        values = [
+            aadhar_no,
+            aadhar_card_front,
+            aadhar_card_back,
+            goods_driver_id
+        ]
+        row_count = update_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing query", err)
+        return JsonResponse({"message": "Error executing update query"}, status=500)
+
+@csrf_exempt
+def goods_driver_pan_card_details_update(request):
+    try:
+        data = json.loads(request.body)
+
+        goods_driver_id = data.get("goods_driver_id")
+        pan_card_no = data.get("pan_card_no")
+        pan_card_front = data.get("pan_card_front")
+        pan_card_back = data.get("pan_card_back")
+       
+        
+        
+        
+        
+        # List of required fields
+        required_fields = {
+            "goods_driver_id":goods_driver_id,
+            "pan_card_no":pan_card_no,
+            "pan_card_front":pan_card_front,
+            "pan_card_back":pan_card_back,
+            
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        
+        query = """
+            UPDATE vtpartner.customers_tbl 
+            SET 
+            pan_card_no = %s,
+            pan_card_front = %s,
+            pan_card_back = %s,
+            WHERE goods_driver_id=%s
+        """
+        values = [
+            pan_card_no,
+            pan_card_front,
+            pan_card_back,
+            goods_driver_id
+        ]
+        row_count = update_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing query", err)
+        return JsonResponse({"message": "Error executing update query"}, status=500)
+
+@csrf_exempt
+def goods_driver_driving_license_details_update(request):
+    try:
+        data = json.loads(request.body)
+
+        goods_driver_id = data.get("goods_driver_id")
+        driving_license_no = data.get("driving_license_no")
+        license_front = data.get("license_front")
+        license_back = data.get("license_back")
+       
+        
+        
+        
+        
+        # List of required fields
+        required_fields = {
+            "goods_driver_id":goods_driver_id,
+            "driving_license_no":driving_license_no,
+            "license_front":license_front,
+            "license_back":license_back,
+            
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        
+        query = """
+            UPDATE vtpartner.customers_tbl 
+            SET 
+            driving_license_no = %s,
+            license_front = %s,
+            license_back = %s,
+            WHERE goods_driver_id=%s
+        """
+        values = [
+            driving_license_no,
+            license_front,
+            license_back,
+            goods_driver_id
+        ]
+        row_count = update_query(query, values)
+
+        # Send success response
+        return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+    except Exception as err:
+        print("Error executing query", err)
+        return JsonResponse({"message": "Error executing update query"}, status=500)
