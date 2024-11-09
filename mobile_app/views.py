@@ -888,3 +888,53 @@ def goods_driver_driving_license_details_update(request):
     except Exception as err:
         print("Error executing query", err)
         return JsonResponse({"message": "Error executing update query"}, status=500)
+
+@csrf_exempt
+def goods_driver_online_status(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        goods_driver_id = data.get("goods_driver_id")
+
+         # List of required fields
+        required_fields = {
+            "goods_driver_id": goods_driver_id,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+                
+                
+        try:
+            query = """
+            select is_online,status,driver_first_name from vtpartner.goods_driverstbl where goods_driver_id=%s
+            """
+            params = [goods_driver_id]
+            result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+                                
+            # Map the results to a list of dictionaries with meaningful keys
+            response_value = [
+                {
+                    "is_online": row[0],
+                    "status": row[1],  
+                    "driver_first_name": row[2]  
+                }
+                for row in result
+            ]
+            # Return customer response
+            return JsonResponse({"results": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
