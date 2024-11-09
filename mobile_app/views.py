@@ -649,8 +649,6 @@ def goods_driver_registration(request):
             city_id = %s,
             aadhar_no = %s,
             pan_card_no = %s,
-            house_no = %s,
-            city_name = %s,
             full_address = %s,
             gender = %s,
             owner_id = %s,
