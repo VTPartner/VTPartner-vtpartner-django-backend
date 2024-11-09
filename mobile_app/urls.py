@@ -30,4 +30,6 @@ urlpatterns = [
     path('goods_driver_registration',views.goods_driver_registration,name='goods_driver_registration'),
     #Status Verification 
     path('goods_driver_online_status',views.goods_driver_online_status,name='goods_driver_online_status'),
+    #Update Online Status Verification 
+    path('goods_driver_update_online_status',views.goods_driver_update_online_status,name='goods_driver_update_online_status'),
 ]

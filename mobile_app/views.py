@@ -938,3 +938,49 @@ def goods_driver_online_status(request):
             return JsonResponse({"message": "An error occurred"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def goods_driver_update_online_status(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        status = data.get("status")
+        goods_driver_id = data.get("goods_driver_id")
+
+         # List of required fields
+        required_fields = {
+            "status": status,
+            "goods_driver_id": goods_driver_id,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+                
+                
+        try:
+            query = """
+            UPDATE vtpartner.goods_driverstbl 
+            SET 
+            status = %s
+            WHERE goods_driver_id=%s
+            """
+            values = [
+                status,
+                goods_driver_id
+            ]
+            row_count = update_query(query, values)
+
+            # Send success response
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
