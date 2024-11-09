@@ -57,6 +57,8 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "https://www.vtpartner.org",
     "https://vtpartner.org",
+    "https://vtpartner.in",
+    "https://www.vtpartner.in",
     'http://localhost:3004'
 ]
 
