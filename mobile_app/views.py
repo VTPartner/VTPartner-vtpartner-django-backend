@@ -634,7 +634,7 @@ def goods_driver_registration(request):
         print("owner_id::",owner_id)
         
         query = """
-            UPDATE vtpartner.customers_tbl 
+            UPDATE vtpartner.goods_driverstbl 
             SET 
             driver_first_name = %s,
             profile_pic = %s,
