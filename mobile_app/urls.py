@@ -14,6 +14,8 @@ urlpatterns = [
     path('all_services',views.all_services,name='all_services'),
     #All Cities
     path('all_cities',views.all_cities,name='all_cities'),
+    #All Vehicles
+    path('all_vehicles',views.all_vehicles,name='all_vehicles'),
     
     
     

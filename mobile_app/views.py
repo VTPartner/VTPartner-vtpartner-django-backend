@@ -365,6 +365,62 @@ def all_cities(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt 
+def all_vehicles(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            category_id = body.get("category_id")
+            # List of required fields
+            required_fields = {
+                "category_id": category_id,
+            }
+
+            # Check for missing fields
+            missing_fields = check_missing_fields(required_fields)  # Assuming check_missing_fields is defined
+
+            # If there are missing fields, return an error response
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            query = """
+                SELECT vehicle_id, vehicle_name, weight, vehicle_types_tbl.vehicle_type_id,
+                       vehicle_types_tbl.vehicle_type_name, description, image, size_image
+                FROM vtpartner.vehiclestbl
+                JOIN vtpartner.vehicle_types_tbl ON vehiclestbl.vehicle_type_id = vehicle_types_tbl.vehicle_type_id
+                WHERE category_id = %s
+                ORDER BY vehicle_name ASC
+            """
+            result = select_query(query)  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            vehicle_details = [
+                {
+                   "vehicle_id": row[0],
+                    "vehicle_name": row[1],
+                    "weight": row[2],
+                    "vehicle_type_id": row[3],
+                    "vehicle_type_name": row[4],
+                    "description": row[5],
+                    "image": row[6],
+                    "size_image": row[7],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": vehicle_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 #Goods Driver Api's
 @csrf_exempt
