@@ -516,11 +516,7 @@ def goods_driver_registration(request):
         goods_driver_id = data.get("goods_driver_id")
         driver_first_name = data.get("driver_first_name")
         profile_pic = data.get("profile_pic")
-        is_online = data.get("is_online")
-        ratings = data.get("ratings")
         mobile_no = data.get("mobile_no")
-        registration_date = data.get("registration_date")
-        time = data.get("time")
         r_lat = data.get("r_lat")
         r_lng = data.get("r_lng")
         current_lat = data.get("current_lat")
@@ -530,11 +526,8 @@ def goods_driver_registration(request):
         city_id = data.get("city_id")
         aadhar_no = data.get("aadhar_no")
         pan_card_no = data.get("pan_card_no")
-        house_no = data.get("house_no")
-        city_name = data.get("city_name")
         full_address = data.get("full_address")
         gender = data.get("gender")
-        owner_id = data.get("owner_id")
         aadhar_card_front = data.get("aadhar_card_front")
         aadhar_card_back = data.get("aadhar_card_back")
         pan_card_front = data.get("pan_card_front")
@@ -553,6 +546,11 @@ def goods_driver_registration(request):
         insurance_no = data.get("insurance_no")
         noc_no = data.get("noc_no")
         vehicle_fuel_type = data.get("vehicle_fuel_type")
+        owner_name = data.get("owner_name")
+        owner_mobile_no = data.get("owner_mobile_no")
+        owner_photo_url = data.get("owner_photo_url")
+        owner_address = data.get("owner_address")
+        owner_city_name = data.get("owner_city_name")
         
         
         
@@ -562,11 +560,7 @@ def goods_driver_registration(request):
             "goods_driver_id":goods_driver_id,
             "driver_first_name":driver_first_name,
             "profile_pic":profile_pic,
-            "is_online":is_online,
-            "ratings":ratings,
             "mobile_no":mobile_no,
-            "registration_date":registration_date,
-            "time":time,
             "r_lat":r_lat,
             "r_lng":r_lng,
             "current_lat":current_lat,
@@ -576,11 +570,8 @@ def goods_driver_registration(request):
             "city_id":city_id,
             "aadhar_no":aadhar_no,
             "pan_card_no":pan_card_no,
-            "house_no":house_no,
-            "city_name":city_name,
             "full_address":full_address,
             "gender":gender,
-            "owner_id":owner_id,
             "aadhar_card_front":aadhar_card_front,
             "aadhar_card_back":aadhar_card_back,
             "pan_card_front":pan_card_front,
@@ -598,7 +589,12 @@ def goods_driver_registration(request):
             "rc_no":rc_no,
             "insurance_no":insurance_no,
             "noc_no":noc_no,
-            "vehicle_fuel_type":vehicle_fuel_type
+            "vehicle_fuel_type":vehicle_fuel_type,
+            "owner_name":owner_name,
+            "owner_mobile_no":owner_mobile_no,
+            "owner_photo_url":owner_photo_url,
+            "owner_address":owner_address,
+            "owner_city_name":owner_city_name,
         }
 
         # Use the utility function to check for missing fields
@@ -610,15 +606,38 @@ def goods_driver_registration(request):
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
                 status=400
             )
-
+        # Check if owner exists by mobile number
+        owner_id = None
+        if owner_name and owner_mobile_no:
+            try:
+                # Check if owner already exists based on mobile number
+                check_owner_query = "SELECT owner_id FROM vtpartner.owner_tbl WHERE owner_mobile_no = %s"
+                owner_result = select_query(check_owner_query, [owner_mobile_no])
+                if owner_result:
+                    # Owner exists, get the existing owner ID
+                    owner_id = owner_result[0][0]
+                else:
+                    # Insert new owner if not found
+                    insert_owner_query = """
+                        INSERT INTO vtpartner.owner_tbl (
+                            owner_name, owner_mobile_no,  city_name, address, profile_photo
+                        ) VALUES (%s, %s, %s,  %s, %s) RETURNING owner_id
+                    """
+                    owner_values = [owner_name, owner_mobile_no,  owner_city_name, owner_address, owner_photo_url]
+                    new_owner_result = insert_query(insert_owner_query, owner_values)
+                    if new_owner_result:
+                        owner_id = new_owner_result[0][0]
+                    else:
+                        raise Exception("Failed to retrieve owner ID from insert operation")
+            except Exception as error:
+                print("Owner error::", error)
+        print("owner_id::",owner_id)
         
         query = """
             UPDATE vtpartner.customers_tbl 
             SET 
             driver_first_name = %s,
             profile_pic = %s,
-            is_online = %s,
-            ratings = %s,
             mobile_no = %s,
             registration_date = %s,
             time = %s,
@@ -660,23 +679,17 @@ def goods_driver_registration(request):
         values = [
             driver_first_name,
             profile_pic,
-            is_online,
-            ratings,
             mobile_no,
-            registration_date,
-            time,
             r_lat,
             r_lng,
             r_lat,
             r_lng,
             recent_online_pic,
-            '0',
+            '1',
             vehicle_id,
             city_id,
             aadhar_no,
             pan_card_no,
-            house_no,
-            city_name,
             full_address,
             gender,
             owner_id,
