@@ -943,6 +943,7 @@ def goods_driver_online_status(request):
 def goods_driver_update_online_status(request):
     if request.method == "POST":
         data = json.loads(request.body)
+        print("data.body::",data)
         status = data.get("status")
         goods_driver_id = data.get("goods_driver_id")
         recent_online_pic = data.get("recent_online_pic")
