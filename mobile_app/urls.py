@@ -32,4 +32,8 @@ urlpatterns = [
     path('goods_driver_online_status',views.goods_driver_online_status,name='goods_driver_online_status'),
     #Update Online Status Verification 
     path('goods_driver_update_online_status',views.goods_driver_update_online_status,name='goods_driver_update_online_status'),
+    #Insert new record in active goods driver table  
+    path('add_new_active_goods_driver',views.add_goods_driver_to_active_drivers_table,name='add_new_active_goods_driver'),
+    #Delete record in active goods driver table once driver wants to go offline
+    path('delete_active_goods_driver',views.delete_goods_driver_to_active_drivers_table,name='delete_active_goods_driver'),
 ]

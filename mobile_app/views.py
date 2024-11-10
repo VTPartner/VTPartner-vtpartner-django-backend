@@ -945,11 +945,17 @@ def goods_driver_update_online_status(request):
         data = json.loads(request.body)
         status = data.get("status")
         goods_driver_id = data.get("goods_driver_id")
+        recent_online_pic = data.get("recent_online_pic")
+        lat = data.get("lat")
+        lng = data.get("lng")
 
          # List of required fields
         required_fields = {
             "status": status,
             "goods_driver_id": goods_driver_id,
+            # "recent_online_pic": recent_online_pic,
+            "lat": lat,
+            "lng": lng,
         }
         # Check for missing fields
          # Use the utility function to check for missing fields
@@ -967,11 +973,21 @@ def goods_driver_update_online_status(request):
             query = """
             UPDATE vtpartner.goods_driverstbl 
             SET 
-            status = %s
+            status = %s,
+            current_lat =%s,
+            current_lng =%s,
+            recent_online_pic = CASE 
+            WHEN %s = 1 THEN %s 
+            ELSE recent_online_pic 
+            END
             WHERE goods_driver_id=%s
             """
             values = [
                 status,
+                lat,
+                lng,
+                status,# Check status for updating recent_online_pic
+                recent_online_pic,  # New picture if status is 1
                 goods_driver_id
             ]
             row_count = update_query(query, values)
@@ -984,3 +1000,106 @@ def goods_driver_update_online_status(request):
             return JsonResponse({"message": "An error occurred"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def add_goods_driver_to_active_drivers_table(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        status = data.get("status")
+        goods_driver_id = data.get("goods_driver_id")
+        current_lat = data.get("current_lat")
+        current_lng = data.get("current_lng")
+
+         # List of required fields
+        required_fields = {
+            "status": status,
+            "goods_driver_id": goods_driver_id,
+            "current_lat": current_lat,
+            "current_lng": current_lng,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+                
+                
+        try:
+            query = """
+            INSERT INTO vtpartner.active_goods_drivertbl 
+            (goods_driver_id,current_lat,current_lng,current_status)
+            VALUES (%s,%s,%s,%s) RETURNING active_id
+            """
+            values = [
+                goods_driver_id,
+                current_lat,
+                current_lng,
+                status,
+            ]
+            new_result = insert_query(query, values)
+            print("new_result::",new_result)
+            if new_result:
+                print("new_result[0][0]::",new_result[0][0])
+                active_id = new_result[0][0]
+                response_value = [
+                    {
+                        "active_id":active_id
+                    }
+                ]
+                # Send success response
+                return JsonResponse({"result": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def delete_goods_driver_to_active_drivers_table(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        goods_driver_id = data.get("goods_driver_id")
+        
+
+         # List of required fields
+        required_fields = {
+            "goods_driver_id": goods_driver_id,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+                
+                
+        try:
+            query = """
+            DELETE FROM vtpartner.active_goods_drivertbl 
+            WHERE goods_driver_id=%s
+            """
+            values = [
+                goods_driver_id,
+            ]
+            row_count = delete_query(query, values)
+            
+            # Send success response
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
