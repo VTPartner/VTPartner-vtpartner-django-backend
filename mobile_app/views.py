@@ -967,7 +967,7 @@ def goods_driver_update_online_status(request):
             )
         
         try:
-            print("status::",status)
+            print("status::",type(status))
             if status == 1:
                 # Include recent_online_pic in the query when status is 1
                 query = """
