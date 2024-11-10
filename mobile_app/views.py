@@ -949,56 +949,64 @@ def goods_driver_update_online_status(request):
         lat = data.get("lat")
         lng = data.get("lng")
 
-         # List of required fields
+        # List of required fields
         required_fields = {
             "status": status,
             "goods_driver_id": goods_driver_id,
-            # "recent_online_pic": recent_online_pic,
             "lat": lat,
             "lng": lng,
         }
         # Check for missing fields
-         # Use the utility function to check for missing fields
         missing_fields = check_missing_fields(required_fields)
         
         # If there are missing fields, return an error response
         if missing_fields:
             return JsonResponse(
-            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
-            status=400
-        )
-                
-                
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
         try:
-            query = """
-            UPDATE vtpartner.goods_driverstbl 
-            SET 
-                status = %s,
-                current_lat = %s,
-                current_lng = %s,
-                recent_online_pic = CASE 
-                    WHEN %s = 1 THEN %s 
-                    ELSE recent_online_pic 
-                END
-            WHERE goods_driver_id = %s
-            """
-            values = [
-                status,       # Status value to set
-                lat,          # Latitude value to set
-                lng,          # Longitude value to set
-                status,       # Condition for CASE (check if status is 1)
-                recent_online_pic,  # New picture if status is 1
-                goods_driver_id  # Driver ID
-            ]
+            if status == 1:
+                # Include recent_online_pic in the query when status is 1
+                query = """
+                UPDATE vtpartner.goods_driverstbl 
+                SET 
+                    status = %s,
+                    current_lat = %s,
+                    current_lng = %s,
+                    recent_online_pic = %s
+                WHERE goods_driver_id = %s
+                """
+                values = [
+                    status,
+                    lat,
+                    lng,
+                    recent_online_pic,
+                    goods_driver_id
+                ]
+            else:
+                # Exclude recent_online_pic when status is not 1
+                query = """
+                UPDATE vtpartner.goods_driverstbl 
+                SET 
+                    status = %s,
+                    current_lat = %s,
+                    current_lng = %s
+                WHERE goods_driver_id = %s
+                """
+                values = [
+                    status,
+                    lat,
+                    lng,
+                    goods_driver_id
+                ]
+
+            # Execute the query
             row_count = update_query(query, values)
 
             # Send success response
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
-
-        except Exception as err:
-            print("Error executing query:", err)
-            return JsonResponse({"message": "An error occurred"}, status=500)
-
 
         except Exception as err:
             print("Error executing query:", err)
