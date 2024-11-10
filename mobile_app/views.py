@@ -25,9 +25,15 @@ from django.core.files.storage import FileSystemStorage
 from PIL import Image  # Pillow library for image processing
 
 # Utility function to check for missing fields
+# def check_missing_fields(fields):
+#     missing_fields = [field for field, value in fields.items() if not value]
+#     print("missing_fields::",missing_fields)
+#     return missing_fields if missing_fields else None
+
 def check_missing_fields(fields):
-    missing_fields = [field for field, value in fields.items() if not value]
-    print("missing_fields::",missing_fields)
+    # Only consider a field missing if its value is None
+    missing_fields = [field for field, value in fields.items() if value is None]
+    print("missing_fields::", missing_fields)
     return missing_fields if missing_fields else None
 
 
@@ -968,6 +974,7 @@ def goods_driver_update_online_status(request):
             )
         
         try:
+
             if status == 1:
                 # Include recent_online_pic in the query when status is 1
                 query = """
