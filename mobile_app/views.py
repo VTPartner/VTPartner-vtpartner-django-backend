@@ -974,7 +974,7 @@ def goods_driver_update_online_status(request):
                 query = """
                 UPDATE vtpartner.goods_driverstbl 
                 SET 
-                    status = %s,
+                    is_online = %s,
                     current_lat = %s,
                     current_lng = %s,
                     recent_online_pic = %s
@@ -992,7 +992,7 @@ def goods_driver_update_online_status(request):
                 query = """
                 UPDATE vtpartner.goods_driverstbl 
                 SET 
-                    status = %s,
+                    is_online = %s,
                     current_lat = %s,
                     current_lng = %s
                 WHERE goods_driver_id = %s
