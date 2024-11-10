@@ -919,7 +919,7 @@ def goods_driver_online_status(request):
                 
         try:
             query = """
-            select is_online,status,driver_first_name from vtpartner.goods_driverstbl where goods_driver_id=%s
+            select is_online,status,driver_first_name,recent_online_pic from vtpartner.goods_driverstbl where goods_driver_id=%s
             """
             params = [goods_driver_id]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
@@ -932,7 +932,8 @@ def goods_driver_online_status(request):
                 {
                     "is_online": row[0],
                     "status": row[1],  
-                    "driver_first_name": row[2]  
+                    "driver_first_name": row[2],  
+                    "recent_online_pic": row[3]  
                 }
                 for row in result
             ]
