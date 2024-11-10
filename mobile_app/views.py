@@ -955,7 +955,7 @@ def goods_driver_update_online_status(request):
             "status": status,
             "goods_driver_id": goods_driver_id,
             "lat": lat,
-            "lng": lng,
+            "lng": lng
         }
         # Check for missing fields
         missing_fields = check_missing_fields(required_fields)
@@ -968,8 +968,6 @@ def goods_driver_update_online_status(request):
             )
         
         try:
-            print("status::",type(status))
-            print("recent_online_pic::",recent_online_pic)
             if status == 1:
                 # Include recent_online_pic in the query when status is 1
                 query = """
