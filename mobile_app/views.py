@@ -973,27 +973,32 @@ def goods_driver_update_online_status(request):
             query = """
             UPDATE vtpartner.goods_driverstbl 
             SET 
-            status = %s,
-            current_lat =%s,
-            current_lng =%s,
-            recent_online_pic = CASE 
-            WHEN %s = 1 THEN %s 
-            ELSE recent_online_pic 
-            END
-            WHERE goods_driver_id=%s
+                status = %s,
+                current_lat = %s,
+                current_lng = %s,
+                recent_online_pic = CASE 
+                    WHEN %s = 1 THEN %s 
+                    ELSE recent_online_pic 
+                END
+            WHERE goods_driver_id = %s
             """
             values = [
-                status,
-                lat,
-                lng,
-                status,# Check status for updating recent_online_pic
+                status,       # Status value to set
+                lat,          # Latitude value to set
+                lng,          # Longitude value to set
+                status,       # Condition for CASE (check if status is 1)
                 recent_online_pic,  # New picture if status is 1
-                goods_driver_id
+                goods_driver_id  # Driver ID
             ]
             row_count = update_query(query, values)
 
             # Send success response
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
 
         except Exception as err:
             print("Error executing query:", err)
