@@ -1197,10 +1197,14 @@ def get_nearby_drivers(request):
                    )) AS distance
             FROM vtpartner.active_goods_drivertbl
             WHERE current_status = 1  -- Only active drivers
-            HAVING distance <= %s
+            AND (6371 * acos(
+                       cos(radians(%s)) * cos(radians(current_lat)) *
+                       cos(radians(current_lng) - radians(%s)) +
+                       sin(radians(%s)) * sin(radians(current_lat))
+                   )) <= %s
             ORDER BY distance;
             """
-            values = [lat, lng, lat, radius_km]
+            values = [lat, lng, lat, lat, lng, lat, radius_km]
 
             # Execute the query
             nearby_drivers = select_query(query, values)
