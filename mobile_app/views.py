@@ -1227,8 +1227,8 @@ ORDER BY distance;
                 {
                     "active_id": driver[0],
                     "goods_driver_id": driver[1],
-                    "current_lat": driver[2],
-                    "current_lng": driver[3],
+                    "latitude": driver[2],
+                    "longitude": driver[3],
                     "entry_time": driver[4],
                     "current_status": driver[5],
                     "driver_name": driver[6],
