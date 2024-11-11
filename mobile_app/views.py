@@ -1190,26 +1190,30 @@ def get_nearby_drivers(request):
             # Haversine formula to calculate the distance in kilometers
             query = """
             SELECT main.active_id, main.goods_driver_id, main.current_lat, main.current_lng, 
-           main.entry_time, main.current_status,
-           (6371 * acos(
-               cos(radians(%s)) * cos(radians(main.current_lat)) *
-               cos(radians(main.current_lng) - radians(%s)) +
-               sin(radians(%s)) * sin(radians(main.current_lat))
-           )) AS distance
-    FROM vtpartner.active_goods_drivertbl AS main
-    INNER JOIN (
-        SELECT goods_driver_id, MAX(entry_time) AS max_entry_time
-        FROM vtpartner.active_goods_drivertbl
-        GROUP BY goods_driver_id
-    ) AS latest ON main.goods_driver_id = latest.goods_driver_id
-                 AND main.entry_time = latest.max_entry_time
-    WHERE main.current_status = 1
-    AND (6371 * acos(
-           cos(radians(%s)) * cos(radians(main.current_lat)) *
-           cos(radians(main.current_lng) - radians(%s)) +
-           sin(radians(%s)) * sin(radians(main.current_lat))
-       )) <= %s
-    ORDER BY distance;
+            main.entry_time, main.current_status,goods_driverstbl.driver_first_name,goods_driverstbl.profile_pic,vehiclestbl.image,vehiclestbl.vehicle_name
+            (6371 * acos(
+                cos(radians(%s)) * cos(radians(main.current_lat)) *
+                cos(radians(main.current_lng) - radians(%s)) +
+                sin(radians(%s)) * sin(radians(main.current_lat))
+            )) AS distance
+            FROM vtpartner.active_goods_drivertbl AS main,vtpartner.goods_driverstbl,vtpartner.vehiclestbl
+            INNER JOIN (
+                SELECT goods_driver_id, MAX(entry_time) AS max_entry_time
+                FROM vtpartner.active_goods_drivertbl
+                GROUP BY goods_driver_id
+            ) AS latest ON main.goods_driver_id = latest.goods_driver_id
+                         AND main.entry_time = latest.max_entry_time
+            WHERE main.current_status = 1
+            AND (6371 * acos(
+                   cos(radians(%s)) * cos(radians(main.current_lat)) *
+                   cos(radians(main.current_lng) - radians(%s)) +
+                   sin(radians(%s)) * sin(radians(main.current_lat))
+               )) <= %s
+            AND goods_driverstbl.category_id=vehiclestbl.category_id
+            AND goods_driverstbl.category_id='1'
+            AND goods_driverstbl.goods_driver_id=main.goods_driver_id
+            AND vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id
+            ORDER BY distance;
             """
             values = [lat, lng, lat, lat, lng, lat, radius_km]
 
@@ -1225,7 +1229,11 @@ def get_nearby_drivers(request):
                     "current_lng": driver[3],
                     "entry_time": driver[4],
                     "current_status": driver[5],
-                    "distance": driver[6]
+                    "driver_name": driver[6],
+                    "driver_profile_pic": driver[7],
+                    "vehicle_image": driver[8],
+                    "vehicle_name": driver[9],
+                    "distance": driver[10]
                 }
                 for driver in nearby_drivers
             ]
