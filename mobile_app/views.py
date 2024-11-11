@@ -1189,26 +1189,27 @@ def get_nearby_drivers(request):
         try:
             # Haversine formula to calculate the distance in kilometers
             query = """
-            SELECT active_id, goods_driver_id, current_lat, current_lng, entry_time, current_status,
+            SELECT main.active_id, main.goods_driver_id, main.current_lat, main.current_lng, 
+           main.entry_time, main.current_status,
            (6371 * acos(
-               cos(radians(%s)) * cos(radians(current_lat)) *
-               cos(radians(current_lng) - radians(%s)) +
-               sin(radians(%s)) * sin(radians(current_lat))
+               cos(radians(%s)) * cos(radians(main.current_lat)) *
+               cos(radians(main.current_lng) - radians(%s)) +
+               sin(radians(%s)) * sin(radians(main.current_lat))
            )) AS distance
-             FROM vtpartner.active_goods_drivertbl AS main
-             INNER JOIN (
-                 SELECT goods_driver_id, MAX(entry_time) AS max_entry_time
-                 FROM vtpartner.active_goods_drivertbl
-                 GROUP BY goods_driver_id
-             ) AS latest ON main.goods_driver_id = latest.goods_driver_id
-                          AND main.entry_time = latest.max_entry_time
-             WHERE current_status = 1
-             AND (6371 * acos(
-                    cos(radians(%s)) * cos(radians(current_lat)) *
-                    cos(radians(current_lng) - radians(%s)) +
-                    sin(radians(%s)) * sin(radians(current_lat))
-                )) <= %s
-             ORDER BY distance;
+    FROM vtpartner.active_goods_drivertbl AS main
+    INNER JOIN (
+        SELECT goods_driver_id, MAX(entry_time) AS max_entry_time
+        FROM vtpartner.active_goods_drivertbl
+        GROUP BY goods_driver_id
+    ) AS latest ON main.goods_driver_id = latest.goods_driver_id
+                 AND main.entry_time = latest.max_entry_time
+    WHERE main.current_status = 1
+    AND (6371 * acos(
+           cos(radians(%s)) * cos(radians(main.current_lat)) *
+           cos(radians(main.current_lng) - radians(%s)) +
+           sin(radians(%s)) * sin(radians(main.current_lat))
+       )) <= %s
+    ORDER BY distance;
             """
             values = [lat, lng, lat, lat, lng, lat, radius_km]
 
