@@ -1196,7 +1196,7 @@ def get_nearby_drivers(request):
                 cos(radians(main.current_lng) - radians(%s)) +
                 sin(radians(%s)) * sin(radians(main.current_lat))
             )) AS distance
-            FROM vtpartner.active_goods_drivertbl AS main,vtpartner.goods_driverstbl,vtpartner.vehiclestbl
+            FROM vtpartner.goods_driverstbl,vtpartner.vehiclestbl,vtpartner.active_goods_drivertbl AS main
             INNER JOIN (
                 SELECT goods_driver_id, MAX(entry_time) AS max_entry_time
                 FROM vtpartner.active_goods_drivertbl
