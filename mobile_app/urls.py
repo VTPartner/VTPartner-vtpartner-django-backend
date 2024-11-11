@@ -38,4 +38,6 @@ urlpatterns = [
     path('delete_active_goods_driver',views.delete_goods_driver_to_active_drivers_table,name='delete_active_goods_driver'),
     #Update Drivers Current Location until he goes offline
     path('update_goods_drivers_current_location',views.update_goods_drivers_current_location,name='update_goods_drivers_current_location'),
+    #Get Near By Drivers
+    path('get_nearby_drivers',views.get_nearby_drivers,name='get_nearby_drivers'),
 ]

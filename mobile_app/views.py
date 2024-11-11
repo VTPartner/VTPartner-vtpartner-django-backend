@@ -1174,3 +1174,56 @@ def update_goods_drivers_current_location(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+#Need to check this first
+@csrf_exempt
+def get_nearby_drivers(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        lat = data.get("lat")
+        lng = data.get("lng")
+        radius_km = data.get("radius_km", 5)  # Radius in kilometers
+
+        if lat is None or lng is None:
+            return JsonResponse({"message": "Latitude and Longitude are required"}, status=400)
+
+        try:
+            # Haversine formula to calculate the distance in kilometers
+            query = """
+            SELECT active_id, goods_driver_id, current_lat, current_lng, entry_time, current_status,
+                   (6371 * acos(
+                       cos(radians(%s)) * cos(radians(current_lat)) *
+                       cos(radians(current_lng) - radians(%s)) +
+                       sin(radians(%s)) * sin(radians(current_lat))
+                   )) AS distance
+            FROM vtpartner.active_goods_drivertbl
+            WHERE current_status = 1  -- Only active drivers
+            HAVING distance <= %s
+            ORDER BY distance;
+            """
+            values = [lat, lng, lat, radius_km]
+
+            # Execute the query
+            nearby_drivers = select_query(query, values)
+
+            # Format response
+            drivers_list = [
+                {
+                    "active_id": driver[0],
+                    "goods_driver_id": driver[1],
+                    "current_lat": driver[2],
+                    "current_lng": driver[3],
+                    "entry_time": driver[4],
+                    "current_status": driver[5],
+                    "distance": driver[6]
+                }
+                for driver in nearby_drivers
+            ]
+
+            return JsonResponse({"nearby_drivers": drivers_list}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
