@@ -36,4 +36,6 @@ urlpatterns = [
     path('add_new_active_goods_driver',views.add_goods_driver_to_active_drivers_table,name='add_new_active_goods_driver'),
     #Delete record in active goods driver table once driver wants to go offline
     path('delete_active_goods_driver',views.delete_goods_driver_to_active_drivers_table,name='delete_active_goods_driver'),
+    #Update Drivers Current Location until he goes offline
+    path('update_goods_drivers_current_location',views.update_goods_drivers_current_location,name='update_goods_drivers_current_location'),
 ]

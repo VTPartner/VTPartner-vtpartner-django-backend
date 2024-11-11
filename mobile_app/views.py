@@ -950,7 +950,6 @@ def goods_driver_online_status(request):
 def goods_driver_update_online_status(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        print("data.body::",data)
         status = data.get("status")
         goods_driver_id = data.get("goods_driver_id")
         recent_online_pic = data.get("recent_online_pic")
@@ -1082,7 +1081,6 @@ def add_goods_driver_to_active_drivers_table(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-
 @csrf_exempt
 def delete_goods_driver_to_active_drivers_table(request):
     if request.method == "POST":
@@ -1116,6 +1114,57 @@ def delete_goods_driver_to_active_drivers_table(request):
             ]
             row_count = delete_query(query, values)
             
+            # Send success response
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def update_goods_drivers_current_location(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        goods_driver_id = data.get("goods_driver_id")
+        lat = data.get("lat")
+        lng = data.get("lng")
+
+        # List of required fields
+        required_fields = {
+            "goods_driver_id": goods_driver_id,
+            "lat": lat,
+            "lng": lng
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
+        try:
+
+            query = """
+                UPDATE vtpartner.active_goods_drivertbl 
+                SET 
+                    current_lat = %s,
+                    current_lng = %s
+                WHERE goods_driver_id = %s
+                """
+            values = [
+                    lat,
+                    lng,
+                    goods_driver_id
+                ]
+
+            # Execute the query
+            row_count = update_query(query, values)
+
             # Send success response
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
