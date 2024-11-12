@@ -427,6 +427,56 @@ def all_vehicles(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def allowed_pin_code(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        pincode = data.get("pincode")
+
+         # List of required fields
+        required_fields = {
+            "pincode": pincode,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+                
+                
+        try:
+            query = """
+            select city_id from vtpartner.allowed_pincodes_tbl where pincode=%s and status='1'
+            """
+            params = [pincode]
+            result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+                                
+            # Map the results to a list of dictionaries with meaningful keys
+            response_value = [
+                {
+                    "city_id": row[0]
+                }
+                for row in result
+            ]
+            # Return customer response
+            return JsonResponse({"results": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+
 
 #Goods Driver Api's
 @csrf_exempt

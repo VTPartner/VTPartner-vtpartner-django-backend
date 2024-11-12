@@ -16,6 +16,8 @@ urlpatterns = [
     path('all_cities',views.all_cities,name='all_cities'),
     #All Vehicles
     path('all_vehicles',views.all_vehicles,name='all_vehicles'),
+    #Allowed PinCodes
+    path('allowed_pin_code',views.allowed_pin_code,name='allowed_pin_code'),
     
     
     
