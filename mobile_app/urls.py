@@ -18,6 +18,8 @@ urlpatterns = [
     path('all_vehicles',views.all_vehicles,name='all_vehicles'),
     #Allowed PinCodes
     path('allowed_pin_code',views.allowed_pin_code,name='allowed_pin_code'),
+    #Calculate Distance between 2 place IDs
+    path('distance',views.distance,name='distance'),
     
     
     

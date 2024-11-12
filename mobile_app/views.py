@@ -29,6 +29,7 @@ from PIL import Image  # Pillow library for image processing
 #     missing_fields = [field for field, value in fields.items() if not value]
 #     print("missing_fields::",missing_fields)
 #     return missing_fields if missing_fields else None
+mapKey = "AIzaSyD-vFDMqcEcgyeppWvGrAuhVymvF0Dxue0"
 
 def check_missing_fields(fields):
     # Only consider a field missing if its value is None
@@ -1298,3 +1299,24 @@ ORDER BY distance;
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def distance(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        origins = data.get("origins")
+        destinations = data.get("destinations")
+        api_key = mapKey  # Make sure to define mapKey somewhere in your settings or context
+
+        try:
+            response = requests.get(
+                f"https://maps.googleapis.com/maps/api/distancematrix/json?origins=place_id:{origins}&destinations=place_id:{destinations}&units=metric&key={api_key}"
+            )
+            response_data = response.json()
+            print("response_data::",response_data)
+            return JsonResponse(response_data, status=200)
+
+        except Exception as error:
+            print("Error fetching distance data:", error)
+            return JsonResponse({"error": "Error fetching distance data"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
