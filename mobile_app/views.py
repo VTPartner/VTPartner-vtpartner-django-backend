@@ -1044,6 +1044,8 @@ def goods_driver_update_online_status(request):
                     recent_online_pic,
                     goods_driver_id
                 ]
+                
+
             else:
                 # Exclude recent_online_pic when status is not 1
                 query = """
@@ -1063,6 +1065,19 @@ def goods_driver_update_online_status(request):
 
             # Execute the query
             row_count = update_query(query, values)
+            
+            #insert record in attendance table
+            query_insert = """
+                    INSERT INTO vtpartner.goods_driver_attendance_tbl(driver_id, time, date, status) 
+                    VALUES (%s, EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE, %s)
+                """
+
+            insert_values = [
+                goods_driver_id,
+                status
+            ]
+            
+            row_count = insert_query(query_insert,insert_values)
 
             # Send success response
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
