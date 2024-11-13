@@ -1232,6 +1232,8 @@ def get_nearby_drivers(request):
         data = json.loads(request.body)
         lat = data.get("lat")
         lng = data.get("lng")
+        city_id = data.get("city_id")
+        price_type = data.get("price_type")
         radius_km = data.get("radius_km", 5)  # Radius in kilometers
 
         if lat is None or lng is None:
@@ -1299,7 +1301,7 @@ INNER JOIN (
 JOIN vtpartner.goods_driverstbl ON main.goods_driver_id = goods_driverstbl.goods_driver_id
 JOIN vtpartner.vehiclestbl ON goods_driverstbl.vehicle_id = vehiclestbl.vehicle_id
 JOIN vtpartner.vehicle_city_wise_price_tbl ON vehiclestbl.vehicle_id = vehicle_city_wise_price_tbl.vehicle_id
-                                            AND vehicle_city_wise_price_tbl.city_id = 1  AND vehicle_city_wise_price_tbl.price_type_id=1
+AND vehicle_city_wise_price_tbl.city_id = %s  AND vehicle_city_wise_price_tbl.price_type_id=%s
 WHERE main.current_status = 1
   AND (6371 * acos(
         cos(radians(%s)) * cos(radians(main.current_lat)) *
@@ -1311,7 +1313,7 @@ WHERE main.current_status = 1
 ORDER BY distance;
 
             """
-            values = [lat, lng, lat, lat, lng, lat, radius_km]
+            values = [lat, lng, lat,city_id,price_type, lat, lng, lat, radius_km]
 
             # Execute the query
             nearby_drivers = select_query(query, values)
