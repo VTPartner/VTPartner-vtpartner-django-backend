@@ -16,6 +16,7 @@ import requests
 import json
 import time
 import re
+import random
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import IntegrityError
@@ -476,6 +477,102 @@ def allowed_pin_code(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+#New Booking 
+@csrf_exempt
+def new_goods_delivery_booking(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        # Read the individual fields from the JSON data
+        customer_id = data.get("customer_id")
+        driver_id = data.get("driver_id")
+        pickup_lat = data.get("pickup_lat")
+        pickup_lng = data.get("pickup_lng")
+        destination_lat = data.get("destination_lat")
+        destination_lng = data.get("destination_lng")
+        distance = data.get("distance")
+        time = data.get("time")
+        total_price = data.get("total_price")
+        base_price = data.get("base_price")
+        otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
+        gst_amount = data.get("gst_amount")
+        igst_amount = data.get("igst_amount")
+        goods_type_id = data.get("goods_type_id")
+        payment_method = data.get("payment_method")
+        city_id = data.get("city_id")
+
+        # List of required fields
+        required_fields = {
+            "customer_id":customer_id,
+            "driver_id":driver_id,
+            "pickup_lat":pickup_lat,
+            "pickup_lng":pickup_lng,
+            "destination_lat":destination_lat,
+            "destination_lng":destination_lng,
+            "distance":distance,
+            "time":time,
+            "total_price":total_price,
+            "base_price":base_price,
+            "otp":otp,
+            "gst_amount":gst_amount,
+            "igst_amount":igst_amount,
+            "goods_type_id":goods_type_id,
+            "payment_method":payment_method,
+            "city_id":city_id,
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
+        try:
+          
+            #insert record in booking table
+            query_insert = """
+                    INSERT INTO vtpartner.bookings_tbl (
+        customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
+        distance, time, total_price, base_price, booking_timing, booking_date, 
+        otp, gst_amount, igst_amount, 
+        payment_method, city_id
+    ) 
+    VALUES (
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+        EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
+        %s, %s
+    ) 
+    RETURNING booking_id;
+                """
+
+            insert_values = [
+                customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
+    distance, time, total_price, base_price, otp, 
+    gst_amount, igst_amount, goods_type_id, payment_method, city_id
+            ]
+            
+            new_result = insert_query(query_insert,insert_values)
+            print("new_result::",new_result)
+            if new_result:
+                print("new_result[0][0]::",new_result[0][0])
+                booking_id = new_result[0][0]
+                response_value = [
+                    {
+                        "booking_id":booking_id,
+                    }
+                ]
+                # Send success response
+                return JsonResponse({"result": response_value}, status=200)
+
+            
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 
 

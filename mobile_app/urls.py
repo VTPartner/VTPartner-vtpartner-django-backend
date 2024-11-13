@@ -24,6 +24,8 @@ urlpatterns = [
     path('get_all_goods_types',views.get_all_goods_types,name='get_all_goods_types'),
     #GuideLines according to category
     path('get_all_guide_lines',views.get_all_guide_lines,name='get_all_guide_lines'),
+    #New Goods Delivery Booking
+    path('new_goods_delivery_booking',views.new_goods_delivery_booking,name='new_goods_delivery_booking'),
     
     
     
