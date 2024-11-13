@@ -1239,6 +1239,36 @@ def get_nearby_drivers(request):
 
         try:
             # Haversine formula to calculate the distance in kilometers
+            #SELECT main.active_id, main.goods_driver_id, main.current_lat, main.current_lng, 
+#        main.entry_time, main.current_status, goods_driverstbl.driver_first_name,
+#        goods_driverstbl.profile_pic, vehiclestbl.image AS vehicle_image, 
+#        vehiclestbl.vehicle_name,weight,
+#        (6371 * acos(
+#            cos(radians(%s)) * cos(radians(main.current_lat)) *
+#            cos(radians(main.current_lng) - radians(%s)) +
+#            sin(radians(%s)) * sin(radians(main.current_lat))
+#        )) AS distance
+# FROM vtpartner.active_goods_drivertbl AS main
+# INNER JOIN (
+#     SELECT goods_driver_id, MAX(entry_time) AS max_entry_time
+#     FROM vtpartner.active_goods_drivertbl
+#     GROUP BY goods_driver_id
+# ) AS latest ON main.goods_driver_id = latest.goods_driver_id
+#               AND main.entry_time = latest.max_entry_time
+# JOIN vtpartner.goods_driverstbl ON main.goods_driver_id = goods_driverstbl.goods_driver_id
+# JOIN vtpartner.vehiclestbl ON goods_driverstbl.vehicle_id = vehiclestbl.vehicle_id
+# WHERE main.current_status = 1
+#   AND (6371 * acos(
+#          cos(radians(%s)) * cos(radians(main.current_lat)) *
+#          cos(radians(main.current_lng) - radians(%s)) +
+#          sin(radians(%s)) * sin(radians(main.current_lat))
+#      )) <= %s
+#   AND goods_driverstbl.category_id = vehiclestbl.category_id
+#   AND goods_driverstbl.category_id = '1'
+# ORDER BY distance;
+#             """
+#             values = [lat, lng, lat, lat, lng, lat, radius_km]
+
             query = """
             SELECT 
     main.active_id, 
@@ -1252,7 +1282,8 @@ def get_nearby_drivers(request):
     vehiclestbl.image AS vehicle_image, 
     vehiclestbl.vehicle_name,
     vehiclestbl.weight,
-    vehicle_city_wise_price_tbl.starting_price_per_km,  -- Price per km for vehicle in city_id 1
+    vehicle_city_wise_price_tbl.starting_price_per_km,
+    vehicle_city_wise_price_tbl.base_fare,
     (6371 * acos(
         cos(radians(%s)) * cos(radians(main.current_lat)) *
         cos(radians(main.current_lng) - radians(%s)) +
@@ -1298,7 +1329,10 @@ ORDER BY distance;
                     "driver_profile_pic": driver[7],
                     "vehicle_image": driver[8],
                     "vehicle_name": driver[9],
-                    "distance": driver[10]
+                    "weight": driver[10],
+                    "starting_price_per_km": driver[11],
+                    "base_fare": driver[12],
+                    "distance": driver[13]
                 }
                 for driver in nearby_drivers
             ]
