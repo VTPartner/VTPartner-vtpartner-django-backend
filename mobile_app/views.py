@@ -512,7 +512,7 @@ def new_goods_delivery_booking(request):
             "time":time,
             "total_price":total_price,
             "base_price":base_price,
-            "otp":otp,
+            "otp":str(otp),
             "gst_amount":gst_amount,
             "igst_amount":igst_amount,
             "goods_type_id":goods_type_id,
