@@ -1463,7 +1463,7 @@ def get_nearby_drivers(request):
         lat = data.get("lat")
         lng = data.get("lng")
         city_id = data.get("city_id")
-        price_type = data.get("price_type")
+        price_type = data.get("price_type", 1)
         radius_km = data.get("radius_km", 5)  # Radius in kilometers
 
         if lat is None or lng is None:
