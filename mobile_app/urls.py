@@ -26,6 +26,8 @@ urlpatterns = [
     path('get_all_guide_lines',views.get_all_guide_lines,name='get_all_guide_lines'),
     #New Goods Delivery Booking
     path('new_goods_delivery_booking',views.new_goods_delivery_booking,name='new_goods_delivery_booking'),
+    #Search Near by Goods Driver for vehicle id to send notification to accept booking
+    path('search_nearby_drivers',views.search_nearby_drivers,name='search_nearby_drivers'),
     
     
     
