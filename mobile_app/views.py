@@ -500,6 +500,10 @@ def new_goods_delivery_booking(request):
         goods_type_id = data.get("goods_type_id")
         payment_method = data.get("payment_method")
         city_id = data.get("city_id")
+        sender_name = data.get("sender_name")
+        sender_number = data.get("sender_number")
+        receiver_name = data.get("receiver_name")
+        receiver_number = data.get("receiver_number")
 
         # List of required fields
         required_fields = {
@@ -519,6 +523,10 @@ def new_goods_delivery_booking(request):
             "goods_type_id":goods_type_id,
             "payment_method":payment_method,
             "city_id":city_id,
+            "sender_name":sender_name,
+            "sender_number":sender_number,
+            "receiver_name":receiver_name,
+            "receiver_number":receiver_number,
         }
 
         # Check for missing fields
