@@ -1370,3 +1370,66 @@ def distance(request):
             return JsonResponse({"error": "Error fetching distance data"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def get_all_goods_types(request):
+    if request.method == "POST":        
+        try:
+            query = """
+            select goods_type_id,goods_type_name from vtpartner.goods_type_tbl
+            """
+            
+            result = select_query(query)
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+                                
+            # Map the results to a list of dictionaries with meaningful keys
+            response_value = [
+                {
+                    "goods_type_id": row[0],
+                    "goods_type_name": row[1]
+                    
+                }
+                for row in result
+            ]
+            # Return customer response
+            return JsonResponse({"results": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_all_guide_lines(request):
+    if request.method == "POST":        
+        try:
+            query = """
+            select guide_id,guide_line from vtpartner.guide_lines_tbl where category_id='1'
+            """
+            
+            result = select_query(query)
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+                                
+            # Map the results to a list of dictionaries with meaningful keys
+            response_value = [
+                {
+                    "guide_id": row[0],
+                    "guide_line": row[1]
+                    
+                }
+                for row in result
+            ]
+            # Return customer response
+            return JsonResponse({"results": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)

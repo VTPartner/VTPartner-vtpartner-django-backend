@@ -20,6 +20,10 @@ urlpatterns = [
     path('allowed_pin_code',views.allowed_pin_code,name='allowed_pin_code'),
     #Calculate Distance between 2 place IDs
     path('distance',views.distance,name='distance'),
+    #Goods types 
+    path('get_all_goods_types',views.get_all_goods_types,name='get_all_goods_types'),
+    #GuideLines according to category
+    path('get_all_guide_lines',views.get_all_guide_lines,name='get_all_guide_lines'),
     
     
     
