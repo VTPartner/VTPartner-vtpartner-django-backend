@@ -482,6 +482,7 @@ def allowed_pin_code(request):
 def new_goods_delivery_booking(request):
     if request.method == "POST":
         data = json.loads(request.body)
+        
         # Read the individual fields from the JSON data
         customer_id = data.get("customer_id")
         driver_id = data.get("driver_id")
@@ -519,10 +520,10 @@ def new_goods_delivery_booking(request):
             "payment_method":payment_method,
             "city_id":city_id,
         }
+
         # Check for missing fields
         missing_fields = check_missing_fields(required_fields)
         
-        # If there are missing fields, return an error response
         if missing_fields:
             return JsonResponse(
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
@@ -530,43 +531,37 @@ def new_goods_delivery_booking(request):
             )
         
         try:
-          
-            #insert record in booking table
+            # Insert record in the booking table
             query_insert = """
-                    INSERT INTO vtpartner.bookings_tbl (
-        customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
-        distance, time, total_price, base_price, booking_timing, booking_date, 
-        otp, gst_amount, igst_amount, 
-        payment_method, city_id
-    ) 
-    VALUES (
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
-        EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-        %s, %s
-    ) 
-    RETURNING booking_id;
-                """
+                INSERT INTO vtpartner.bookings_tbl (
+                    customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                    distance, time, total_price, base_price, booking_timing, booking_date, 
+                    otp, gst_amount, igst_amount, 
+                    payment_method, city_id
+                ) 
+                VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                    EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
+                    %s, %s
+                ) 
+                RETURNING booking_id;
+            """
 
             insert_values = [
                 customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
-    distance, time, total_price, base_price, otp, 
-    gst_amount, igst_amount, goods_type_id, payment_method, city_id
+                distance, time, total_price, base_price, otp, 
+                gst_amount, igst_amount, payment_method, city_id
             ]
+
+            # Assuming insert_query is a function that runs the query
+            new_result = insert_query(query_insert, insert_values)
             
-            new_result = insert_query(query_insert,insert_values)
-            print("new_result::",new_result)
             if new_result:
-                print("new_result[0][0]::",new_result[0][0])
-                booking_id = new_result[0][0]
-                response_value = [
-                    {
-                        "booking_id":booking_id,
-                    }
-                ]
+                booking_id = new_result[0][0]  # Extracting booking_id from the result
+                response_value = [{"booking_id": booking_id}]
+
                 # Send success response
                 return JsonResponse({"result": response_value}, status=200)
-
-            
 
         except Exception as err:
             print("Error executing query:", err)
