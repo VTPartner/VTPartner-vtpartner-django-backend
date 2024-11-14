@@ -206,7 +206,10 @@ def login_view(request):
             status=400
         )
                 
-                
+        send_notification_using_api('dsTW2AoxW0uwrrmSJprFLV:APA91bGjCwFLxNyf2juIY4_sNZV2nLLpOGrwdoYQxnKY5mi4gidNVDbH12QQmZWkIur_7_CFg23QSAJVqYm8fQfc6p0hYZfe65JswAOBYgeWHKE0s6OMrVY','Title','Body',{
+            'intent':'driver',
+            'booking_id':'4'
+        })
         try:
             query = """
             SELECT customer_id,customer_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,email,gst_no,gst_address,pincode FROM
