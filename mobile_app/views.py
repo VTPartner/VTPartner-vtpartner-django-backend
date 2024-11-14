@@ -125,6 +125,7 @@ def insert_query(query, params):
 def get_server_key_token():
     # Define the required scopes
     scopes = ["https://www.googleapis.com/auth/firebase.messaging"]
+    #Loading from .env
     service_account_key = os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
     # Load the service account credentials
     credentials = service_account.Credentials.from_service_account_info(
