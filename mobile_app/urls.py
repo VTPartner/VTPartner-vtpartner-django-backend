@@ -4,6 +4,8 @@ from . import views
 app_name = 'vt_partner'
 
 urlpatterns = [
+    #Send Notification
+    path('send_notification_using_api',views.send_notification_using_api,name='send_notification_using_api'),
     #Upload Images
     path('upload',views.upload_image,name='upload'),
     #Customer Login
