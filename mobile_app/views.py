@@ -2023,7 +2023,7 @@ def booking_details_for_ride_acceptance(request):
                     "receiver_name":row[27],
                     "receiver_number":row[28],
                     "customer_name":row[29],
-                    "customers_auth_token":row[30]
+                    "customers_auth_token":row[30],
                     
                 }
                 for row in result
