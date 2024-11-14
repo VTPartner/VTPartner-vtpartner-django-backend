@@ -126,6 +126,7 @@ def get_server_key_token():
     # Define the required scopes
     scopes = ["https://www.googleapis.com/auth/firebase.messaging"]
     service_account_key = os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
+    print("service_account_key::",service_account_key)
     # Load the service account credentials
     credentials = service_account.Credentials.from_service_account_info(
         service_account_key,  # Replace with your actual service account dictionary or JSON file
@@ -144,7 +145,7 @@ def get_server_key_token():
 def send_notification_using_api(token: str, title: str, body: str, data: dict) -> None:
     # Retrieve the server key for authorization
     server_key = get_server_key_token()  # Replace with your actual method to get the server key
-
+    print("server_key::",server_key)
     url = "https://fcm.googleapis.com/v1/projects/vt-partner-8317b/messages:send"
     headers = {
         'Content-Type': 'application/json',
