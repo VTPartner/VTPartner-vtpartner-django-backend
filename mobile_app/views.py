@@ -122,6 +122,7 @@ def insert_query(query, params):
         print("General Error executing query:", e)
         raise
 
+@csrf_exempt
 def get_server_key_token():
     # Define the required scopes
     scopes = ["https://www.googleapis.com/auth/firebase.messaging"]
