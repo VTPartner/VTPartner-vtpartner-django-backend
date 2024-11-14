@@ -30,6 +30,8 @@ urlpatterns = [
     path('search_nearby_drivers',views.search_nearby_drivers,name='search_nearby_drivers'),
     #Update Customer Firebase Token
     path('update_firebase_customer_token',views.update_firebase_customer_token,name='update_firebase_customer_token'),
+    #Tracking the Booking
+    path('booking_details_live_track',views.booking_details_live_track,name='booking_details_live_track'),
     
     
     
@@ -56,4 +58,6 @@ urlpatterns = [
     path('get_nearby_drivers',views.get_nearby_drivers,name='get_nearby_drivers'),
     #Update Goods Driver Firebase Token
     path('update_firebase_goods_driver_token',views.update_firebase_goods_driver_token,name='update_firebase_goods_driver_token'),
+    #Booking Details for ride acceptance
+    path('booking_details_for_ride_acceptance',views.booking_details_for_ride_acceptance,name='booking_details_for_ride_acceptance'),
 ]
