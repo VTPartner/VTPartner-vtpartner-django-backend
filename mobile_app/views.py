@@ -700,6 +700,58 @@ ORDER BY distance;
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def update_firebase_customer_token(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        customer_id = data.get("customer_id")
+        authToken = data.get("authToken")
+        
+
+        # List of required fields
+        required_fields = {
+            "customer_id": customer_id,
+            "authToken": authToken,
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
+        try:
+
+            query = """
+                UPDATE vtpartner.customers_tbl 
+                SET 
+                    authtoken = %s
+                WHERE customer_id = %s
+                """
+            values = [
+                    authToken,
+                    customer_id
+                ]
+
+            # Execute the query
+            row_count = update_query(query, values)
+
+            # Send success response
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+
+
+
 
 
 #Goods Driver Api's
@@ -1665,6 +1717,54 @@ def get_all_guide_lines(request):
             ]
             # Return customer response
             return JsonResponse({"results": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def update_firebase_goods_driver_token(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        goods_driver_id = data.get("goods_driver_id")
+        authToken = data.get("authToken")
+        
+
+        # List of required fields
+        required_fields = {
+            "goods_driver_id": goods_driver_id,
+            "authToken": authToken,
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
+        try:
+
+            query = """
+                UPDATE vtpartner.goods_driverstbl 
+                SET 
+                    authtoken = %s
+                WHERE goods_driver_id = %s
+                """
+            values = [
+                    authToken,
+                    goods_driver_id
+                ]
+
+            # Execute the query
+            row_count = update_query(query, values)
+
+            # Send success response
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)

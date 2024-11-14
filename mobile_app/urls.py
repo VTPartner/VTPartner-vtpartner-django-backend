@@ -28,6 +28,8 @@ urlpatterns = [
     path('new_goods_delivery_booking',views.new_goods_delivery_booking,name='new_goods_delivery_booking'),
     #Search Near by Goods Driver for vehicle id to send notification to accept booking
     path('search_nearby_drivers',views.search_nearby_drivers,name='search_nearby_drivers'),
+    #Update Customer Firebase Token
+    path('update_firebase_customer_token',views.update_firebase_customer_token,name='update_firebase_customer_token'),
     
     
     
@@ -52,4 +54,6 @@ urlpatterns = [
     path('update_goods_drivers_current_location',views.update_goods_drivers_current_location,name='update_goods_drivers_current_location'),
     #Get Near By Drivers
     path('get_nearby_drivers',views.get_nearby_drivers,name='get_nearby_drivers'),
+    #Update Goods Driver Firebase Token
+    path('update_firebase_goods_driver_token',views.update_firebase_goods_driver_token,name='update_firebase_goods_driver_token'),
 ]
