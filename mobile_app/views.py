@@ -24,6 +24,8 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from google.oauth2 import service_account
 import google.auth.transport.requests
+import os
+from dotenv import load_dotenv
 
 from PIL import Image  # Pillow library for image processing
 
@@ -123,25 +125,10 @@ def insert_query(query, params):
 def get_server_key_token():
     # Define the required scopes
     scopes = ["https://www.googleapis.com/auth/firebase.messaging"]
-
+    service_account_key = os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
     # Load the service account credentials
     credentials = service_account.Credentials.from_service_account_info(
-        {
-          "type": "service_account",
-          "project_id": "vt-partner-8317b",
-          "private_key_id": "837e02078949fb8be96ff2b9d6e09dfb779a8efd",
-          "private_key":
-              "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDH7eZNh/qpGcEo\nK+pcufsqIMDpVUuKKAoNgVdSNpt8KKtKsgt7R/fnCtBaqc8E0e9iJWKFIEtcKPhi\n/sMga5mUJTjwm/1YigSVe620OaUSN7NySGaz7St10A4rx4IAvYkgtZ/Mxr3BL3TA\n+gvl09F3UkICC8AOpLmxnTTOu0wEay/Ms0sVITzdDWBQ2/Q6hzEa2KdbXxqQUgLJ\nkvcDkGzdJhmjSJhXZCUDNXzz4+dkO6x5GSbNt0/vzasvJoRt5LCu1k0X0NNaBGs/\n1/Lzh0excl6lAlZKHDK+vXaX50wEKtizNXBdOBc6XSwUGSeQ6iQbB20/SMOWJ9Ki\nPnZ6XiHlAgMBAAECggEALCWwpqshowiAWgYEfNBGkWFlJ8EBarL3sU6/wPQ09kAm\nvto85c6ZA6gkJPj9MSPIV+RIcnwUl/emDXoTDUwlQAzOG3dehJgJdha23yaheDnb\ngp9RKmbzI1M7ZdhqsQ4pQxNIA5hZG1kGz3wHd4sD5HTCBaChmrouFPXRTNsX6Jt8\nhs5c45ewvXYVem3DD2WY3cV3+B5VF7v3gniU2n0+6AkOO7io6pLVPKXqv1rdeQ/8\nZHkbCmA6EsgXWcWwgvnErIh4ahiDehJFa6ZYqzMXNG1cectTONIfHuQxKWIEFMbS\nvu1blrG49Yf9sDEPGRudThhxziM+jSru4CrSeYUU4QKBgQDuqNRgXU3GWyd0ZRFl\nfRNEYrsyActv7jn83vVVT7rxaD0uEgcKUXaK8KjAKfCWyxErWYEjsBao64LLaqOx\nQ5DaxFE9TEmtvFrArQueMBZh5YzWLL2LuLVxfnuJekFe9PES7CrCaZseB2jA+cfZ\nOk7tD8OXZPOL58b2BZ7HV8xcUQKBgQDWdKvpzs3Jk6KqXKYZSzDSc7O/dduSic3z\ndUbZD9itWJ/SEkDGI+9JJnB6yGsUK7XSg/v4DQ5iTxLkVYPIsKInugv5l83F0sW9\nidejYHGJQpPH3ihPaHOyNJppDx8e1XO3MA5k5CfPa3USzNuZ0X6cprzKxwqG+BMv\nONlXi8wLVQKBgDFNuYoq3F1lCXKXSo+/1hIjn26GRmPaQCqIWQCF1yX2FeWFneS4\nzZeIfiQsxeIxE1v0QqR/xT6iYMPrROPjBHLdabcTIol8xvbVCPhmEMmqpXy9g27w\n+rL2oUjWc9jNG1yAY5kEPiJm/3IWZ/3teM6qmgqVtWaqvESpBpNCBRrxAoGBALyo\nNJfhks0ysFW4XXJA4DkzCbxzfO7DhccXs3S+aPnNzgLqhcsIz7cFNsv8xZ4f+bqw\n2xdSvQWk1FTEGcOSB4R1OZWfgqj1i3j66xVRgW+jfwfDmqiIlcb+WZv0boccdciA\nYRlGUPM6b+pTBxig4AYE9G5afRtQ3uea1jAazixlAoGBAIpka81kFHels4njhIYO\nV04+2CC/bq81pn8puUZNt+xuR0yLLoEPSYglP5Oohc1Eu0FZZYBaIScN9pgrzEvj\nDABU0sf1MQDaRGkcrgPyrVh94RpalkOpdfVnYmOq9iZZ8gI/0DKYemCKTOHxXZgR\nLSP+No/oYiXtfsXoHWkOMRKq\n-----END PRIVATE KEY-----\n",
-          "client_email":
-              "latest-vt-partner-final@vt-partner-8317b.iam.gserviceaccount.com",
-          "client_id": "113906949943313096106",
-          "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-          "token_uri": "https://oauth2.googleapis.com/token",
-          "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-          "client_x509_cert_url":
-              "https://www.googleapis.com/robot/v1/metadata/x509/latest-vt-partner-final%40vt-partner-8317b.iam.gserviceaccount.com",
-          "universe_domain": "googleapis.com"
-        },  # Replace with your actual service account dictionary or JSON file
+        service_account_key,  # Replace with your actual service account dictionary or JSON file
         scopes=scopes
     )
 
@@ -151,6 +138,7 @@ def get_server_key_token():
 
     # Return the access token
     return credentials.token
+
 
 @csrf_exempt
 def send_notification_using_api(token: str, title: str, body: str, data: dict) -> None:
