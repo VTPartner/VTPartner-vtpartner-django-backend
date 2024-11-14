@@ -22,10 +22,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import IntegrityError
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
-from google.oauth2 import service_account
-import google.auth.transport.requests
-import os
-from dotenv import load_dotenv
+# from google.oauth2 import service_account
+# import google.auth.transport.requests
+# import os
+# from dotenv import load_dotenv
 
 from PIL import Image  # Pillow library for image processing
 
@@ -122,56 +122,7 @@ def insert_query(query, params):
         print("General Error executing query:", e)
         raise
 
-def get_server_key_token():
-    # Define the required scopes
-    scopes = ["https://www.googleapis.com/auth/firebase.messaging"]
-    #Loading from .env
-    service_account_key = os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
-    # Load the service account credentials
-    credentials = service_account.Credentials.from_service_account_info(
-        service_account_key,  # Replace with your actual service account dictionary or JSON file
-        scopes=scopes
-    )
 
-    # Use a request object for the credentials to refresh and generate an access token
-    request = google.auth.transport.requests.Request()
-    credentials.refresh(request)
-
-    # Return the access token
-    return credentials.token
-
-
-@csrf_exempt
-def send_notification_using_api(token: str, title: str, body: str, data: dict) -> None:
-    # Retrieve the server key for authorization
-    server_key = get_server_key_token()  # Replace with your actual method to get the server key
-
-    url = "https://fcm.googleapis.com/v1/projects/vt-partner-8317b/messages:send"
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {server_key}',
-    }
-
-    # Construct the message payload
-    message = {
-        "message": {
-            "token": token,
-            "notification": {
-                "body": body,
-                "title": title
-            },
-            "data": data
-        }
-    }
-
-    # Send the notification request
-    response = requests.post(url, headers=headers, data=json.dumps(message))
-
-    # Check the response status
-    if response.status_code == 200:
-        print("Notification sent successfully.")
-    else:
-        print(f'Notification failed to send: {response.status_code} - {response.text}')
 
 @csrf_exempt
 def upload_image(request):
