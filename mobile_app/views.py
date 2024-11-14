@@ -155,6 +155,42 @@ def get_server_key_token():
     # Return the access token
     return credentials.token
 
+def sendFMCMsg(deviceToken, msg, title, data,serverToken):
+    
+    deviceToken = deviceToken.replace('__colon__', ':')
+
+    # Validate the device token
+    if not deviceToken:
+        print("Invalid device token")
+        return
+
+    # Check if the token has already been sent a notification
+    # (You may want to implement a more robust solution to track notifications)
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {serverToken}',
+    }
+
+    body =  {
+        "message": {
+            "token": deviceToken,
+            "notification": {
+                "body": msg,
+                "title": title
+            },
+            "data": data
+        }
+    }
+
+    try:
+        response = requests.post("https://fcm.googleapis.com/v1/projects/vt-partner-8317b/messages:send", headers=headers, data=json.dumps(body))
+        response_data = response.json()
+        print("FCM Response:")
+        print(response_data)
+        print("Status Code:", response.status_code)
+    except requests.exceptions.RequestException as e:
+        print("Error sending FCM notification:", e)
 
 @csrf_exempt
 def send_notification_using_api(token: str, title: str, body: str, data: dict) -> None:
@@ -221,11 +257,11 @@ def login_view(request):
             {"message": f"Missing required fields: {', '.join(missing_fields)}"},
             status=400
         )
-                
-        send_notification_using_api('dsTW2AoxW0uwrrmSJprFLV:APA91bGjCwFLxNyf2juIY4_sNZV2nLLpOGrwdoYQxnKY5mi4gidNVDbH12QQmZWkIur_7_CFg23QSAJVqYm8fQfc6p0hYZfe65JswAOBYgeWHKE0s6OMrVY','Title','Body',{
+        map_data = {
             'intent':'driver',
             'booking_id':'4'
-        })
+        }
+        sendFMCMsg('dsTW2AoxW0uwrrmSJprFLV:APA91bGjCwFLxNyf2juIY4_sNZV2nLLpOGrwdoYQxnKY5mi4gidNVDbH12QQmZWkIur_7_CFg23QSAJVqYm8fQfc6p0hYZfe65JswAOBYgeWHKE0s6OMrVY','Body','Title',map_data,'ya29.c.c0ASRK0GZnHD1SG1xIN9oult4JlXi1ajaJnY-tOG1rRBnL5Q4tI3OdTz2JP-yX0tu7enYTXWtj5vqZQ_doucDyCBlorpav8UR_4Ovwm1HwVHkF1yC37gHobmsnVK-zNK-8XKJNocNI8R7eGbMvFuOItUrQYbGv9GomhgwUZpIzIcuERujHkllQcftyPtPqm5tWjpooF5T-CJ1F91u2NW0xmarRHVAOHU82f3zeaAvGiwp2KfAFSJ1Zh0432GypzzZGjcMrhCu4vXxW5kSpzssDyJ2ONlV90ncvRM0c2aWl81o1P-kWQyOVO99mwhSA7OLH5kUU4I38H6LyV0ZRCh-ulTqsD9jYAy_PO3SnIal0uVjYqofshvI8thgT384C9VmdUeadJx2Xyi1bdg4h9VOIgkQqj2vFBbQoQeSmVeqOhzBwtyfz30s7XBZkdoki4OuQf3Qw1Ijog4W_8XIX97uM3pBzBXc1Jfex1V-6RbbBI4b8fl7o7a8F-_9d41lovcmvi8ISFrnprzg_Zo6MZ96-9izzfaumQM4Yk5qq9OnJimjaFb8Zuia3eJ-7x5R7y97eJvZ7RvptWuXnc44uBcBFOS7rklMcZxepFXQuymrzqntQmxkt6vpZUzfWpJmhtdMpQJhq9gt5ZgzFhwganBc2i9aJ4-izMOR9yeFYsttjfBU_cO7hXaafg80IowSz8wofX-B2_9waRk7RMmUBsWeoRs6IJ_JukV-oz1Z0iJyMt2b8q1Z2zwlsz-_zYFvjdRjI1ijpylUmWR-kzvfMx4V7WM2Su_m3ldcbhfFi2mwX84c125uk2FIZXdad3X3WbJxsmu-ex5OSU1RkyMtrufjl3RRxMQIcVo_grQej4k7nndb_e2g37gXhXqUaBk9MtFXlfQxJcaaqpuaSYSW4J5hXmdU3pUJjuc9oB0Ib5wdXRQtVlqsw_MB0hZz1FpI2wF38_wqXljJplXYi9OtatM335pYeqid_2pgaFxiOYecn7w-cXSig6tYly8J')
         try:
             query = """
             SELECT customer_id,customer_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,email,gst_no,gst_address,pincode FROM
