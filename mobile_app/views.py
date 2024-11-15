@@ -2210,10 +2210,6 @@ def goods_driver_booking_accepted(request):
             ret_driver_id = result[0][0]
             return JsonResponse({"message": "No Data Found"}, status=404)
             
-            
-
-            return JsonResponse({"results": booking_details}, status=200)
-
         except Exception as err:
             print("Error executing query:", err)
             return JsonResponse({"message": "Internal Server Error"}, status=500)
