@@ -585,6 +585,29 @@ def allowed_pin_code(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+
+def get_goods_driver_auth_token(server_token, goods_driver_id):
+    auth_token = ""
+    try:
+        query = """
+        select authtoken from vtpartner.goods_driverstbl where goods_driver_id=%s 
+        """
+        params = [goods_driver_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            return JsonResponse({"message": "No Data Found"}, status=404)
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for goods driver:", err)
+        return auth_token
+
+
 #New Booking 
 @csrf_exempt
 def new_goods_delivery_booking(request):
@@ -614,6 +637,7 @@ def new_goods_delivery_booking(request):
         receiver_number = data.get("receiver_number")
         pickup_address = data.get("pickup_address")
         drop_address = data.get("drop_address")
+        server_access_token = data.get("server_access_token")
 
         # List of required fields
         required_fields = {
@@ -639,6 +663,7 @@ def new_goods_delivery_booking(request):
             "receiver_number":receiver_number,
             "pickup_address":pickup_address,
             "drop_address":drop_address,
+            "server_access_token":server_access_token,
         }
 
         # Check for missing fields
@@ -649,6 +674,10 @@ def new_goods_delivery_booking(request):
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
                 status=400
             )
+        
+        driver_auth_token = get_goods_driver_auth_token(server_access_token,driver_id)
+
+        
         
         try:
             # Insert record in the booking table
@@ -679,6 +708,13 @@ def new_goods_delivery_booking(request):
             if new_result:
                 booking_id = new_result[0][0]  # Extracting booking_id from the result
                 response_value = [{"booking_id": booking_id}]
+                
+                #send notification to goods driver
+                fcm_data = {
+                    'intent':'driver',
+                    'booking_id':booking_id
+                }
+                sendFMCMsg(driver_auth_token,f'You have a new Ride Request for \nPickup Location : {pickup_address}. \n Drop Location : {drop_address}','New Ride Request',fcm_data)
 
                 # Send success response
                 return JsonResponse({"result": response_value}, status=200)
