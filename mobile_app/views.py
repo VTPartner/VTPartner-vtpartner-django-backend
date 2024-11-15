@@ -2025,7 +2025,7 @@ def booking_details_for_ride_acceptance(request):
             
         try:
             query = """
-                select booking_id,bookings_tbl.customer_id,bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,customer_name,customers_tbl.authtoken,pickup_address,drop_address from vtpartner.bookings_tbl,vtpartner.customers_tbl where customers_tbl.customer_id=bookings_tbl.customer_id and booking_id=%s
+                select booking_id,bookings_tbl.customer_id,bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,customer_name,customers_tbl.authtoken,pickup_address,drop_address from vtpartner.bookings_tbl,vtpartner.customers_tbl where customers_tbl.customer_id=bookings_tbl.customer_id and booking_id=%s and bookings_tbl.driver_id!='-1'
             """
             result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
 
