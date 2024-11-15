@@ -1737,7 +1737,7 @@ def update_goods_drivers_current_location(request):
             row_count = update_query(query, values)
 
             # Send success response
-            print("printing statusCode : 200")
+            
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
         except Exception as err:
