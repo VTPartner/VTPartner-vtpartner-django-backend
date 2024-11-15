@@ -60,4 +60,6 @@ urlpatterns = [
     path('update_firebase_goods_driver_token',views.update_firebase_goods_driver_token,name='update_firebase_goods_driver_token'),
     #Booking Details for ride acceptance
     path('booking_details_for_ride_acceptance',views.booking_details_for_ride_acceptance,name='booking_details_for_ride_acceptance'),
+    #Booking accepted
+    path('goods_driver_booking_accepted',views.goods_driver_booking_accepted,name='goods_driver_booking_accepted'),
 ]

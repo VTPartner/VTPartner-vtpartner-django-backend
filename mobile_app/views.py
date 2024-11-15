@@ -2079,3 +2079,143 @@ def booking_details_for_ride_acceptance(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+def get_customer_auth_token(customer_id):
+    auth_token = ""
+    try:
+        query = """
+        select authtoken from vtpartner.customers_tbl where customer_id=%s 
+        """
+        params = [customer_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            return JsonResponse({"message": "No Data Found"}, status=404)
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for goods driver:", err)
+        return auth_token
+    
+@csrf_exempt 
+def goods_driver_booking_accepted(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        booking_id = data.get("booking_id")
+        driver_id = data.get("driver_id")
+        server_token = data.get("server_token")
+        customer_id = data.get("customer_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "booking_id": booking_id,
+            "driver_id": driver_id,
+            "server_token": server_token,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                select driver_id from vtpartner.bookings_tbl where booking_id=%s
+            """
+            result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                #Update booking status and driver assinged
+                try:
+
+                    query = """
+                       update vtpartner.bookings_tbl set driver_id=%s ,booking_status='Accepted' where booking_id=%s
+                        """
+                    values = [
+                            driver_id,
+                            booking_id
+                        ]
+
+                    # Execute the query
+                    row_count = update_query(query, values)
+                    #Inserting record in booking_history table
+                    try:
+
+                        query = """
+                           insert into vtpartner.bookings_history_tbl (status,booking_id) values ('Accepted',%s)
+                            """
+                        values = [
+                                booking_id
+                            ]
+
+                        # Execute the query
+                        row_count = insert_query(query, values)
+                        #Updating driver status to occupied
+                        try:
+
+                            query = """
+                               update vtpartner.active_goods_drivertbl set current_status='2' where goods_driver_id=%s
+                                """
+                            values = [
+                                    driver_id
+                                ]
+
+                            # Execute the query
+                            row_count = update_query(query, values)
+
+
+
+                            #get the customer auth token
+                            auth_token = get_customer_auth_token(customer_id)
+                            
+                            #send Fcm notification to customer saying driver assigned
+                            customer_data = {
+                                'intent':'live_tracking',
+                                'booking_id':str(booking_id)
+                            }
+                            sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token)
+
+                            # Send success response
+                            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+                        except Exception as err:
+                            print("Error executing query:", err)
+                            return JsonResponse({"message": "An error occurred"}, status=500)
+                        
+                        
+                        
+
+                    except Exception as err:
+                        print("Error executing query:", err)
+                        return JsonResponse({"message": "An error occurred"}, status=500)
+
+                    
+
+                except Exception as err:
+                    print("Error executing updating booking status to accepted:", err)
+                    return JsonResponse({"message": "An error occurred"}, status=500)
+
+            # Checking if driver is assigned
+            ret_driver_id = result[0][0]
+            return JsonResponse({"message": "No Data Found"}, status=404)
+            
+            
+
+            return JsonResponse({"results": booking_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
