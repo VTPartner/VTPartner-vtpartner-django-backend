@@ -612,6 +612,8 @@ def new_goods_delivery_booking(request):
         sender_number = data.get("sender_number")
         receiver_name = data.get("receiver_name")
         receiver_number = data.get("receiver_number")
+        pickup_address = data.get("pickup_address")
+        drop_address = data.get("drop_address")
 
         # List of required fields
         required_fields = {
@@ -635,6 +637,8 @@ def new_goods_delivery_booking(request):
             "sender_number":sender_number,
             "receiver_name":receiver_name,
             "receiver_number":receiver_number,
+            "pickup_address":pickup_address,
+            "drop_address":drop_address,
         }
 
         # Check for missing fields
@@ -658,7 +662,7 @@ def new_goods_delivery_booking(request):
                 VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s, %s,%s, %s
+                    %s, %s,%s, %s,%s, %s,%s, %s
                 ) 
                 RETURNING booking_id;
             """
@@ -666,7 +670,7 @@ def new_goods_delivery_booking(request):
             insert_values = [
                 customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
                 distance, time, total_price, base_price, otp, 
-                gst_amount, igst_amount, payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number
+                gst_amount, igst_amount, payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number,pickup_address,drop_address
             ]
 
             # Assuming insert_query is a function that runs the query
