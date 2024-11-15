@@ -712,7 +712,7 @@ def new_goods_delivery_booking(request):
                 #send notification to goods driver
                 fcm_data = {
                     'intent':'driver',
-                    'booking_id':booking_id
+                    'booking_id':str(booking_id)
                 }
                 sendFMCMsg(driver_auth_token,f'You have a new Ride Request for \nPickup Location : {pickup_address}. \n Drop Location : {drop_address}','New Ride Request',fcm_data,server_access_token)
 
