@@ -921,7 +921,7 @@ def booking_details_live_track(request):
             
         try:
             query = """
-                select booking_id,bookings_tbl.customer_id,bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address from vtpartner.bookings_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=bookings_tbl.driver_id and customers_tbl.customer_id=bookings_tbl.customer_id and booking_id=%s
+                select booking_id,bookings_tbl.customer_id,bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no from vtpartner.bookings_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=bookings_tbl.driver_id and customers_tbl.customer_id=bookings_tbl.customer_id and booking_id=%s
             """
             result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
 
@@ -964,7 +964,9 @@ def booking_details_live_track(request):
                     "customer_name": row[30],
                     "customers_auth_token": row[31],
                     "pickup_address": row[32],
-                    "drop_address": row[33]
+                    "drop_address": row[33],
+                    "customer_mobile_no": row[34],
+                    "driver_mobile_no": row[35]
 
                     
                 }
