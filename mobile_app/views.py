@@ -1006,7 +1006,7 @@ def customers_all_bookings(request):
             
         try:
             query = """
-                select booking_id,bookings_tbl.customer_id,bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no from vtpartner.bookings_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=bookings_tbl.driver_id and customers_tbl.customer_id=bookings_tbl.customer_id and bookings_tbl.customer_id=%s and booking_completed='-1'
+                select booking_id,bookings_tbl.customer_id,bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image from vtpartner.vehiclestbl,vtpartner.bookings_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=bookings_tbl.driver_id and customers_tbl.customer_id=bookings_tbl.customer_id and bookings_tbl.customer_id=%s and booking_completed='-1 and vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id'
             """
             result = select_query(query,[customer_id])  # Assuming select_query is defined elsewhere
 
@@ -1051,7 +1051,10 @@ def customers_all_bookings(request):
                     "pickup_address": row[32],
                     "drop_address": row[33],
                     "customer_mobile_no": row[34],
-                    "driver_mobile_no": row[35]
+                    "driver_mobile_no": row[35],
+                    "vehicle_id": row[36],
+                    "vehicle_name": row[37],
+                    "vehicle_image": row[38],
 
                     
                 }
@@ -1091,7 +1094,7 @@ def customers_all_orders(request):
             
         try:
             query = """
-                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no from vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.customer_id=%s and order_completed='1'
+                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.customer_id=%s and order_completed='1' and vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id
             """
             result = select_query(query,[customer_id])  # Assuming select_query is defined elsewhere
 
@@ -1134,7 +1137,10 @@ def customers_all_orders(request):
                     "pickup_address": row[30],
                     "drop_address": row[31],
                     "customer_mobile_no": row[32],
-                    "driver_mobile_no": row[33]
+                    "driver_mobile_no": row[33],
+                    "vehicle_id": row[34],
+                    "vehicle_name": row[35],
+                    "vehicle_image": row[36],
 
                     
                 }
