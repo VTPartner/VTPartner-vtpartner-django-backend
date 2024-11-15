@@ -686,10 +686,10 @@ def new_goods_delivery_booking(request):
                     customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
                     distance, time, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number
+                    payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number,pickup_address,drop_address
                 ) 
                 VALUES (
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                    %s, '-1', %s, %s, %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
                     %s, %s,%s, %s,%s, %s,%s, %s
                 ) 
