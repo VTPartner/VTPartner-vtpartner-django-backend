@@ -2117,6 +2117,7 @@ def goods_driver_booking_accepted(request):
             "booking_id": booking_id,
             "driver_id": driver_id,
             "server_token": server_token,
+            "customer_id":customer_id
         
         }
         # Check for missing fields
