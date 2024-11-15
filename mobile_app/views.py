@@ -689,7 +689,7 @@ def new_goods_delivery_booking(request):
                     payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number,pickup_address,drop_address
                 ) 
                 VALUES (
-                    %s, '-1', %s, %s, %s, %s, %s, %s, %s, %s, 
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
                     %s, %s,%s, %s,%s, %s,%s, %s
                 ) 
@@ -697,7 +697,7 @@ def new_goods_delivery_booking(request):
             """
 
             insert_values = [
-                customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
                 distance, time, total_price, base_price, otp, 
                 gst_amount, igst_amount, payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number,pickup_address,drop_address
             ]
