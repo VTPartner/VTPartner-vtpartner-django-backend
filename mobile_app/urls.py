@@ -68,4 +68,8 @@ urlpatterns = [
     path('booking_details_for_ride_acceptance',views.booking_details_for_ride_acceptance,name='booking_details_for_ride_acceptance'),
     #Booking accepted
     path('goods_driver_booking_accepted',views.goods_driver_booking_accepted,name='goods_driver_booking_accepted'),
+    #Update Booking Status Done by Goods Driver
+    path('update_booking_status_driver',views.update_booking_status_driver,name='update_booking_status_driver'),
+    #Generate Order Id after successful delivery completed
+    path('generate_order_id_for_booking_id_goods_driver',views.generate_order_id_for_booking_id_goods_driver,name='generate_order_id_for_booking_id_goods_driver'),
 ]
