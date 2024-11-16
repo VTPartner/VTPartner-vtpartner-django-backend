@@ -1193,7 +1193,6 @@ def goods_driver_current_location(request):
                 {
                     "current_lat": row[0],
                     "current_lng": row[1],
-                   
                 }
                 for row in result
             ]
