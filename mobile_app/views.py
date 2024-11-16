@@ -1156,6 +1156,55 @@ def customers_all_orders(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt 
+def goods_driver_current_location(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+       
+        try:
+            query = """
+               select current_lat,current_lng from vtpartner.active_goods_drivertbl where goods_driver_id=%s
+            """
+            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "current_lat": row[0],
+                    "current_lng": row[1],
+                   
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 
 
