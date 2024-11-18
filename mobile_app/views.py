@@ -2703,7 +2703,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
                     
 
                     # Execute the query
-                    ret_result = insert_query2(query)
+                    ret_result = insert_query2(query,[booking_id])
                     #get order_id from here
                     if ret_result!=None:
                         order_id = ret_result[0][0]
