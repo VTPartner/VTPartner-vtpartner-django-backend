@@ -2396,7 +2396,7 @@ def goods_driver_booking_accepted(request):
                 try:
 
                     query = """
-                       update vtpartner.bookings_tbl set driver_id=%s ,booking_status='Accepted' where booking_id=%s
+                       update vtpartner.bookings_tbl set driver_id=%s ,booking_status='Driver Accepted' where booking_id=%s
                         """
                     values = [
                             driver_id,
