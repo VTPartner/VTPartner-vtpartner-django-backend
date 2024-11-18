@@ -2409,7 +2409,7 @@ def goods_driver_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.bookings_history_tbl (status,booking_id) values ('Accepted',%s)
+                           insert into vtpartner.bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
                             """
                         values = [
                                 booking_id
