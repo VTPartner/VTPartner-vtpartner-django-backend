@@ -2708,21 +2708,21 @@ def generate_order_id_for_booking_id_goods_driver(request):
                     if ret_result!=None:
                         order_id = ret_result[0][0]
                         try:
-                            query = """
+                            query2 = """
                             update vtpartner.active_goods_drivertbl set current_status='1' where goods_driver_id=%s
                             """
-                            values = [
-                                    booking_status,
+                            values2 = [
                                     booking_id
                                 ]
 
                             # Execute the query
-                            row_count = update_query(query, values)
+                            row_count = update_query(query2, values2)
+                            #success
+                            return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
                         except Exception as err:
                             print("Error executing query:", err)
                             return JsonResponse({"message": "An error occurred"}, status=500)
-                    #success
-                    return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
+                    
 
                 except Exception as err:
                     print("Error executing query:", err)
