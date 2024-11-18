@@ -2557,11 +2557,21 @@ def generate_order_id_for_booking_id_goods_driver(request):
     if request.method == "POST":
         data = json.loads(request.body)
         booking_id = data.get("booking_id")
+        payment_method = data.get("payment_method")
+        payment_id = data.get("payment_id")
+        booking_status = data.get("booking_status")
+        server_token = data.get("server_token")
+        customer_id = data.get("customer_id")
         
 
         # List of required fields
         required_fields = {
             "booking_id": booking_id,
+            "payment_method": payment_method,
+            "payment_id": payment_id,
+            "booking_status": booking_status,
+            "server_token": server_token,
+            "customer_id": customer_id,
             
         }
         # Check for missing fields
@@ -2573,80 +2583,155 @@ def generate_order_id_for_booking_id_goods_driver(request):
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
                 status=400
             )
-            
+        
+        #Updating the Status to Trip Ended
+        
         try:
-            query = """
-            INSERT INTO vtpartner.orders_tbl (
-                customer_id, 
-                driver_id, 
-                pickup_lat, 
-                pickup_lng, 
-                destination_lat, 
-                destination_lng, 
-                distance, 
-                time, 
-                total_price, 
-                base_price, 
-                booking_timing, 
-                booking_date, 
-                booking_status, 
-                driver_arrival_time, 
-                otp, 
-                gst_amount, 
-                igst_amount, 
-                goods_type_id, 
-                payment_method, 
-                city_id, 
-                booking_id, 
-                sender_name, 
-                sender_number, 
-                receiver_name, 
-                receiver_number, 
-                pickup_address, 
-                drop_address
-            )
-            SELECT 
-                customer_id, 
-                driver_id, 
-                pickup_lat, 
-                pickup_lng, 
-                destination_lat, 
-                destination_lng, 
-                distance, 
-                time, 
-                total_price, 
-                base_price, 
-                booking_timing, 
-                booking_date, 
-                booking_status, 
-                driver_arrival_time, 
-                otp, 
-                gst_amount, 
-                igst_amount, 
-                goods_type_id, 
-                payment_method, 
-                city_id, 
-                booking_id, 
-                sender_name, 
-                sender_number, 
-                receiver_name, 
-                receiver_number, 
-                pickup_address, 
-                drop_address
-            FROM vtpartner.bookings_tbl
-            WHERE booking_id = %s
-            RETURNING order_id;
-            """
 
-            
+            query = """
+                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                """
+            values = [
+                    booking_status,
+                    booking_id
+                ]
 
             # Execute the query
-            ret_result = insert_query2(query)
-            #get order_id from here
-            if ret_result!=None:
-                order_id = ret_result[0][0]
-            #success
-            return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
+            row_count = update_query(query, values)
+
+            # Updating Booking History Table
+            try:
+
+                query = """
+                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    """
+                values = [
+                        booking_id,
+                        booking_status
+                    ]
+
+                # Execute the query
+                row_count = insert_query(query, values)
+
+                # Send success response
+                auth_token = get_customer_auth_token(customer_id)
+                body = title = ""
+                data_map = {}
+                if booking_status == "Driver Arrived":
+                    body = "Our agent has arrived at your pickup location"
+                    title = "Agent Arrived"
+                elif booking_status == "OTP verified":
+                    body = "Your trip otp is verified"
+                    title = "Trip OTP Verified"
+                elif booking_status == "Start Trip":
+                    body = "Trip has been started from your pickup location"
+                    title = "Trip Started"
+                elif booking_status == "Ongoing":
+                    body = "Trip has been started from your pickup location"
+                    title = "Ongoing"
+                elif booking_status == "End Trip":
+                    body = "Your package has been delivered successfully"
+                    title = "Package Deliveried"
+                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+                
+                #Generating Order ID
+                try:
+                    query = """
+                    INSERT INTO vtpartner.orders_tbl (
+                        customer_id, 
+                        driver_id, 
+                        pickup_lat, 
+                        pickup_lng, 
+                        destination_lat, 
+                        destination_lng, 
+                        distance, 
+                        time, 
+                        total_price, 
+                        base_price, 
+                        booking_timing, 
+                        booking_date, 
+                        booking_status, 
+                        driver_arrival_time, 
+                        otp, 
+                        gst_amount, 
+                        igst_amount, 
+                        goods_type_id, 
+                        payment_method, 
+                        city_id, 
+                        booking_id, 
+                        sender_name, 
+                        sender_number, 
+                        receiver_name, 
+                        receiver_number, 
+                        pickup_address, 
+                        drop_address
+                    )
+                    SELECT 
+                        customer_id, 
+                        driver_id, 
+                        pickup_lat, 
+                        pickup_lng, 
+                        destination_lat, 
+                        destination_lng, 
+                        distance, 
+                        time, 
+                        total_price, 
+                        base_price, 
+                        booking_timing, 
+                        booking_date, 
+                        booking_status, 
+                        driver_arrival_time, 
+                        otp, 
+                        gst_amount, 
+                        igst_amount, 
+                        goods_type_id, 
+                        payment_method, 
+                        city_id, 
+                        booking_id, 
+                        sender_name, 
+                        sender_number, 
+                        receiver_name, 
+                        receiver_number, 
+                        pickup_address, 
+                        drop_address
+                    FROM vtpartner.bookings_tbl
+                    WHERE booking_id = %s
+                    RETURNING order_id;
+                    """
+
+                    
+
+                    # Execute the query
+                    ret_result = insert_query2(query)
+                    #get order_id from here
+                    if ret_result!=None:
+                        order_id = ret_result[0][0]
+                        try:
+                            query = """
+                            update vtpartner.active_goods_drivertbl set current_status='1' where goods_driver_id=%s
+                            """
+                            values = [
+                                    booking_status,
+                                    booking_id
+                                ]
+
+                            # Execute the query
+                            row_count = update_query(query, values)
+                        except Exception as err:
+                            print("Error executing query:", err)
+                            return JsonResponse({"message": "An error occurred"}, status=500)
+                    #success
+                    return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
+
+                except Exception as err:
+                    print("Error executing query:", err)
+                    return JsonResponse({"message": "An error occurred"}, status=500)
+        
+            except Exception as err:
+                        print("Error executing query:", err)
+                        return JsonResponse({"message": "An error occurred"}, status=500) 
+        
 
         except Exception as err:
             print("Error executing query:", err)
