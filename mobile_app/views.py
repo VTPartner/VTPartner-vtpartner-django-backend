@@ -1123,14 +1123,14 @@ def customers_all_orders(request):
             
         try:
             query = """
-                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.customer_id=%s and order_completed='1' and vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id order by order_id desc
+                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.customer_id=%s and  vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id order by order_id desc
             """
             result = select_query(query,[customer_id])  # Assuming select_query is defined elsewhere
 
             if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            # Map each row to a dictionary with appropriate keys and convert values to strings
+            # Map each row to a dictionary with appropriate keys
             booking_details = [
                 {
                     "booking_id": str(row[0]),
@@ -1154,22 +1154,24 @@ def customers_all_orders(request):
                     "goods_type_id": str(row[18]),
                     "payment_method": str(row[19]),
                     "city_id": str(row[20]),
-                    "order_id": str(row[21]),
-                    "sender_name": str(row[22]),
-                    "sender_number": str(row[23]),
-                    "receiver_name": str(row[24]),
-                    "receiver_number": str(row[25]),
-                    "driver_first_name": str(row[26]),
-                    "goods_driver_auth_token": str(row[27]),
-                    "customer_name": str(row[28]),
-                    "customers_auth_token": str(row[29]),
-                    "pickup_address": str(row[30]),
-                    "drop_address": str(row[31]),
-                    "customer_mobile_no": str(row[32]),
-                    "driver_mobile_no": str(row[33]),
-                    "vehicle_id": str(row[34]),
-                    "vehicle_name": str(row[35]),
-                    "vehicle_image": str(row[36]),
+                    "cancelled_reason": str(row[21]),
+                    "cancel_time": str(row[22]),
+                    "order_id": str(row[23]),
+                    "sender_name": str(row[24]),
+                    "sender_number": str(row[25]),
+                    "receiver_name": str(row[26]),
+                    "receiver_number": str(row[27]),
+                    "driver_first_name": str(row[28]),
+                    "goods_driver_auth_token": str(row[29]),
+                    "customer_name": str(row[30]),
+                    "customers_auth_token": str(row[31]),
+                    "pickup_address": str(row[32]),
+                    "drop_address": str(row[33]),
+                    "customer_mobile_no": str(row[34]),
+                    "driver_mobile_no": str(row[35]),
+                    "vehicle_id": str(row[36]),
+                    "vehicle_name": str(row[37]),
+                    "vehicle_image": str(row[38]),
                 }
                 for row in result
             ]
