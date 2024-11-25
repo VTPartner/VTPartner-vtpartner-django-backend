@@ -2531,9 +2531,12 @@ def update_booking_status_driver(request):
                 auth_token = get_customer_auth_token(customer_id)
                 body = title = ""
                 data_map = {}
-                if booking_status == "Arrived":
+                if booking_status == "Driver Arrived":
                     body = "Our agent has arrived at your pickup location"
                     title = "Agent Arrived"
+                elif booking_status == "OTP Verified":
+                    body = "You're OTP is Verified Successfully!"
+                    title = "OTP Verification"
                 elif booking_status == "Start Trip":
                     body = "Trip has been started from your pickup location"
                     title = "Trip Started"
@@ -2560,6 +2563,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
     if request.method == "POST":
         data = json.loads(request.body)
         booking_id = data.get("booking_id")
+        driver_id = data.get("driver_id")
         payment_method = data.get("payment_method")
         payment_id = data.get("payment_id")
         booking_status = data.get("booking_status")
@@ -2570,6 +2574,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
         # List of required fields
         required_fields = {
             "booking_id": booking_id,
+            "driver_id": driver_id,
             "payment_method": payment_method,
             "payment_id": payment_id,
             "booking_status": booking_status,
@@ -2715,7 +2720,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
                             update vtpartner.active_goods_drivertbl set current_status='1' where goods_driver_id=%s
                             """
                             values2 = [
-                                    booking_id
+                                    driver_id
                                 ]
 
                             # Execute the query
