@@ -2726,7 +2726,22 @@ def generate_order_id_for_booking_id_goods_driver(request):
                             # Execute the query
                             row_count = update_query(query2, values2)
                             #success
-                            return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
+                            try:
+                                query3 = """
+                                update vtpartner.bookings_tbl set booking_completed='1' where booking_id=%s
+                                """
+                                values3 = [
+                                        booking_id
+                                    ]
+
+                                # Execute the query
+                                row_count = update_query(query3, values3)
+                                #success
+                                return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
+                            except Exception as err:
+                                print("Error executing query:", err)
+                                return JsonResponse({"message": "An error occurred"}, status=500)
+                            # return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
                         except Exception as err:
                             print("Error executing query:", err)
                             return JsonResponse({"message": "An error occurred"}, status=500)
