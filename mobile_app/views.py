@@ -1015,6 +1015,95 @@ def booking_details_live_track(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
+def goods_order_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        order_id = data.get("order_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "order_id": order_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,vehicle_plate_no,vehicle_fuel_type,goods_driverstbl.profile_pic from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and order_id=%s and vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id
+            """
+            result = select_query(query,[order_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            booking_details = [
+                {
+                    "booking_id": row[0],
+                    "customer_id": row[1],
+                    "driver_id": row[2],
+                    "pickup_lat": row[3],
+                    "pickup_lng": row[4],
+                    "destination_lat": row[5],
+                    "destination_lng": row[6],
+                    "distance": row[7],
+                    "total_time": row[8],
+                    "total_price": row[9],
+                    "base_price": row[10],
+                    "booking_timing": row[11],
+                    "booking_date": row[12],
+                    "booking_status": row[13],
+                    "driver_arrival_time": row[14],
+                    "otp": row[15],
+                    "gst_amount": row[16],
+                    "igst_amount": row[17],
+                    "goods_type_id": row[18],
+                    "payment_method": row[19],
+                    "city_id": row[20],
+                    "order_id": row[21],
+                    "sender_name": row[22],
+                    "sender_number": row[23],
+                    "receiver_name": row[24],
+                    "receiver_number": row[25],
+                    "driver_first_name": row[26],
+                    "goods_driver_auth_token": row[27],
+                    "customer_name": row[28],
+                    "customers_auth_token": row[29],
+                    "pickup_address": row[30],
+                    "drop_address": row[31],
+                    "customer_mobile_no": row[32],
+                    "driver_mobile_no": row[33],
+                    "vehicle_id": str(row[34]),
+                    "vehicle_name": str(row[35]),
+                    "vehicle_image": str(row[36]),
+                    "vehicle_plate_no": str(row[37]),
+                    "vehicle_fuel_type": str(row[38]),
+                    "profile_pic": str(row[39]),
+
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": booking_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
 def customers_all_bookings(request):
     if request.method == "POST":
         data = json.loads(request.body)
