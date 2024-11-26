@@ -36,8 +36,10 @@ urlpatterns = [
     path('customers_all_bookings',views.customers_all_bookings,name='customers_all_bookings'),
     #Customers All Orders
     path('customers_all_orders',views.customers_all_orders,name='customers_all_orders'),
-    #Tracking the Booking
+    #Get Order Details
     path('goods_order_details',views.goods_order_details,name='goods_order_details'),
+    #Save Order Review
+    path('save_order_ratings',views.save_order_ratings,name='save_order_ratings'),
     #Goods Driver Live Location Tracking
     path('goods_driver_current_location',views.goods_driver_current_location,name='goods_driver_current_location'),
     
