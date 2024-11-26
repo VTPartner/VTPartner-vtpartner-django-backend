@@ -1039,7 +1039,7 @@ def goods_order_details(request):
             
         try:
             query = """
-                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,vehicle_plate_no,vehicle_fuel_type,goods_driverstbl.profile_pic,orders_tbl.ratings from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and order_id=%s and vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id
+                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,vehicle_plate_no,vehicle_fuel_type,goods_driverstbl.profile_pic,orders_tbl.ratings,pickup_time,drop_time from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and order_id=%s and vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id
             """
             result = select_query(query,[order_id])  # Assuming select_query is defined elsewhere
 
@@ -1090,6 +1090,8 @@ def goods_order_details(request):
                     "vehicle_fuel_type": str(row[38]),
                     "profile_pic": str(row[39]),
                     "ratings": str(row[40]),
+                    "pickup_time": str(row[41]),
+                    "drop_time": str(row[42]),
 
                     
                 }
@@ -2668,9 +2670,29 @@ def update_booking_status_driver(request):
                 elif booking_status == "Start Trip":
                     body = "Trip has been started from your pickup location"
                     title = "Trip Started"
+                    # Update Pickup epoch here
+                    update_pickup_epoch_query = """
+                    UPDATE vtpartner.bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    """
+                    values = [
+                            booking_id
+                        ]
+
+                    # Execute the query
+                    row_count = update_query(update_pickup_epoch_query, values)
                 elif booking_status == "End Trip":
                     body = "Your package has been delivered successfully"
                     title = "Package Deliveried"
+                    # Update Drop epoch here
+                    update_drop_epoch_query = """
+                    UPDATE vtpartner.bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    """
+                    values = [
+                            booking_id
+                        ]
+
+                    # Execute the query
+                    row_count = update_query(update_drop_epoch_query, values)
                 sendFMCMsg(auth_token,body,title,data_map,server_token)
                 return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
@@ -2801,7 +2823,9 @@ def generate_order_id_for_booking_id_goods_driver(request):
                         receiver_name, 
                         receiver_number, 
                         pickup_address, 
-                        drop_address
+                        drop_address,
+                        pickup_time,
+                        drop_time
                     )
                     SELECT 
                         customer_id, 
@@ -2830,7 +2854,9 @@ def generate_order_id_for_booking_id_goods_driver(request):
                         receiver_name, 
                         receiver_number, 
                         pickup_address, 
-                        drop_address
+                        drop_address,
+                        pickup_time,
+                        drop_time
                     FROM vtpartner.bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
