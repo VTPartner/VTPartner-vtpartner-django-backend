@@ -2233,7 +2233,6 @@ def update_goods_drivers_current_location(request):
 def get_nearby_drivers(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        print("data::",data)
         lat = data.get("lat")
         lng = data.get("lng")
         city_id = data.get("city_id")
@@ -2323,7 +2322,7 @@ ORDER BY distance;
 
             # Execute the query
             nearby_drivers = select_query(query, values)
-            print("nearby_drivers::",nearby_drivers)
+            
 
             # Format response
             drivers_list = [
