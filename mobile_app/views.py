@@ -1175,7 +1175,7 @@ def cancel_booking(request):
             sendFMCMsg(
             driver_auth_token,
             f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
-            f'Ride Canceled - [Booking ID: {str[booking_id]}]',
+            f'Ride Canceled - [Booking ID: {str(booking_id)}]',
             fcm_data,
             server_token
             )
