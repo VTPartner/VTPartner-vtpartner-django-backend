@@ -38,6 +38,8 @@ urlpatterns = [
     path('customers_all_orders',views.customers_all_orders,name='customers_all_orders'),
     #Get Order Details
     path('goods_order_details',views.goods_order_details,name='goods_order_details'),
+    #Cancel Booking
+    path('cancel_booking',views.cancel_booking,name='cancel_booking'),
     #Save Order Review
     path('save_order_ratings',views.save_order_ratings,name='save_order_ratings'),
     #Goods Driver Live Location Tracking

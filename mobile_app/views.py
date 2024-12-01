@@ -613,7 +613,7 @@ def allowed_pin_code(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 
-def get_goods_driver_auth_token(server_token, goods_driver_id):
+def get_goods_driver_auth_token( goods_driver_id):
     auth_token = ""
     try:
         query = """
@@ -1105,6 +1105,103 @@ def goods_order_details(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def cancel_booking(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        booking_id = data.get("booking_id")
+        customer_id = data.get("customer_id")
+        driver_id = data.get("driver_id")
+        server_token = data.get("server_token")
+        pickup_address = data.get("pickup_address")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "booking_id": booking_id,
+            "server_token": server_token,
+            "customer_id": customer_id,
+            "driver_id": driver_id,
+        
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.bookings_tbl set booking_status='Cancelled' WHERE booking_id=%s
+            """
+            row_count = update_query(query,[booking_id])  
+            
+            #Updating it in Booking History Table to maintain record at what time it was cancelled
+            query2 = """
+                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    """
+            values2 = [
+                    booking_id,
+                    'Cancelled'
+                ]
+
+            # Execute the query
+            row_count = insert_query(query2, values2)
+            
+            query3 = """
+            update vtpartner.active_goods_drivertbl set current_status='1' where goods_driver_id=%s
+            """
+            values3 = [
+                    driver_id
+            ]
+            # Execute the query
+            row_count = update_query(query3, values3)
+            #Send Notitification to customer and driver
+            customer_auth_token = get_customer_auth_token(customer_id)
+            driver_auth_token = get_goods_driver_auth_token(driver_id)
+            
+            #send notification to goods driver for booking cancelled
+            fcm_data = {
+                'intent':'driver_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+            driver_auth_token,
+            f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
+            f'Ride Canceled - [Booking ID: {str[booking_id]}]',
+            fcm_data,
+            server_token
+            )
+
+            
+            #send notification to Customer for booking cancellation confirmation.
+            fcm_data2 = {
+                'intent':'customer_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+                customer_auth_token,
+                f'Your ride request has been successfully canceled. \nPickup Location: {pickup_address}.',
+                'Ride Cancellation Confirmation',
+                fcm_data2,
+                server_token
+            )
+
+            
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 @csrf_exempt 
 def save_order_ratings(request):
     if request.method == "POST":
