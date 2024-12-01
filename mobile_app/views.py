@@ -702,7 +702,7 @@ def new_goods_delivery_booking(request):
                 status=400
             )
         
-        driver_auth_token = get_goods_driver_auth_token(server_access_token,driver_id)
+        driver_auth_token = get_goods_driver_auth_token(driver_id)
 
         
         
