@@ -2322,6 +2322,7 @@ ORDER BY distance;
 
             # Execute the query
             nearby_drivers = select_query(query, values)
+            print("nearby_drivers::",nearby_drivers)
 
             # Format response
             drivers_list = [
