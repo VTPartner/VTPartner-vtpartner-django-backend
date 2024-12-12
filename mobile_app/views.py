@@ -3023,13 +3023,31 @@ def generate_order_id_for_booking_id_goods_driver(request):
 @csrf_exempt 
 def get_goods_driver_recharge_list(request):
     if request.method == "POST":
+        data = json.loads(request.body)
+        category_id = data.get("category_id")
+        
+
+        # List of required fields
+        required_fields = {
+            "category_id": category_id,
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
         try:
             query = """
-               select recharge_id,amount,points,status,description,valid_days from vtpartner.goods_driver_recharge_tbl where category_id='1'
+               select recharge_id,amount,points,status,description,valid_days from vtpartner.goods_driver_recharge_tbl where category_id=%s
                 ORDER BY 
                     amount ASC
             """
-            result = select_query(query)  # Assuming select_query is defined elsewhere
+            result = select_query(query,[category_id])  # Assuming select_query is defined elsewhere
 
             if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
