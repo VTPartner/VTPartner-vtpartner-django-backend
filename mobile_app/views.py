@@ -3224,7 +3224,7 @@ def new_goods_driver_recharge(request):
         try:
 
             query = """
-                insert into vtpartner.goods_driver_topup_recharge_history_tbl(driver_id,recharge_id,amount,allotted_points,valid_till_date,payment_method,payment_id,remaining_points) values (%s,%s,%s,%s,%s,%s,%s,%s)
+                insert into vtpartner.goods_driver_topup_recharge_history_tbl(driver_id,recharge_id,amount,allotted_points,valid_till_date,payment_method,payment_id) values (%s,%s,%s,%s,%s,%s,%s)
                 """
             values = [
                     driver_id,
@@ -3233,8 +3233,7 @@ def new_goods_driver_recharge(request):
                     allotted_points,
                     valid_till_date,
                     payment_method,
-                    payment_id,
-                    allotted_points
+                    payment_id
                 ]
 
             # Execute the query
@@ -3244,13 +3243,14 @@ def new_goods_driver_recharge(request):
             try:
 
                 query = """
-                    INSERT INTO vtpartner.goods_driver_topup_recharge_current_points_tbl (recharge_id,allotted_points,valid_till_date,driver_id) VALUES (%s,%s,%s,%s)
+                    INSERT INTO vtpartner.goods_driver_topup_recharge_current_points_tbl (recharge_id,allotted_points,valid_till_date,driver_id,remaining_points) VALUES (%s,%s,%s,%s,%s)
                     """
                 values = [
                         recharge_id,
                         allotted_points,
                         valid_till_date,
                         driver_id,
+                        allotted_points
                     ]
 
                 # Execute the query
