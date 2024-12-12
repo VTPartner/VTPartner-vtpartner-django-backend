@@ -3073,6 +3073,118 @@ def get_goods_driver_recharge_list(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt 
+def get_goods_driver_current_recharge_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+               select topup_id,recharge_id,allotted_points,used_points,remaining_points,negative_points,valid_till_date,status from vtpartner.goods_driver_topup_recharge_current_points_tbl where driver_id=%s
+            """
+            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "topup_id": row[0],
+                    "recharge_id": row[1],
+                    "allotted_points": row[2],
+                    "used_points": row[3],
+                    "remaining_points": row[4],
+                    "negative_points": row[5],
+                    "valid_till_date": row[6],
+                    "status": row[7]
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt 
+def get_goods_driver_recharge_history_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+               select history_id,recharge_id,amount,allotted_points,date,valid_till_date,status,payment_method,payment_id,transaction_type,admin_id from vtpartner.goods_driver_topup_recharge_history_tbl where driver_id=%s
+            """
+            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "history_id": row[0],
+                    "recharge_id": row[1],
+                    "amount": row[2],
+                    "allotted_points": row[3],
+                    "date": row[4],
+                    "valid_till_date": row[5],
+                    "status": row[6],
+                    "payment_method": row[7],
+                    "payment_id": row[8],
+                    "transaction_type": row[9],
+                    "admin_id": row[10]
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 @csrf_exempt 
 def new_goods_driver_recharge(request):
