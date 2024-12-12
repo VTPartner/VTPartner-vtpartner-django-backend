@@ -51,6 +51,7 @@ urlpatterns = [
     
     
     
+    
     #Goods Driver Api's URLs
     #Login
     path('goods_driver_login',views.goods_driver_login_view,name='goods_driver_login'),
@@ -78,4 +79,6 @@ urlpatterns = [
     path('update_booking_status_driver',views.update_booking_status_driver,name='update_booking_status_driver'),
     #Generate Order Id after successful delivery completed
     path('generate_order_id_for_booking_id_goods_driver',views.generate_order_id_for_booking_id_goods_driver,name='generate_order_id_for_booking_id_goods_driver'),
+    #Get Goods Driver Recharge List 
+    path('get_goods_driver_recharge_list',views.get_goods_driver_recharge_list,name='get_goods_driver_recharge_list'),
 ]

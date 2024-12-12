@@ -3018,3 +3018,40 @@ def generate_order_id_for_booking_id_goods_driver(request):
         
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt 
+def get_goods_driver_recharge_list(request):
+    if request.method == "POST":
+        try:
+            query = """
+               select recharge_id,amount,points,status,description,valid_days from vtpartner.goods_driver_recharge_tbl where category_id='1'
+                ORDER BY 
+                    amount ASC
+            """
+            result = select_query(query)  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "recharge_id": row[0],
+                    "amount": row[1],
+                    "points": row[2],
+                    "status": row[3],
+                    "description": row[4],
+                    "valid_days": row[5]
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
