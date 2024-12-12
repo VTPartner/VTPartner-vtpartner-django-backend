@@ -3208,7 +3208,7 @@ def new_goods_driver_recharge(request):
             "valid_till_date": valid_till_date,
             "payment_method": payment_method,
             "payment_id": payment_id,
-            "negative_points": negative_points,
+            "previous_negative_points": negative_points,
         }
         # Check for missing fields
         missing_fields = check_missing_fields(required_fields)
