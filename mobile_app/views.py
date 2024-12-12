@@ -3019,7 +3019,6 @@ def generate_order_id_for_booking_id_goods_driver(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-
 @csrf_exempt 
 def get_goods_driver_recharge_list(request):
     if request.method == "POST":
@@ -3073,3 +3072,89 @@ def get_goods_driver_recharge_list(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt 
+def new_goods_driver_recharge(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        recharge_id = data.get("recharge_id")
+        amount = data.get("amount")
+        allotted_points = data.get("allotted_points")
+        valid_till_date = data.get("valid_till_date")
+        payment_method = data.get("payment_method")
+        payment_id = data.get("payment_id")
+        negative_points = data.get("previous_negative_points",0)
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+            "recharge_id": recharge_id,
+            "amount": amount,
+            "allotted_points": allotted_points,
+            "valid_till_date": valid_till_date,
+            "payment_method": payment_method,
+            "payment_id": payment_id,
+            "negative_points": negative_points,
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        if negative_points > 0:
+            allotted_points -= negative_points
+        try:
+
+            query = """
+                insert into vtpartner.goods_driver_topup_recharge_history_tbl(driver_id,recharge_id,amount,allotted_points,valid_till_date,payment_method,payment_id) values (%s,%s,%s,%s,%s,%s,%s)
+                """
+            values = [
+                    driver_id,
+                    recharge_id,
+                    amount,
+                    allotted_points,
+                    valid_till_date,
+                    payment_method,
+                    payment_id
+                ]
+
+            # Execute the query
+            row_count = insert_query(query, values)
+
+            # Updating Booking History Table
+            try:
+
+                query = """
+                    INSERT INTO vtpartner.goods_driver_topup_recharge_current_points_tbl (recharge_id,allotted_points,valid_till_date,driver_id) VALUES (%s,%s,%s,%s)
+                    """
+                values = [
+                        recharge_id,
+                        allotted_points,
+                        valid_till_date,
+                        driver_id,
+                    ]
+
+                # Execute the query
+                row_count = insert_query(query, values)
+
+                
+                return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+            except Exception as err:
+                print("Error executing query:", err)
+                return JsonResponse({"message": "An error occurred"}, status=500)
+            #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+        
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+   
