@@ -3085,7 +3085,7 @@ def new_goods_driver_recharge(request):
         valid_till_date = data.get("valid_till_date")
         payment_method = data.get("payment_method")
         payment_id = data.get("payment_id")
-        negative_points = data.get("previous_negative_points",0)
+        negative_points = data.get("previous_negative_points")
 
         # List of required fields
         required_fields = {
