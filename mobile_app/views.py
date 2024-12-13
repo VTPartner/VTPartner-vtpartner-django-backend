@@ -3425,3 +3425,76 @@ def goods_driver_all_orders(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def goods_driver_whole_year_earnings(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                SELECT
+                months.month_index,
+                COALESCE(SUM(e.amount), 0.0) AS total_earnings
+            FROM (
+                SELECT 1 AS month_index UNION ALL
+                SELECT 2 UNION ALL
+                SELECT 3 UNION ALL
+                SELECT 4 UNION ALL
+                SELECT 5 UNION ALL
+                SELECT 6 UNION ALL
+                SELECT 7 UNION ALL
+                SELECT 8 UNION ALL
+                SELECT 9 UNION ALL
+                SELECT 10 UNION ALL
+                SELECT 11 UNION ALL
+                SELECT 12
+            ) AS months
+            LEFT JOIN vtpartner.goods_driver_earningstbl e
+                ON EXTRACT(MONTH FROM e.earning_date) = months.month_index
+                AND e.driver_id = %s
+            GROUP BY months.month_index
+            ORDER BY months.month_index;
+
+            """
+            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            earning_details = [
+                {
+                    "month_index": row[0],
+                    "total_earnings": row[1],
+                   
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": earning_details}, status=200)
+
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
