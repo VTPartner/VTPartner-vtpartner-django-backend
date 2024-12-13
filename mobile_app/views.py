@@ -2996,7 +2996,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
                                 row_count = update_query(query3, values3)
                                 
                                 query_update = """
-                                update vtpartner.orders_tbl set payment_method=%s,payment_id=%s, where order_id=%s
+                                update vtpartner.orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
                                 """
                                 values_update = [
                                         payment_method,
