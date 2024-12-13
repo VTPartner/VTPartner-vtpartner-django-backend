@@ -2821,6 +2821,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
         booking_status = data.get("booking_status")
         server_token = data.get("server_token")
         customer_id = data.get("customer_id")
+        total_amount = data.get("total_amount")
         
 
         # List of required fields
@@ -2832,6 +2833,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
             "booking_status": booking_status,
             "server_token": server_token,
             "customer_id": customer_id,
+            "total_amount": total_amount,
             
         }
         # Check for missing fields
@@ -2992,11 +2994,66 @@ def generate_order_id_for_booking_id_goods_driver(request):
 
                                 # Execute the query
                                 row_count = update_query(query3, values3)
-                                #success
-                                return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
+                                #Adding the amount to driver earnings table
+                                try:
+                                    query4 = """
+                                    insert into vtpartner.goods_driver_earningstbl(driver_id,amount,order_id,payment_id,payment_mode) values (%s,%s,%s,%s,%s)
+                                    """
+                                    values4 = [
+                                            driver_id,
+                                            total_amount,
+                                            order_id,
+                                            payment_id,
+                                            payment_method
+                                        ]
+
+                                    # Execute the query
+                                    row_count = insert_query(query4, values4)
+                                    #success
+                                    #Adding the amount to driver earnings table
+                                    try:
+                                        query5 = """
+                                            UPDATE vtpartner.goods_driver_topup_recharge_current_points_tbl
+                                            SET 
+                                                used_points = used_points + %s,
+                                                remaining_points = CASE 
+                                                    WHEN remaining_points >= %s THEN remaining_points - %s
+                                                    ELSE 0
+                                                END,
+                                                negative_points = CASE
+                                                    WHEN remaining_points < %s THEN negative_points + (%s - remaining_points)
+                                                    ELSE negative_points
+                                                END,
+                                                last_updated_time = date_part('epoch'::text, CURRENT_TIMESTAMP)
+                                            WHERE driver_id = %s
+                                        """
+                                        values5 = [
+                                                total_amount,  # %s for updating used_points
+                                                total_amount,  # %s for checking remaining_points
+                                                total_amount,  # %s for deducting from remaining_points
+                                                total_amount,  # %s for checking if negative_points should be updated
+                                                total_amount,  # %s for calculating difference for negative_points
+                                                driver_id          # %s for identifying the driver
+                                            ]
+
+                                        # Execute the query
+                                        row_count = insert_query(query5, values5)
+                                        #success
+                                        return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
+                                    except Exception as err:
+                                        print("Error executing query:", err)
+                                        return JsonResponse({"message": "An error occurred"}, status=500)
+                                except Exception as err:
+                                    print("Error executing query:", err)
+                                    return JsonResponse({"message": "An error occurred"}, status=500)
+                                
+                                    #success
+                                    #return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
                             except Exception as err:
                                 print("Error executing query:", err)
                                 return JsonResponse({"message": "An error occurred"}, status=500)
+                            
+                            
                             # return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
                         except Exception as err:
                             print("Error executing query:", err)
