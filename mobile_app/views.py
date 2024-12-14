@@ -3524,7 +3524,7 @@ def goods_driver_todays_earnings(request):
             
         try:
             query = """
-                 select sum(amount) from vtpartner.goods_driver_earningstbl where driver_id=%s and earning_date=CURRENT_DATE
+                 select sum(amount),count(*) from vtpartner.goods_driver_earningstbl where driver_id=%s and earning_date=CURRENT_DATE
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
@@ -3535,6 +3535,7 @@ def goods_driver_todays_earnings(request):
             earning_details = [
                 {
                     "todays_earnings": row[0],
+                    "todays_rides": row[1],
                   
                 }
                 for row in result
