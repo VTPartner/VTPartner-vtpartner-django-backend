@@ -3498,3 +3498,53 @@ def goods_driver_whole_year_earnings(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def goods_driver_todays_earnings(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                 select sum(amount) from vtpartner.goods_driver_earningstbl where driver_id=%s and earning_date=CURRENT_DATE
+            """
+            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            earning_details = [
+                {
+                    "todays_earnings": row[0],
+                  
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": earning_details}, status=200)
+
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
