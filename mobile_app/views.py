@@ -3269,6 +3269,7 @@ def new_goods_driver_recharge(request):
         payment_method = data.get("payment_method")
         payment_id = data.get("payment_id")
         negative_points = data.get("previous_negative_points")
+        last_validity_date = data.get("last_validity_date")
 
         # List of required fields
         required_fields = {
@@ -3281,6 +3282,7 @@ def new_goods_driver_recharge(request):
             "payment_method": payment_method,
             "payment_id": payment_id,
             "previous_negative_points": negative_points,
+            "last_validity_date": last_validity_date,
         }
         # Check for missing fields
         missing_fields = check_missing_fields(required_fields)
@@ -3309,10 +3311,24 @@ def new_goods_driver_recharge(request):
                 ]
             # Execute the query
             row_count = insert_query(query, values)
+            
+            #checking if recharge has been expired
+            last_validity_date_obj = datetime.strptime(last_validity_date, "%Y-%m-%d")
+
+            # Get the current date
+            current_date = datetime.now()
+
+            # Check if last_validity_date is greater than the current date
+            isExpired = False
+            if last_validity_date_obj > current_date:
+                print("The last validity date is in the future.")
+            else:
+                isExpired = True
+                print("The last validity date is today or has passed.")
 
             # Updating Booking History Table
             try:
-                if negative_points > 0:
+                if negative_points > 0 or isExpired:
                     query = """
                     update vtpartner.goods_driver_topup_recharge_current_points_tbl set recharge_id=%s,amount=%s,allotted_points=%s,valid_till_date=%s,payment_method=%s,payment_id=%s,remaining_points='0',negative_points='0' where topup_id=%s and driver_id=%s
                     """
