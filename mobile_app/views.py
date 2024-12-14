@@ -3330,14 +3330,12 @@ def new_goods_driver_recharge(request):
             try:
                 if negative_points > 0 or isExpired:
                     query = """
-                    update vtpartner.goods_driver_topup_recharge_current_points_tbl set recharge_id=%s,allotted_points=%s,valid_till_date=%s,payment_method=%s,payment_id=%s,remaining_points='0',negative_points='0',used_points='0' where topup_id=%s and driver_id=%s
+                    update vtpartner.goods_driver_topup_recharge_current_points_tbl set recharge_id=%s,allotted_points=%s,valid_till_date=%s,remaining_points='0',negative_points='0',used_points='0' where topup_id=%s and driver_id=%s
                     """
                     values = [
                             recharge_id,
                             allotted_points,
                             valid_till_date,
-                            payment_method,
-                            payment_id,
                             topup_id,
                             driver_id
                         ]
