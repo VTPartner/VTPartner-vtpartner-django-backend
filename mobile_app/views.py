@@ -3499,18 +3499,15 @@ def goods_driver_whole_year_earnings(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-@csrf_exempt 
+@csrf_exempt
 def goods_driver_todays_earnings(request):
     if request.method == "POST":
         data = json.loads(request.body)
         driver_id = data.get("driver_id")
-        
-        
 
         # List of required fields
         required_fields = {
             "driver_id": driver_id,
-        
         }
         # Check for missing fields
         missing_fields = check_missing_fields(required_fields)
@@ -3523,26 +3520,26 @@ def goods_driver_todays_earnings(request):
             )
             
         try:
+            # Query to get today's earnings and rides count
             query = """
-                 select sum(amount),count(*) from vtpartner.goods_driver_earningstbl where driver_id=%s and earning_date=CURRENT_DATE
+                SELECT COALESCE(SUM(amount), 0) AS todays_earnings, 
+                       COUNT(*) AS todays_rides 
+                FROM vtpartner.goods_driver_earningstbl 
+                WHERE driver_id = %s AND earning_date = CURRENT_DATE;
             """
-            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+            result = select_query(query, [driver_id])  # Assuming select_query is defined elsewhere
 
-            if result == []:
+            if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            # Map each row to a dictionary with appropriate keys
-            earning_details = [
-                {
-                    "todays_earnings": row[0],
-                    "todays_rides": row[1],
-                  
-                }
-                for row in result
-            ]
+            # Extract the first row from the result
+            row = result[0]
+            earning_details = {
+                "todays_earnings": row[0],
+                "todays_rides": row[1],
+            }
 
-            return JsonResponse({"results": earning_details}, status=200)
-
+            return JsonResponse({"results": [earning_details]}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
