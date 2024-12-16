@@ -1462,6 +1462,105 @@ def goods_driver_current_location(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def get_all_sub_categories(request):
+    if request.method == "POST": 
+        
+        data = json.loads(request.body)
+        cat_id = data.get("cat_id")
+
+         # List of required fields
+        required_fields = {
+            "cat_id": cat_id,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )  
+                   
+        try:
+            query = """
+            select sub_cat_id,sub_cat_name,image from vtpartner.sub_categorytbl where cat_id=%s
+            """
+            
+            result = select_query(query,[cat_id])
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+                                
+            # Map the results to a list of dictionaries with meaningful keys
+            response_value = [
+                {
+                    "sub_cat_id": row[0],
+                    "sub_cat_name": row[1],
+                    "image": row[2]
+                    
+                    
+                }
+                for row in result
+            ]
+            # Return customer response
+            return JsonResponse({"results": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_all_sub_services(request):
+    if request.method == "POST": 
+        data = json.loads(request.body)
+        sub_cat_id = data.get("sub_cat_id")
+
+         # List of required fields
+        required_fields = {
+            "sub_cat_id": sub_cat_id,
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )       
+        try:
+            query = """
+            select service_id,service_name,service_image from vtpartner.other_servicestbl where sub_cat_id=%s
+            """
+            
+            result = select_query(query,[sub_cat_id])
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+                                
+            # Map the results to a list of dictionaries with meaningful keys
+            response_value = [
+                {
+                    "service_id": row[0],
+                    "service_name": row[1],
+                    "service_image": row[2]
+                }
+                for row in result
+            ]
+            # Return customer response
+            return JsonResponse({"results": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 
 
