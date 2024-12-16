@@ -1486,7 +1486,7 @@ def get_all_sub_categories(request):
                    
         try:
             query = """
-            select sub_cat_id,sub_cat_name,image from vtpartner.sub_categorytbl where cat_id=%s
+            select sub_cat_id,sub_cat_name,image from vtpartner.sub_categorytbl where cat_id=%s order by sub_cat_name asc
             """
             
             result = select_query(query,[cat_id])
@@ -1536,7 +1536,7 @@ def get_all_sub_services(request):
         )       
         try:
             query = """
-            select service_id,service_name,service_image from vtpartner.other_servicestbl where sub_cat_id=%s
+            select service_id,service_name,service_image from vtpartner.other_servicestbl where sub_cat_id=%s order by service_name asc
             """
             
             result = select_query(query,[sub_cat_id])
