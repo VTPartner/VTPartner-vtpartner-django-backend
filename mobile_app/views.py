@@ -3211,7 +3211,7 @@ def get_goods_driver_recharge_list(request):
             
         try:
             query = """
-               select recharge_id,amount,points,status,description,valid_days from vtpartner.goods_driver_recharge_tbl where category_id=%s
+               select recharge_id,amount,points,status,description,valid_days from vtpartner.recharge_plans_tbl where category_id=%s
                 ORDER BY 
                     amount ASC
             """
