@@ -3320,7 +3320,7 @@ def get_goods_driver_recharge_history_details(request):
             
         try:
             query = """
-               select history_id,recharge_id,amount,allotted_points,date,valid_till_date,status,payment_method,payment_id,transaction_type,admin_id from vtpartner.goods_driver_topup_recharge_history_tbl where driver_id=%s
+               select history_id,recharge_id,amount,allotted_points,date,valid_till_date,status,payment_method,payment_id,transaction_type,admin_id,last_recharge_negative_points from vtpartner.goods_driver_topup_recharge_history_tbl where driver_id=%s
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
@@ -3340,7 +3340,8 @@ def get_goods_driver_recharge_history_details(request):
                     "payment_method": row[7],
                     "payment_id": row[8],
                     "transaction_type": row[9],
-                    "admin_id": row[10]
+                    "admin_id": row[10],
+                    "last_recharge_negative_points": row[11],
                     
                 }
                 for row in result
