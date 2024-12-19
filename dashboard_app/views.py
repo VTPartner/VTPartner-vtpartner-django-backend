@@ -1994,7 +1994,7 @@ def register_agent(request):
                 name_column = "driver_first_name"
                 driver_id_field = "other_driver_id"
             elif category_id == 5:
-                driver_table = "vtpartner.handyman_servicestbl"
+                driver_table = "vtpartner.handymans_tbl"
                 name_column = "name"
                 driver_id_field = "handyman_id"
             else:
@@ -2196,7 +2196,7 @@ def check_handyman_existence(request):
             if category_id == "5":
                 check_driver_query = """
                     SELECT handyman_id 
-                    FROM vtpartner.handyman_servicestbl 
+                    FROM vtpartner.handymans_tbl 
                     WHERE mobile_no = %s AND category_id = %s
                 """
             else:
@@ -2543,17 +2543,17 @@ def all_handy_man(request):
         try:
             query = """
                 SELECT handyman_id, name, profile_pic, is_online, ratings, mobile_no,
-                       handyman_servicestbl.registration_date, handyman_servicestbl.time,
+                       handymans_tbl.registration_date, handymans_tbl.time,
                        r_lat, r_lng, current_lat, current_lng, status, recent_online_pic,
-                       is_verified, handyman_servicestbl.category_id, handyman_servicestbl.sub_cat_id,
-                       handyman_servicestbl.service_id, city_id, aadhar_no, pan_card_no,
-                       handyman_servicestbl.house_no, handyman_servicestbl.city_name,
+                       is_verified, handymans_tbl.category_id, handymans_tbl.sub_cat_id,
+                       handymans_tbl.service_id, city_id, aadhar_no, pan_card_no,
+                       handymans_tbl.house_no, handymans_tbl.city_name,
                        full_address, gender, aadhar_card_front, aadhar_card_back,
                        pan_card_front, pan_card_back, sub_cat_name, service_name, category_name
-                FROM vtpartner.handyman_servicestbl
-                LEFT JOIN vtpartner.sub_categorytbl ON handyman_servicestbl.sub_cat_id = sub_categorytbl.sub_cat_id
-                LEFT JOIN vtpartner.other_servicestbl ON handyman_servicestbl.service_id = other_servicestbl.service_id
-                LEFT JOIN vtpartner.categorytbl ON categorytbl.category_id = handyman_servicestbl.category_id
+                FROM vtpartner.handymans_tbl
+                LEFT JOIN vtpartner.sub_categorytbl ON handymans_tbl.sub_cat_id = sub_categorytbl.sub_cat_id
+                LEFT JOIN vtpartner.other_servicestbl ON handymans_tbl.service_id = other_servicestbl.service_id
+                LEFT JOIN vtpartner.categorytbl ON categorytbl.category_id = handymans_tbl.category_id
                 ORDER BY handyman_id DESC
             """
 
@@ -3182,7 +3182,7 @@ def edit_handyman_details(request):
 
         # Prepare the update query and values
         update_driver_query = """
-            UPDATE vtpartner.handyman_servicestbl
+            UPDATE vtpartner.handymans_tbl
             SET 
                 name = %s,
                 mobile_no = %s,
@@ -3258,7 +3258,7 @@ def update_handyman_status(request):
 
         # Prepare the update query and values
         query = """
-            UPDATE vtpartner.handyman_servicestbl
+            UPDATE vtpartner.handymans_tbl
             SET 
                 status = %s
             WHERE handyman_id = %s
@@ -3508,7 +3508,7 @@ def add_new_handyman_details(request):
 
         # Prepare the update query and values
         add_query = """
-            INSERT INTO vtpartner.handyman_servicestbl
+            INSERT INTO vtpartner.handymans_tbl
             (
                 name ,
                 mobile_no ,
