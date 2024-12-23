@@ -120,11 +120,11 @@ urlpatterns = [
     #Update Goods Driver Firebase Token
     path('update_firebase_cab_driver_token',views.update_firebase_cab_driver_token,name='update_firebase_cab_driver_token'),
     #Booking Details for ride acceptance
-    path('booking_details_for_ride_acceptance',views.booking_details_for_ride_acceptance,name='booking_details_for_ride_acceptance'),
+    path('cab_booking_details_for_ride_acceptance',views.cab_booking_details_for_ride_acceptance,name='cab_booking_details_for_ride_acceptance'),
     #Booking accepted
     path('cab_driver_booking_accepted',views.cab_driver_booking_accepted,name='cab_driver_booking_accepted'),
     #Update Booking Status Done by Goods Driver
-    path('update_booking_status_driver',views.update_booking_status_driver,name='update_booking_status_driver'),
+    path('update_booking_status_cab_driver',views.update_booking_status_cab_driver,name='update_booking_status_cab_driver'),
     #Generate Order Id after successful delivery completed
     path('generate_order_id_for_booking_id_cab_driver',views.generate_order_id_for_booking_id_cab_driver,name='generate_order_id_for_booking_id_cab_driver'),
     #Get Goods Driver Current Recharge and points details
@@ -141,4 +141,131 @@ urlpatterns = [
     path('cab_driver_whole_year_earnings',views.cab_driver_whole_year_earnings,name='cab_driver_whole_year_earnings'),
     #My All Rides
     path('cab_driver_todays_earnings',views.cab_driver_todays_earnings,name='cab_driver_todays_earnings'),
+    
+    #Other Drivers Api's URLs
+    #Login
+    path('other_driver_login',views.other_driver_login_view,name='other_driver_login'),
+    #Registration 
+    path('other_driver_registration',views.other_driver_registration,name='other_driver_registration'),
+    #Status Verification 
+    path('other_driver_online_status',views.other_driver_online_status,name='other_driver_online_status'),
+    #Update Online Status Verification 
+    path('other_driver_update_online_status',views.other_driver_update_online_status,name='other_driver_update_online_status'),
+    #Insert new record in active goods driver table  
+    path('add_new_active_other_driver',views.add_other_driver_to_active_drivers_table,name='add_new_active_other_driver'),
+    #Delete record in active goods driver table once driver wants to go offline
+    path('delete_active_other_driver',views.delete_other_driver_to_active_drivers_table,name='delete_active_other_driver'),
+    #Update Drivers Current Location until he goes offline
+    path('update_other_drivers_current_location',views.update_other_drivers_current_location,name='update_other_drivers_current_location'),
+    #Get Near By Cab Drivers
+    path('get_nearby_other_drivers',views.get_nearby_other_drivers,name='get_nearby_other_drivers'),
+    #Update Goods Driver Firebase Token
+    path('update_firebase_other_driver_token',views.update_firebase_other_driver_token,name='update_firebase_other_driver_token'),
+    #Booking Details for ride acceptance
+    path('other_driver_booking_details_for_ride_acceptance',views.other_driver_booking_details_for_ride_acceptance,name='other_driver_booking_details_for_ride_acceptance'),
+    #Booking accepted
+    path('other_driver_booking_accepted',views.other_driver_booking_accepted,name='other_driver_booking_accepted'),
+    #Update Booking Status Done by Goods Driver
+    path('update_booking_status_other_driver',views.update_booking_status_other_driver,name='update_booking_status_other_driver'),
+    #Generate Order Id after successful delivery completed
+    path('generate_order_id_for_booking_id_other_driver',views.generate_order_id_for_booking_id_other_driver,name='generate_order_id_for_booking_id_other_driver'),
+    #Get Goods Driver Current Recharge and points details
+    path('get_other_driver_current_recharge_details',views.get_other_driver_current_recharge_details,name='get_other_driver_current_recharge_details'),
+    #Get Goods Driver Recharge history details
+    path('get_other_driver_recharge_history_details',views.get_other_driver_recharge_history_details,name='get_other_driver_recharge_history_details'),
+    #Get Goods Driver Recharge List 
+    path('get_other_driver_recharge_list',views.get_other_driver_recharge_list,name='get_other_driver_recharge_list'),
+    #Insert the Goods Driver New Recharge
+    path('new_other_driver_recharge',views.new_other_driver_recharge,name='new_other_driver_recharge'),
+    #My All Rides
+    path('other_driver_all_orders',views.other_driver_all_orders,name='other_driver_all_orders'),
+    #My Whole Years Earnings
+    path('other_driver_whole_year_earnings',views.other_driver_whole_year_earnings,name='other_driver_whole_year_earnings'),
+    #My All Rides
+    path('other_driver_todays_earnings',views.other_driver_todays_earnings,name='other_driver_todays_earnings'),
+    
+    #JCB Crane Drivers Api's URLs
+    #Login
+    path('jcb_crane_driver_login',views.jcb_crane_driver_login_view,name='jcb_crane_driver_login'),
+    #Registration 
+    path('jcb_crane_driver_registration',views.jcb_crane_driver_registration,name='jcb_crane_driver_registration'),
+    #Status Verification 
+    path('jcb_crane_driver_online_status',views.jcb_crane_driver_online_status,name='jcb_crane_driver_online_status'),
+    #Update Online Status Verification 
+    path('jcb_crane_driver_update_online_status',views.jcb_crane_driver_update_online_status,name='jcb_crane_driver_update_online_status'),
+    #Insert new record in active goods driver table  
+    path('add_new_active_jcb_crane_driver',views.add_jcb_crane_driver_to_active_drivers_table,name='add_new_active_jcb_crane_driver'),
+    #Delete record in active goods driver table once driver wants to go offline
+    path('delete_active_jcb_crane_driver',views.delete_jcb_crane_driver_to_active_drivers_table,name='delete_active_jcb_crane_driver'),
+    #Update Drivers Current Location until he goes offline
+    path('update_jcb_crane_drivers_current_location',views.update_jcb_crane_drivers_current_location,name='update_jcb_crane_drivers_current_location'),
+    #Get Near By Cab Drivers
+    path('get_nearby_jcb_crane_drivers',views.get_nearby_jcb_crane_drivers,name='get_nearby_jcb_crane_drivers'),
+    #Update Goods Driver Firebase Token
+    path('update_firebase_jcb_crane_driver_token',views.update_firebase_jcb_crane_driver_token,name='update_firebase_jcb_crane_driver_token'),
+    #Booking Details for ride acceptance
+    path('jcb_crane_booking_details_for_ride_acceptance',views.jcb_crane_booking_details_for_ride_acceptance,name='jcb_crane_booking_details_for_ride_acceptance'),
+    #Booking accepted
+    path('jcb_crane_driver_booking_accepted',views.jcb_crane_driver_booking_accepted,name='jcb_crane_driver_booking_accepted'),
+    #Update Booking Status Done by Goods Driver
+    path('update_booking_status_jcb_crane_driver',views.update_booking_status_jcb_crane_driver,name='update_booking_status_jcb_crane_driver'),
+    #Generate Order Id after successful delivery completed
+    path('generate_order_id_for_booking_id_jcb_crane_driver',views.generate_order_id_for_booking_id_jcb_crane_driver,name='generate_order_id_for_booking_id_jcb_crane_driver'),
+    #Get Goods Driver Current Recharge and points details
+    path('get_jcb_crane_driver_current_recharge_details',views.get_jcb_crane_driver_current_recharge_details,name='get_jcb_crane_driver_current_recharge_details'),
+    #Get Goods Driver Recharge history details
+    path('get_jcb_crane_driver_recharge_history_details',views.get_jcb_crane_driver_recharge_history_details,name='get_jcb_crane_driver_recharge_history_details'),
+    #Get Goods Driver Recharge List 
+    path('get_jcb_crane_driver_recharge_list',views.get_jcb_crane_driver_recharge_list,name='get_jcb_crane_driver_recharge_list'),
+    #Insert the Goods Driver New Recharge
+    path('new_jcb_crane_driver_recharge',views.new_jcb_crane_driver_recharge,name='new_jcb_crane_driver_recharge'),
+    #My All Rides
+    path('jcb_crane_driver_all_orders',views.jcb_crane_driver_all_orders,name='jcb_crane_driver_all_orders'),
+    #My Whole Years Earnings
+    path('jcb_crane_driver_whole_year_earnings',views.jcb_crane_driver_whole_year_earnings,name='jcb_crane_driver_whole_year_earnings'),
+    #My All Rides
+    path('jcb_crane_driver_todays_earnings',views.jcb_crane_driver_todays_earnings,name='jcb_crane_driver_todays_earnings'),
+    
+    
+    #Handy Man Agents Api's URLs
+    #Login
+    path('handyman_login',views.handyman_login_view,name='handyman_login'),
+    #Registration 
+    path('handyman_registration',views.handyman_registration,name='handyman_registration'),
+    #Status Verification 
+    path('handyman_online_status',views.handyman_online_status,name='handyman_online_status'),
+    #Update Online Status Verification 
+    path('handyman_update_online_status',views.handyman_update_online_status,name='handyman_update_online_status'),
+    #Insert new record in active goods driver table  
+    path('add_new_active_handyman',views.add_handyman_to_active_drivers_table,name='add_new_active_handyman'),
+    #Delete record in active goods driver table once driver wants to go offline
+    path('delete_active_handyman',views.delete_handyman_to_active_drivers_table,name='delete_active_handyman'),
+    #Update Drivers Current Location until he goes offline
+    path('update_handymans_current_location',views.update_handymans_current_location,name='update_handymans_current_location'),
+    #Get Near By Cab Drivers
+    path('get_nearby_handymans',views.get_nearby_handymans,name='get_nearby_handymans'),
+    #Update Goods Driver Firebase Token
+    path('update_firebase_handyman_token',views.update_firebase_handyman_token,name='update_firebase_handyman_token'),
+    #Booking Details for ride acceptance
+    path('handyman_booking_details_for_ride_acceptance',views.handyman_booking_details_for_ride_acceptance,name='handyman_booking_details_for_ride_acceptance'),
+    #Booking accepted
+    path('handyman_booking_accepted',views.handyman_booking_accepted,name='handyman_booking_accepted'),
+    #Update Booking Status Done by Goods Driver
+    path('update_booking_status_handyman',views.update_booking_status_handyman,name='update_booking_status_handyman'),
+    #Generate Order Id after successful delivery completed
+    path('generate_order_id_for_booking_id_handyman',views.generate_order_id_for_booking_id_handyman,name='generate_order_id_for_booking_id_handyman'),
+    #Get Goods Driver Current Recharge and points details
+    path('get_handyman_current_recharge_details',views.get_handyman_current_recharge_details,name='get_handyman_current_recharge_details'),
+    #Get Goods Driver Recharge history details
+    path('get_handyman_recharge_history_details',views.get_handyman_recharge_history_details,name='get_handyman_recharge_history_details'),
+    #Get Goods Driver Recharge List 
+    path('get_handyman_recharge_list',views.get_handyman_recharge_list,name='get_handyman_recharge_list'),
+    #Insert the Goods Driver New Recharge
+    path('new_handyman_recharge',views.new_handyman_recharge,name='new_handyman_recharge'),
+    #My All Rides
+    path('handyman_all_orders',views.handyman_all_orders,name='handyman_all_orders'),
+    #My Whole Years Earnings
+    path('handyman_whole_year_earnings',views.handyman_whole_year_earnings,name='handyman_whole_year_earnings'),
+    #My All Rides
+    path('handyman_todays_earnings',views.handyman_todays_earnings,name='handyman_todays_earnings'),
 ]
