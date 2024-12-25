@@ -5810,23 +5810,9 @@ def other_driver_registration(request):
         pan_card_back = data.get("pan_card_back")
         license_front = data.get("license_front")
         license_back = data.get("license_back")
-        insurance_image = data.get("insurance_image")
-        noc_image = data.get("noc_image")
-        pollution_certificate_image = data.get("pollution_certificate_image")
-        rc_image = data.get("rc_image")
-        vehicle_image = data.get("vehicle_image")
-        vehicle_plate_image = data.get("vehicle_plate_image")
-        driving_license_no = data.get("driving_license_no")
-        vehicle_plate_no = data.get("vehicle_plate_no")
-        rc_no = data.get("rc_no")
-        insurance_no = data.get("insurance_no")
-        noc_no = data.get("noc_no")
-        vehicle_fuel_type = data.get("vehicle_fuel_type")
-        owner_name = data.get("owner_name")
-        owner_mobile_no = data.get("owner_mobile_no")
-        owner_photo_url = data.get("owner_photo_url")
-        owner_address = data.get("owner_address")
-        owner_city_name = data.get("owner_city_name")
+        sub_cat_id = data.get("sub_cat_id")
+        service_id = data.get("service_id")
+        
         
         
         
@@ -5854,23 +5840,9 @@ def other_driver_registration(request):
             "pan_card_back":pan_card_back,
             "license_front":license_front,
             "license_back":license_back,
-            "insurance_image":insurance_image,
-            "noc_image":noc_image,
-            "pollution_certificate_image":pollution_certificate_image,
-            "rc_image":rc_image,
-            "vehicle_image":vehicle_image,
-            "vehicle_plate_image":vehicle_plate_image,
-            "driving_license_no":driving_license_no,
-            "vehicle_plate_no":vehicle_plate_no,
-            "rc_no":rc_no,
-            "insurance_no":insurance_no,
-            "noc_no":noc_no,
-            "vehicle_fuel_type":vehicle_fuel_type,
-            "owner_name":owner_name,
-            "owner_mobile_no":owner_mobile_no,
-            "owner_photo_url":owner_photo_url,
-            "owner_address":owner_address,
-            "owner_city_name":owner_city_name,
+            "sub_cat_id":sub_cat_id,
+            "service_id":service_id,
+           
         }
 
         # Use the utility function to check for missing fields
@@ -5882,32 +5854,7 @@ def other_driver_registration(request):
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
                 status=400
             )
-        # Check if owner exists by mobile number
-        owner_id = None
-        if owner_name and owner_mobile_no:
-            try:
-                # Check if owner already exists based on mobile number
-                check_owner_query = "SELECT owner_id FROM vtpartner.owner_tbl WHERE owner_mobile_no = %s"
-                owner_result = select_query(check_owner_query, [owner_mobile_no])
-                if owner_result:
-                    # Owner exists, get the existing owner ID
-                    owner_id = owner_result[0][0]
-                else:
-                    # Insert new owner if not found
-                    insert_owner_query = """
-                        INSERT INTO vtpartner.owner_tbl (
-                            owner_name, owner_mobile_no,  city_name, address, profile_photo
-                        ) VALUES (%s, %s, %s,  %s, %s) RETURNING owner_id
-                    """
-                    owner_values = [owner_name, owner_mobile_no,  owner_city_name, owner_address, owner_photo_url]
-                    new_owner_result = insert_query(insert_owner_query, owner_values)
-                    if new_owner_result:
-                        owner_id = new_owner_result[0][0]
-                    else:
-                        raise Exception("Failed to retrieve owner ID from insert operation")
-            except Exception as error:
-                print("Owner error::", error)
-        print("owner_id::",owner_id)
+       
         
         query = """
             UPDATE vtpartner.other_driverstbl 
@@ -5927,25 +5874,15 @@ def other_driver_registration(request):
             pan_card_no = %s,
             full_address = %s,
             gender = %s,
-            owner_id = %s,
             aadhar_card_front = %s,
             aadhar_card_back = %s,
             pan_card_front = %s,
             pan_card_back = %s,
             license_front = %s,
             license_back = %s,
-            insurance_image = %s,
-            noc_image = %s,
-            pollution_certificate_image = %s,
-            rc_image = %s,
-            vehicle_image = %s,
-            vehicle_plate_image = %s,
-            driving_license_no = %s,
-            vehicle_plate_no = %s,
-            rc_no = %s,
-            insurance_no = %s,
-            noc_no = %s,
-            vehicle_fuel_type = %s
+            sub_cat_id = %s,
+            service_id = %s,
+            
             WHERE other_driver_id=%s
         """
         values = [
@@ -5957,32 +5894,21 @@ def other_driver_registration(request):
             r_lat,
             r_lng,
             recent_online_pic,
-            '2',
+            '4',
             vehicle_id,
             city_id,
             aadhar_no,
             pan_card_no,
             full_address,
             gender,
-            owner_id,
             aadhar_card_front,
             aadhar_card_back,
             pan_card_front,
             pan_card_back,
             license_front,
             license_back,
-            insurance_image,
-            noc_image,
-            pollution_certificate_image,
-            rc_image,
-            vehicle_image,
-            vehicle_plate_image,
-            driving_license_no,
-            vehicle_plate_no,
-            rc_no,
-            insurance_no,
-            noc_no,
-            vehicle_fuel_type,
+            sub_cat_id,
+            service_id,
             other_driver_id
         ]
         row_count = update_query(query, values)
