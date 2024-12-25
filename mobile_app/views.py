@@ -5878,7 +5878,7 @@ def other_driver_registration(request):
             license_front = %s,
             license_back = %s,
             sub_cat_id = %s,
-            service_id = %s,
+            service_id = %s
             
             WHERE other_driver_id=%s
         """
