@@ -5798,7 +5798,6 @@ def other_driver_registration(request):
         current_lat = data.get("current_lat")
         current_lng = data.get("current_lng")
         recent_online_pic = data.get("recent_online_pic")
-        vehicle_id = data.get("vehicle_id")
         city_id = data.get("city_id")
         aadhar_no = data.get("aadhar_no")
         pan_card_no = data.get("pan_card_no")
@@ -5828,7 +5827,6 @@ def other_driver_registration(request):
             "current_lat":current_lat,
             "current_lng":current_lng,
             "recent_online_pic":recent_online_pic,
-            "vehicle_id":vehicle_id,
             "city_id":city_id,
             "aadhar_no":aadhar_no,
             "pan_card_no":pan_card_no,
@@ -5868,7 +5866,6 @@ def other_driver_registration(request):
             current_lng = %s,
             recent_online_pic = %s,
             category_id = %s,
-            vehicle_id = %s,
             city_id = %s,
             aadhar_no = %s,
             pan_card_no = %s,
@@ -5895,7 +5892,6 @@ def other_driver_registration(request):
             r_lng,
             recent_online_pic,
             '4',
-            vehicle_id,
             city_id,
             aadhar_no,
             pan_card_no,
