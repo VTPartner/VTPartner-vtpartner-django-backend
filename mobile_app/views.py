@@ -9685,8 +9685,8 @@ def handyman_login_view(request):
                 
         try:
             query = """
-            SELECT handyman_id,driver_first_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,city_id FROM
-            vtpartner.handymanstbl WHERE mobile_no=%s
+            SELECT handyman_id,name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,city_id FROM
+            vtpartner.handymans_tbl WHERE mobile_no=%s
             """
             params = [mobile_no]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
@@ -9695,7 +9695,7 @@ def handyman_login_view(request):
                 try:
                     #Insert if not found
                     query = """
-                        INSERT INTO vtpartner.handymanstbl (
+                        INSERT INTO vtpartner.handymans_tbl (
                             mobile_no
                         ) VALUES (%s) RETURNING handyman_id
                     """
@@ -9813,7 +9813,7 @@ def handyman_registration(request):
         
         
         query = """
-            UPDATE vtpartner.handymanstbl 
+            UPDATE vtpartner.handymans_tbl 
             SET 
             name = %s,
             profile_pic = %s,
@@ -10065,7 +10065,7 @@ def handyman_online_status(request):
                 
         try:
             query = """
-            select is_online,status,name,recent_online_pic,profile_pic,mobile_no from vtpartner.handymanstbl where handyman_id=%s
+            select is_online,status,name,recent_online_pic,profile_pic,mobile_no from vtpartner.handymans_tbl where handyman_id=%s
             """
             params = [handyman_id]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
@@ -10126,7 +10126,7 @@ def handyman_update_online_status(request):
             if status == 1:
                 # Include recent_online_pic in the query when status is 1
                 query = """
-                UPDATE vtpartner.handymanstbl 
+                UPDATE vtpartner.handymans_tbl 
                 SET 
                     is_online = %s,
                     current_lat = %s,
@@ -10146,7 +10146,7 @@ def handyman_update_online_status(request):
             else:
                 # Exclude recent_online_pic when status is not 1
                 query = """
-                UPDATE vtpartner.handymanstbl 
+                UPDATE vtpartner.handymans_tbl 
                 SET 
                     is_online = %s,
                     current_lat = %s,
@@ -10370,7 +10370,7 @@ def get_nearby_handymans(request):
 #     GROUP BY handyman_id
 # ) AS latest ON main.handyman_id = latest.handyman_id
 #               AND main.entry_time = latest.max_entry_time
-# JOIN vtpartner.handymanstbl ON main.handyman_id = handymanstbl.handyman_id
+# JOIN vtpartner.handymans_tbl ON main.handyman_id = handymanstbl.handyman_id
 # JOIN vtpartner.vehiclestbl ON handymanstbl.vehicle_id = vehiclestbl.vehicle_id
 # WHERE main.current_status = 1
 #   AND (6371 * acos(
@@ -10413,7 +10413,7 @@ INNER JOIN (
     GROUP BY handyman_id
 ) AS latest ON main.handyman_id = latest.handyman_id
              AND main.entry_time = latest.max_entry_time
-JOIN vtpartner.handymanstbl ON main.handyman_id = handymanstbl.handyman_id
+JOIN vtpartner.handymans_tbl ON main.handyman_id = handymanstbl.handyman_id
 JOIN vtpartner.vehiclestbl ON handymanstbl.vehicle_id = vehiclestbl.vehicle_id
 JOIN vtpartner.vehicle_city_wise_price_tbl ON vehiclestbl.vehicle_id = vehicle_city_wise_price_tbl.vehicle_id
 AND vehicle_city_wise_price_tbl.city_id = %s  AND vehicle_city_wise_price_tbl.price_type_id=%s
@@ -10494,7 +10494,7 @@ def update_firebase_handyman_token(request):
         try:
 
             query = """
-                UPDATE vtpartner.handymanstbl 
+                UPDATE vtpartner.handymans_tbl 
                 SET 
                     authtoken = %s
                 WHERE handyman_id = %s
@@ -11406,7 +11406,7 @@ def handyman_all_orders(request):
             
         try:
             query = """
-                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,handymanstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,handymanstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,orders_tbl.ratings,orders_tbl.rating_description from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.handymanstbl,vtpartner.customers_tbl where handymanstbl.handyman_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.driver_id=%s and  vehiclestbl.vehicle_id=handymanstbl.vehicle_id order by order_id desc
+                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,handymanstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,handymanstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,orders_tbl.ratings,orders_tbl.rating_description from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.handymans_tbl,vtpartner.customers_tbl where handymanstbl.handyman_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.driver_id=%s and  vehiclestbl.vehicle_id=handymanstbl.vehicle_id order by order_id desc
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
