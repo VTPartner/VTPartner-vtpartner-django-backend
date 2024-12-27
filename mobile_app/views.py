@@ -9834,7 +9834,7 @@ def handyman_registration(request):
             aadhar_card_front = %s,
             aadhar_card_back = %s,
             pan_card_front = %s,
-            pan_card_back = %s,
+            pan_card_back = %s
             
             WHERE handyman_id=%s
         """
