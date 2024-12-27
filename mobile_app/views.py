@@ -7765,6 +7765,8 @@ def jcb_crane_driver_registration(request):
         owner_photo_url = data.get("owner_photo_url")
         owner_address = data.get("owner_address")
         owner_city_name = data.get("owner_city_name")
+        sub_cat_id = data.get("sub_cat_id")
+        service_id = data.get("service_id")
         
         
         
@@ -7809,6 +7811,8 @@ def jcb_crane_driver_registration(request):
             "owner_photo_url":owner_photo_url,
             "owner_address":owner_address,
             "owner_city_name":owner_city_name,
+            "sub_cat_id":sub_cat_id,
+            "service_id":service_id,
         }
 
         # Use the utility function to check for missing fields
@@ -7883,7 +7887,9 @@ def jcb_crane_driver_registration(request):
             rc_no = %s,
             insurance_no = %s,
             noc_no = %s,
-            vehicle_fuel_type = %s
+            vehicle_fuel_type = %s,
+            sub_cat_id = %s,
+            service_id = %s
             WHERE jcb_crane_driver_id=%s
         """
         values = [
@@ -7895,7 +7901,7 @@ def jcb_crane_driver_registration(request):
             r_lat,
             r_lng,
             recent_online_pic,
-            '2',
+            '3',
             vehicle_id,
             city_id,
             aadhar_no,
@@ -7921,6 +7927,8 @@ def jcb_crane_driver_registration(request):
             insurance_no,
             noc_no,
             vehicle_fuel_type,
+            sub_cat_id,
+            service_id,
             jcb_crane_driver_id
         ]
         row_count = update_query(query, values)
@@ -9752,7 +9760,6 @@ def handyman_registration(request):
         current_lat = data.get("current_lat")
         current_lng = data.get("current_lng")
         recent_online_pic = data.get("recent_online_pic")
-        vehicle_id = data.get("vehicle_id")
         city_id = data.get("city_id")
         aadhar_no = data.get("aadhar_no")
         pan_card_no = data.get("pan_card_no")
@@ -9762,25 +9769,9 @@ def handyman_registration(request):
         aadhar_card_back = data.get("aadhar_card_back")
         pan_card_front = data.get("pan_card_front")
         pan_card_back = data.get("pan_card_back")
-        license_front = data.get("license_front")
-        license_back = data.get("license_back")
-        insurance_image = data.get("insurance_image")
-        noc_image = data.get("noc_image")
-        pollution_certificate_image = data.get("pollution_certificate_image")
-        rc_image = data.get("rc_image")
-        vehicle_image = data.get("vehicle_image")
-        vehicle_plate_image = data.get("vehicle_plate_image")
-        driving_license_no = data.get("driving_license_no")
-        vehicle_plate_no = data.get("vehicle_plate_no")
-        rc_no = data.get("rc_no")
-        insurance_no = data.get("insurance_no")
-        noc_no = data.get("noc_no")
-        vehicle_fuel_type = data.get("vehicle_fuel_type")
-        owner_name = data.get("owner_name")
-        owner_mobile_no = data.get("owner_mobile_no")
-        owner_photo_url = data.get("owner_photo_url")
-        owner_address = data.get("owner_address")
-        owner_city_name = data.get("owner_city_name")
+        sub_cat_id = data.get("sub_cat_id")
+        service_id = data.get("service_id")
+        
         
         
         
@@ -9796,7 +9787,6 @@ def handyman_registration(request):
             "current_lat":current_lat,
             "current_lng":current_lng,
             "recent_online_pic":recent_online_pic,
-            "vehicle_id":vehicle_id,
             "city_id":city_id,
             "aadhar_no":aadhar_no,
             "pan_card_no":pan_card_no,
@@ -9806,25 +9796,9 @@ def handyman_registration(request):
             "aadhar_card_back":aadhar_card_back,
             "pan_card_front":pan_card_front,
             "pan_card_back":pan_card_back,
-            "license_front":license_front,
-            "license_back":license_back,
-            "insurance_image":insurance_image,
-            "noc_image":noc_image,
-            "pollution_certificate_image":pollution_certificate_image,
-            "rc_image":rc_image,
-            "vehicle_image":vehicle_image,
-            "vehicle_plate_image":vehicle_plate_image,
-            "driving_license_no":driving_license_no,
-            "vehicle_plate_no":vehicle_plate_no,
-            "rc_no":rc_no,
-            "insurance_no":insurance_no,
-            "noc_no":noc_no,
-            "vehicle_fuel_type":vehicle_fuel_type,
-            "owner_name":owner_name,
-            "owner_mobile_no":owner_mobile_no,
-            "owner_photo_url":owner_photo_url,
-            "owner_address":owner_address,
-            "owner_city_name":owner_city_name,
+            "sub_cat_id":sub_cat_id,
+            "service_id":service_id,
+            
         }
 
         # Use the utility function to check for missing fields
@@ -9836,37 +9810,12 @@ def handyman_registration(request):
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
                 status=400
             )
-        # Check if owner exists by mobile number
-        owner_id = None
-        if owner_name and owner_mobile_no:
-            try:
-                # Check if owner already exists based on mobile number
-                check_owner_query = "SELECT owner_id FROM vtpartner.owner_tbl WHERE owner_mobile_no = %s"
-                owner_result = select_query(check_owner_query, [owner_mobile_no])
-                if owner_result:
-                    # Owner exists, get the existing owner ID
-                    owner_id = owner_result[0][0]
-                else:
-                    # Insert new owner if not found
-                    insert_owner_query = """
-                        INSERT INTO vtpartner.owner_tbl (
-                            owner_name, owner_mobile_no,  city_name, address, profile_photo
-                        ) VALUES (%s, %s, %s,  %s, %s) RETURNING owner_id
-                    """
-                    owner_values = [owner_name, owner_mobile_no,  owner_city_name, owner_address, owner_photo_url]
-                    new_owner_result = insert_query(insert_owner_query, owner_values)
-                    if new_owner_result:
-                        owner_id = new_owner_result[0][0]
-                    else:
-                        raise Exception("Failed to retrieve owner ID from insert operation")
-            except Exception as error:
-                print("Owner error::", error)
-        print("owner_id::",owner_id)
+        
         
         query = """
             UPDATE vtpartner.handymanstbl 
             SET 
-            driver_first_name = %s,
+            name = %s,
             profile_pic = %s,
             mobile_no = %s,
             r_lat = %s,
@@ -9875,31 +9824,18 @@ def handyman_registration(request):
             current_lng = %s,
             recent_online_pic = %s,
             category_id = %s,
-            vehicle_id = %s,
+            sub_cat_id = %s,
+            service_id = %s,
             city_id = %s,
             aadhar_no = %s,
             pan_card_no = %s,
             full_address = %s,
             gender = %s,
-            owner_id = %s,
             aadhar_card_front = %s,
             aadhar_card_back = %s,
             pan_card_front = %s,
             pan_card_back = %s,
-            license_front = %s,
-            license_back = %s,
-            insurance_image = %s,
-            noc_image = %s,
-            pollution_certificate_image = %s,
-            rc_image = %s,
-            vehicle_image = %s,
-            vehicle_plate_image = %s,
-            driving_license_no = %s,
-            vehicle_plate_no = %s,
-            rc_no = %s,
-            insurance_no = %s,
-            noc_no = %s,
-            vehicle_fuel_type = %s
+            
             WHERE handyman_id=%s
         """
         values = [
@@ -9911,32 +9847,18 @@ def handyman_registration(request):
             r_lat,
             r_lng,
             recent_online_pic,
-            '2',
-            vehicle_id,
+            '5',
+            sub_cat_id,
+            service_id,
             city_id,
             aadhar_no,
             pan_card_no,
             full_address,
             gender,
-            owner_id,
             aadhar_card_front,
             aadhar_card_back,
             pan_card_front,
             pan_card_back,
-            license_front,
-            license_back,
-            insurance_image,
-            noc_image,
-            pollution_certificate_image,
-            rc_image,
-            vehicle_image,
-            vehicle_plate_image,
-            driving_license_no,
-            vehicle_plate_no,
-            rc_no,
-            insurance_no,
-            noc_no,
-            vehicle_fuel_type,
             handyman_id
         ]
         row_count = update_query(query, values)
@@ -10143,7 +10065,7 @@ def handyman_online_status(request):
                 
         try:
             query = """
-            select is_online,status,driver_first_name,recent_online_pic,profile_pic,mobile_no from vtpartner.handymanstbl where handyman_id=%s
+            select is_online,status,name,recent_online_pic,profile_pic,mobile_no from vtpartner.handymanstbl where handyman_id=%s
             """
             params = [handyman_id]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
@@ -11251,7 +11173,7 @@ def get_handyman_current_recharge_details(request):
             
         try:
             query = """
-               select topup_id,recharge_id,allotted_points,used_points,remaining_points,negative_points,valid_till_date,status from vtpartner.handyman_topup_recharge_current_points_tbl where driver_id=%s
+               select topup_id,recharge_id,allotted_points,used_points,remaining_points,negative_points,valid_till_date,status from vtpartner.handyman_topup_recharge_current_points_tbl where handy_man_id=%s
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
@@ -11306,7 +11228,7 @@ def get_handyman_recharge_history_details(request):
             
         try:
             query = """
-               select history_id,recharge_id,amount,allotted_points,date,valid_till_date,status,payment_method,payment_id,transaction_type,admin_id,last_recharge_negative_points from vtpartner.handyman_topup_recharge_history_tbl where driver_id=%s
+               select history_id,recharge_id,amount,allotted_points,date,valid_till_date,status,payment_method,payment_id,transaction_type,admin_id,last_recharge_negative_points from vtpartner.handyman_topup_recharge_history_tbl where handy_man_id=%s
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
@@ -11383,7 +11305,7 @@ def new_handyman_recharge(request):
             allotted_points -= negative_points
         try:
             query = """
-                insert into vtpartner.handyman_topup_recharge_history_tbl(driver_id,recharge_id,amount,allotted_points,valid_till_date,payment_method,payment_id,last_recharge_negative_points) values (%s,%s,%s,%s,%s,%s,%s,%s)
+                insert into vtpartner.handyman_topup_recharge_history_tbl(handy_man_id,recharge_id,amount,allotted_points,valid_till_date,payment_method,payment_id,last_recharge_negative_points) values (%s,%s,%s,%s,%s,%s,%s,%s)
                 """
             values = [
                     driver_id,
@@ -11416,7 +11338,7 @@ def new_handyman_recharge(request):
             try:
                 if negative_points > 0 or isExpired:
                     query = """
-                    update vtpartner.handyman_topup_recharge_current_points_tbl set recharge_id=%s,allotted_points=%s,valid_till_date=%s,remaining_points=%s,negative_points='0',used_points='0' where topup_id=%s and driver_id=%s
+                    update vtpartner.handyman_topup_recharge_current_points_tbl set recharge_id=%s,allotted_points=%s,valid_till_date=%s,remaining_points=%s,negative_points='0',used_points='0' where topup_id=%s and handy_man_id=%s
                     """
                     values = [
                             recharge_id,
@@ -11431,7 +11353,7 @@ def new_handyman_recharge(request):
                     row_count = insert_query(query, values)
                 else:
                     query = """
-                        INSERT INTO vtpartner.handyman_topup_recharge_current_points_tbl (recharge_id,allotted_points,valid_till_date,driver_id,remaining_points) VALUES (%s,%s,%s,%s,%s)
+                        INSERT INTO vtpartner.handyman_topup_recharge_current_points_tbl (recharge_id,allotted_points,valid_till_date,handy_man_id,remaining_points) VALUES (%s,%s,%s,%s,%s)
                         """
                     values = [
                             recharge_id,
@@ -11645,7 +11567,7 @@ def handyman_todays_earnings(request):
                 SELECT COALESCE(SUM(amount), 0) AS todays_earnings, 
                        COUNT(*) AS todays_rides 
                 FROM vtpartner.handyman_earningstbl 
-                WHERE driver_id = %s AND earning_date = CURRENT_DATE;
+                WHERE handy_man_id = %s AND earning_date = CURRENT_DATE;
             """
             result = select_query(query, [driver_id])  # Assuming select_query is defined elsewhere
 
