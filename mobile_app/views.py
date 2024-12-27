@@ -7661,7 +7661,7 @@ def jcb_crane_driver_login_view(request):
                 
         try:
             query = """
-            SELECT jcb_crane_driver_id,driver_first_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,city_id FROM
+            SELECT jcb_crane_driver_id,driver_name,profile_pic,is_online,ratings,mobile_no,registration_date,time,r_lat,r_lng,current_lat,current_lng,status,full_address,city_id FROM
             vtpartner.jcb_crane_driverstbl WHERE mobile_no=%s
             """
             params = [mobile_no]
@@ -7854,7 +7854,7 @@ def jcb_crane_driver_registration(request):
         query = """
             UPDATE vtpartner.jcb_crane_driverstbl 
             SET 
-            driver_first_name = %s,
+            driver_name = %s,
             profile_pic = %s,
             mobile_no = %s,
             r_lat = %s,
