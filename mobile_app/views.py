@@ -185,7 +185,8 @@ def get_server_key_token():
 def sendFMCMsg(deviceToken, msg, title, data,serverToken):
     
     deviceToken = deviceToken.replace('__colon__', ':')
-
+    print(f"deviceToken::{deviceToken}")
+    print(f"serverKey::{serverToken}")
     # Validate the device token
     if not deviceToken:
         print("Invalid device token")
@@ -2791,7 +2792,7 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                         print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
                         
                         if driver_auth_token:
-                            sendBulkFMCMsg(
+                            sendFMCMsg(
                                 driver_auth_token,
                                 f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
                                 "New Goods Ride Request",
