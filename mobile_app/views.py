@@ -218,6 +218,37 @@ def sendFMCMsg(deviceToken, msg, title, data,serverToken):
         print("Status Code:", response.status_code)
     except requests.exceptions.RequestException as e:
         print("Error sending FCM notification:", e)
+        
+def sendBulkFMCMsg(deviceTokens, msg, title, data, serverToken):
+    # Validate the device tokens
+    deviceTokens = [token.replace('__colon__', ':') for token in deviceTokens if token]
+
+    if not deviceTokens:
+        print("No valid device tokens provided")
+        return
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'key={serverToken}',  # Legacy FCM server key
+    }
+
+    body = {
+        "registration_ids": deviceTokens,
+        "notification": {
+            "body": msg,
+            "title": title,
+        },
+        "data": data
+    }
+
+    try:
+        response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, json=body)
+        response_data = response.json()
+        print("FCM Response:", response_data)
+        print("Status Code:", response.status_code)
+    except requests.exceptions.RequestException as e:
+        print("Error sending FCM bulk notification:", e)
+
 
 @csrf_exempt
 def send_notification_using_api(token: str, title: str, body: str, data: dict) -> None:
@@ -2760,7 +2791,7 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                         print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
                         
                         if driver_auth_token:
-                            sendFMCMsg(
+                            sendBulkFMCMsg(
                                 driver_auth_token,
                                 f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
                                 "New Goods Ride Request",
