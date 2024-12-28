@@ -2757,6 +2757,8 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                 for driver in nearby_drivers:
                     try:
                         driver_auth_token = get_goods_driver_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
+                        print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
+                        
                         if driver_auth_token:
                             sendFMCMsg(
                                 driver_auth_token,
