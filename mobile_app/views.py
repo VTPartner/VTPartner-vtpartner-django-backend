@@ -1199,6 +1199,7 @@ def cancel_booking(request):
         driver_id = data.get("driver_id")
         server_token = data.get("server_token")
         pickup_address = data.get("pickup_address")
+        cancel_reason = data.get("cancel_reason")
         
         
 
@@ -1208,6 +1209,7 @@ def cancel_booking(request):
             "server_token": server_token,
             "customer_id": customer_id,
             "driver_id": driver_id,
+            "cancel_reason": cancel_reason,
         
         
         }
@@ -1223,9 +1225,9 @@ def cancel_booking(request):
             
         try:
             query = """
-                UPDATE vtpartner.bookings_tbl set booking_status='Cancelled' WHERE booking_id=%s
+                UPDATE vtpartner.bookings_tbl set booking_status='Cancelled',cancelled_reason=%s WHERE booking_id=%s
             """
-            row_count = update_query(query,[booking_id])  
+            row_count = update_query(query,[cancel_reason,booking_id])  
             
             #Updating it in Booking History Table to maintain record at what time it was cancelled
             query2 = """
