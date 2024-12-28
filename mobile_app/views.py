@@ -718,6 +718,27 @@ def get_goods_driver_auth_token( goods_driver_id):
         print("Error in finding the auth token for goods driver:", err)
         return auth_token
 
+def get_goods_driver_auth_token2(goods_driver_id):
+    auth_token = ""
+    try:
+        query = """
+        SELECT authtoken FROM vtpartner.goods_driverstbl WHERE goods_driver_id=%s
+        """
+        params = [goods_driver_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            print(f"No auth token found for goods_driver_id: {goods_driver_id}")
+            return None  # Return None instead of empty string for clarity
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for goods driver:", err)
+        return None
 
 #New Booking 
 @csrf_exempt
@@ -2724,15 +2745,31 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                 # ]
 
                 # Send notifications to all the online drivers
+                # for driver in nearby_drivers:
+                #     driver_auth_token = get_goods_driver_auth_token(driver[1])
+                #     sendFMCMsg(
+                #         driver_auth_token,
+                #         f'You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}',
+                #         'New Goods Ride Request',
+                #         fcm_data,
+                #         server_access_token
+                #     )
                 for driver in nearby_drivers:
-                    driver_auth_token = get_goods_driver_auth_token(driver[1])
-                    sendFMCMsg(
-                        driver_auth_token,
-                        f'You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}',
-                        'New Goods Ride Request',
-                        fcm_data,
-                        server_access_token
-                    )
+                    try:
+                        driver_auth_token = get_goods_driver_auth_token(driver[1])  # driver[1] assumed to be goods_driver_id
+                        if driver_auth_token:
+                            sendFMCMsg(
+                                driver_auth_token,
+                                f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
+                                "New Goods Ride Request",
+                                fcm_data,
+                                server_access_token
+                            )
+                            print(f"Notification sent to driver ID {driver[1]}")
+                        else:
+                            print(f"Skipped notification for driver ID {driver[1]} due to missing auth token")
+                    except Exception as err:
+                        print(f"Error sending notification to driver ID {driver[1]}: {err}")
 
 
                 return JsonResponse({"result": response_value}, status=200)
