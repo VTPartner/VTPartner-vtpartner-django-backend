@@ -48,6 +48,8 @@ urlpatterns = [
     path('get_all_sub_categories',views.get_all_sub_categories,name='get_all_sub_categories'),
     #Getting all sub services such as Wireman
     path('get_all_sub_services',views.get_all_sub_services,name='get_all_sub_services'),
+    #Generate New Booking Id For Goods Delivery booking with send notification to all driver for specific vehicle id
+    path('generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token',views.generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token,name='generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token'),
     
     
     
