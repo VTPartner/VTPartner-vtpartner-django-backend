@@ -564,6 +564,90 @@ def all_vehicles(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt 
+def all_vehicles_with_price_details(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            category_id = body.get("category_id")
+            price_type_id = body.get("price_type_id")
+            city_id = body.get("city_id")
+            # List of required fields
+            required_fields = {
+                "category_id": category_id,
+                "price_type_id": price_type_id,
+                "city_id": city_id,
+            }
+
+            # Check for missing fields
+            missing_fields = check_missing_fields(required_fields)  # Assuming check_missing_fields is defined
+
+            # If there are missing fields, return an error response
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            query = """
+                SELECT
+                v.vehicle_id,
+                v.vehicle_name,
+                v.weight,
+                vt.vehicle_type_id,
+                vt.vehicle_type_name,
+                v.description,
+                v.image,
+                v.size_image,
+                vcwp.starting_price_per_km,
+                vcwp.base_fare,
+                vcwp.minimum_time
+                FROM
+                vtpartner.vehiclestbl v
+                JOIN
+                vtpartner.vehicle_types_tbl vt
+                ON v.vehicle_type_id = vt.vehicle_type_id
+                JOIN
+                vtpartner.vehicle_city_wise_price_tbl vcwp
+                ON v.vehicle_id = vcwp.vehicle_id
+                WHERE
+                v.category_id = %s
+                AND vcwp.price_type_id = %s
+                AND vcwp.city_id = %s
+                ORDER BY
+                v.vehicle_id
+            """
+            result = select_query(query,[category_id,price_type_id,city_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            vehicle_details = [
+                {
+                   "vehicle_id": row[0],
+                    "vehicle_name": row[1],
+                    "weight": row[2],
+                    "vehicle_type_id": row[3],
+                    "vehicle_type_name": row[4],
+                    "description": row[5],
+                    "image": row[6],
+                    "size_image": row[7],
+                    "starting_price_per_km": row[8],
+                    "base_fare": row[9],
+                    "minimum_time": row[10],
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": vehicle_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 @csrf_exempt
 def allowed_pin_code(request):
     if request.method == "POST":
@@ -2434,7 +2518,7 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
         data = json.loads(request.body)
         # lat = data.get("lat")
         # lng = data.get("lng")
-        city_id = data.get("city_id")
+        # city_id = data.get("city_id")
         price_type = data.get("price_type", 1)
         radius_km = data.get("radius_km", 5)  # Radius in kilometers
         vehicle_id = data.get("vehicle_id")  # Vehicle ID
