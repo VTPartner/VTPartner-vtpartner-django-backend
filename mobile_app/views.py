@@ -296,6 +296,62 @@ def upload_image(request):
         return JsonResponse({'error': 'Invalid request'})
 
 # Create your views here.
+
+@csrf_exempt
+def send_otp(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            mobile_no = data.get("mobile_no")
+
+            # Validate mobile_no
+            if not mobile_no:
+                return JsonResponse({"message": "Mobile number is required."}, status=400)
+
+            # Remove +91 prefix if present and ensure it's exactly 10 digits
+            mobile_no = re.sub(r"^\+91", "", mobile_no)  # Remove +91
+            if len(mobile_no) > 10:
+                mobile_no = mobile_no[-10:]  # Keep the last 10 digits
+
+            if len(mobile_no) != 10 or not mobile_no.isdigit():
+                return JsonResponse({"message": "Invalid mobile number."}, status=400)
+
+            # Generate a random 6-digit OTP
+            otp = random.randint(100000, 999999)
+
+            # OTP message template
+            otp_message = f"VTPartner Your OTP is {otp}. Please use this code to complete your verification. Do not share this OTP with anyone."
+
+            # SMS API endpoint and parameters
+            sms_api_url = "http://smsozone.com/api/mt/SendSMS"
+            sms_params = {
+                "APIKey": "qkUTqWb5NU66z5StCDcrIA",
+                "senderid": "VTPART",
+                "channel": "Trans",
+                "DCS": 0,
+                "flashsms": 0,
+                "number": mobile_no,
+                "text": otp_message,
+                "route": 2069,
+            }
+
+            # Send the OTP (You might use a library like `requests` to make the API call)
+            response = requests.get(sms_api_url, params=sms_params)
+
+            if response.status_code == 200:
+                # Success: Return the OTP for testing purposes (Remove in production)
+                return JsonResponse({"message": "OTP sent successfully.", "otp": otp}, status=200)
+            else:
+                # Failure: Handle SMS API error
+                return JsonResponse({"message": "Failed to send OTP.", "details": response.text}, status=500)
+
+        except Exception as e:
+            print("Error:", e)
+            return JsonResponse({"message": "An error occurred while processing the request."}, status=500)
+
+    return JsonResponse({"message": "Method not allowed."}, status=405)
+
+
 @csrf_exempt
 def login_view(request):
     if request.method == "POST":

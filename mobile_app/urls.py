@@ -4,6 +4,8 @@ from . import views
 app_name = 'vt_partner'
 
 urlpatterns = [
+    #Send OTP 
+    path('send_otp',views.send_otp,name='send_otp'),
     #Upload Images
     path('upload',views.upload_image,name='upload'),
     #Customer Login
