@@ -344,13 +344,13 @@ def send_otp(request):
                 return JsonResponse({"message": "OTP sent successfully.", "otp": otp}, status=200)
             else:
                 # Failure: Handle SMS API error
-                return JsonResponse({"message": "Failed to send OTP.", "details": response.text}, status=500)
+                return JsonResponse({"error_message": "Failed to send OTP.", "details": response.text}, status=500)
 
         except Exception as e:
             print("Error:", e)
-            return JsonResponse({"message": "An error occurred while processing the request."}, status=500)
+            return JsonResponse({"error_message": "An error occurred while processing the request."}, status=500)
 
-    return JsonResponse({"message": "Method not allowed."}, status=405)
+    return JsonResponse({"error_message": "Method not allowed."}, status=405)
 
 
 @csrf_exempt
