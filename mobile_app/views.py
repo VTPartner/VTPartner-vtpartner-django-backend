@@ -5844,23 +5844,23 @@ def new_cab_driver_recharge(request):
             # Execute the query
             row_count = insert_query(query, values)
             
-            #checking if recharge has been expired
-            last_validity_date_obj = datetime.strptime(last_validity_date, "%Y-%m-%d")
+            # #checking if recharge has been expired
+            # last_validity_date_obj = datetime.strptime(last_validity_date, "%Y-%m-%d")
 
-            # Get the current date
-            current_date = datetime.now()
+            # # Get the current date
+            # current_date = datetime.now()
 
-            # Check if last_validity_date is greater than the current date
-            isExpired = False
-            if last_validity_date_obj > current_date:
-                print("The last validity date is in the future.")
-            else:
-                isExpired = True
-                print("The last validity date is today or has passed.")
+            # # Check if last_validity_date is greater than the current date
+            # isExpired = False
+            # if last_validity_date_obj > current_date:
+            #     print("The last validity date is in the future.")
+            # else:
+            #     isExpired = True
+            #     print("The last validity date is today or has passed.")
 
             # Updating Booking History Table
             try:
-                if negative_points > 0 or isExpired:
+                if negative_points > 0 :
                     query = """
                     update vtpartner.cab_driver_topup_recharge_current_points_tbl set recharge_id=%s,allotted_points=%s,valid_till_date=%s,remaining_points=%s,negative_points='0',used_points='0' where topup_id=%s and driver_id=%s
                     """
