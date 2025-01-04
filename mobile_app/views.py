@@ -8551,7 +8551,7 @@ def jcb_crane_driver_online_status(request):
                 
         try:
             query = """
-            select is_online,status,driver_first_name,recent_online_pic,profile_pic,mobile_no from vtpartner.jcb_crane_driverstbl where jcb_crane_driver_id=%s
+            select is_online,status,driver_name,recent_online_pic,profile_pic,mobile_no from vtpartner.jcb_crane_driverstbl where jcb_crane_driver_id=%s
             """
             params = [jcb_crane_driver_id]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
@@ -8841,7 +8841,7 @@ def get_nearby_jcb_crane_drivers(request):
         try:
             # Haversine formula to calculate the distance in kilometers
             #SELECT main.active_id, main.jcb_crane_driver_id, main.current_lat, main.current_lng, 
-#        main.entry_time, main.current_status, jcb_crane_driverstbl.driver_first_name,
+#        main.entry_time, main.current_status, jcb_crane_driverstbl.driver_name,
 #        jcb_crane_driverstbl.profile_pic, vehiclestbl.image AS vehicle_image, 
 #        vehiclestbl.vehicle_name,weight,
 #        (6371 * acos(
@@ -8878,7 +8878,7 @@ def get_nearby_jcb_crane_drivers(request):
     main.current_lng, 
     main.entry_time, 
     main.current_status, 
-    jcb_crane_driverstbl.driver_first_name,
+    jcb_crane_driverstbl.driver_name,
     jcb_crane_driverstbl.profile_pic, 
     vehiclestbl.image AS vehicle_image, 
     vehiclestbl.vehicle_name,
