@@ -3230,6 +3230,7 @@ def update_booking_status_driver(request):
         booking_status = data.get("booking_status")
         server_token = data.get("server_token")
         customer_id = data.get("customer_id")
+        total_payment = data.get("total_payment")
 
         # List of required fields
         required_fields = {
@@ -3296,6 +3297,9 @@ def update_booking_status_driver(request):
 
                     # Execute the query
                     row_count = update_query(update_pickup_epoch_query, values)
+                elif booking_status == "Make Payment":
+                   body = f"Please do the payment against Booking ID {booking_id}. Total Amount=Rs.{total_payment}/-"
+                   title = "Make Payment"
                 elif booking_status == "End Trip":
                     body = "Your package has been delivered successfully"
                     title = "Package Deliveried"
