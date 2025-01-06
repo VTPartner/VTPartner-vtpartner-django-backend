@@ -5483,14 +5483,14 @@ def update_booking_status_cab_driver(request):
                 body = title = ""
                 data_map = {}
                 if booking_status == "Driver Arrived":
-                    body = "Our agent has arrived at your pickup location"
-                    title = "Agent Arrived"
+                    body = "Our cab agent has arrived at your pickup location"
+                    title = "Cab Agent Arrived"
                 elif booking_status == "OTP Verified":
                     body = "You're OTP is Verified Successfully!"
-                    title = "OTP Verification"
+                    title = "Cab OTP Verification"
                 elif booking_status == "Start Trip":
-                    body = "Trip has been started from your pickup location"
-                    title = "Trip Started"
+                    body = "Cab Trip has been started from your pickup location"
+                    title = "Cab Trip Started"
                     # Update Pickup epoch here
                     update_pickup_epoch_query = """
                     UPDATE vtpartner.cab_bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
@@ -5503,10 +5503,10 @@ def update_booking_status_cab_driver(request):
                     row_count = update_query(update_pickup_epoch_query, values)
                 elif booking_status == "Make Payment":
                    body = f"Please do the payment against Booking ID {booking_id}. Total Amount=Rs.{total_payment}/-"
-                   title = "Make Payment"
+                   title = "Make Payment For Cab"
                 elif booking_status == "End Trip":
-                    body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
+                    body = "Cab reached successfully to your destination"
+                    title = "Cab Reached Destination"
                     # Update Drop epoch here
                     update_drop_epoch_query = """
                     UPDATE vtpartner.cab_bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
