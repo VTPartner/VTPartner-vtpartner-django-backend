@@ -151,6 +151,8 @@ urlpatterns = [
     path('cab_driver_todays_earnings',views.cab_driver_todays_earnings,name='cab_driver_todays_earnings'),
     #All Cab Drivers Nearby
     path('generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token',views.generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token,name='generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token'),
+    #All Cab Drivers Nearby
+    path('cab_booking_details_live_track',views.cab_booking_details_live_track,name='cab_booking_details_live_track'),
     
     #Other Drivers Api's URLs
     #Login
