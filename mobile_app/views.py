@@ -829,6 +829,28 @@ def get_goods_driver_auth_token2(goods_driver_id):
         print("Error in finding the auth token for goods driver:", err)
         return None
 
+def get_cab_driver_auth_token2(cab_driver_id):
+    auth_token = ""
+    try:
+        query = """
+        SELECT authtoken FROM vtpartner.cab_driverstbl WHERE cab_driver_id=%s
+        """
+        params = [cab_driver_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            print(f"No auth token found for cab_driver_id: {cab_driver_id}")
+            return None  # Return None instead of empty string for clarity
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for cab driver:", err)
+        return None
+
 #New Booking 
 @csrf_exempt
 def new_goods_delivery_booking(request):
@@ -6151,8 +6173,234 @@ def cab_driver_todays_earnings(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        # lat = data.get("lat")
+        # lng = data.get("lng")
+        # city_id = data.get("city_id")
+        price_type = data.get("price_type", 1)
+        radius_km = data.get("radius_km", 5)  # Radius in kilometers
+        vehicle_id = data.get("vehicle_id")  # Vehicle ID
+        # Read the individual fields from the JSON data
+        customer_id = data.get("customer_id")
+        pickup_lat = data.get("pickup_lat")
+        pickup_lng = data.get("pickup_lng")
+        destination_lat = data.get("destination_lat")
+        destination_lng = data.get("destination_lng")
+        distance = data.get("distance")
+        time = data.get("time")
+        total_price = data.get("total_price")
+        base_price = data.get("base_price")
+        otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
+        gst_amount = data.get("gst_amount")
+        igst_amount = data.get("igst_amount")
+        goods_type_id = data.get("goods_type_id")
+        payment_method = data.get("payment_method")
+        city_id = data.get("city_id")
+        pickup_address = data.get("pickup_address")
+        drop_address = data.get("drop_address")
+        server_access_token = data.get("server_access_token")
 
-#Cab Driver Api's
+        # List of required fields
+        required_fields = {
+            "city_id":city_id,
+            "price_type":price_type,
+            "radius_km":radius_km,
+            "vehicle_id":vehicle_id,
+            "customer_id":customer_id,
+            "pickup_lat":pickup_lat,
+            "pickup_lng":pickup_lng,
+            "destination_lat":destination_lat,
+            "destination_lng":destination_lng,
+            "distance":distance,
+            "time":time,
+            "total_price":total_price,
+            "base_price":base_price,
+            "otp":str(otp),
+            "gst_amount":gst_amount,
+            "igst_amount":igst_amount,
+            "goods_type_id":goods_type_id,
+            "payment_method":payment_method,
+            "city_id":city_id,
+            "pickup_address":pickup_address,
+            "drop_address":drop_address,
+            "server_access_token":server_access_token,
+        }
+
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
+        
+
+        
+        
+        
+        
+
+        if pickup_lat is None or pickup_lng is None:
+            return JsonResponse({"message": "Latitude and Longitude are required"}, status=400)
+
+        try:
+            
+            # Insert record in the booking table
+            query_insert = """
+                INSERT INTO vtpartner.cab_bookings_tbl (
+                    customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                    distance, time, total_price, base_price, booking_timing, booking_date, 
+                    otp, gst_amount, igst_amount, 
+                    payment_method, city_id,pickup_address,drop_address
+                ) 
+                VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                    EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
+                    %s, %s,%s, %s,%s, %s,%s, %s
+                ) 
+                RETURNING booking_id;
+            """
+
+            insert_values = [
+                customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                distance, time, total_price, base_price, otp, 
+                gst_amount, igst_amount, payment_method, city_id,pickup_address,drop_address
+            ]
+
+            # Assuming insert_query is a function that runs the query
+            new_result = insert_query(query_insert, insert_values)
+            
+            if new_result:
+                booking_id = new_result[0][0]  # Extracting booking_id from the result
+                response_value = [{"booking_id": booking_id}]
+                
+                #send notification to all goods driver
+                fcm_data = {
+                    'intent':'cab_driver',
+                    'booking_id':str(booking_id)
+                }
+                query = """
+                    SELECT 
+                    main.active_id, 
+                    main.cab_driver_id, 
+                    main.current_lat, 
+                    main.current_lng, 
+                    main.entry_time, 
+                    main.current_status, 
+                    cab_driverstbl.driver_first_name,
+                    cab_driverstbl.profile_pic, 
+                    vehiclestbl.image AS vehicle_image, 
+                    vehiclestbl.vehicle_name,
+                    vehiclestbl.weight,
+                    vehicle_city_wise_price_tbl.starting_price_per_km,
+                    vehicle_city_wise_price_tbl.base_fare,
+                    vehiclestbl.vehicle_id,
+                    vehiclestbl.size_image,
+                    cab_driverstbl.authtoken,
+                    (6371 * acos(
+                        cos(radians(%s)) * cos(radians(main.current_lat)) *
+                        cos(radians(main.current_lng) - radians(%s)) +
+                        sin(radians(%s)) * sin(radians(main.current_lat))
+                    )) AS distance
+                FROM vtpartner.active_cab_drivertbl AS main
+                INNER JOIN (
+                    SELECT cab_driver_id, MAX(entry_time) AS max_entry_time
+                    FROM vtpartner.active_cab_drivertbl
+                    GROUP BY cab_driver_id
+                ) AS latest ON main.cab_driver_id = latest.cab_driver_id
+                            AND main.entry_time = latest.max_entry_time
+                JOIN vtpartner.cab_driverstbl ON main.cab_driver_id = cab_driverstbl.cab_driver_id
+                JOIN vtpartner.vehiclestbl ON cab_driverstbl.vehicle_id = vehiclestbl.vehicle_id
+                JOIN vtpartner.vehicle_city_wise_price_tbl ON vehiclestbl.vehicle_id = vehicle_city_wise_price_tbl.vehicle_id
+                AND vehicle_city_wise_price_tbl.city_id = %s  AND vehicle_city_wise_price_tbl.price_type_id=%s
+                WHERE main.current_status = 1
+                AND (6371 * acos(
+                        cos(radians(%s)) * cos(radians(main.current_lat)) *
+                        cos(radians(main.current_lng) - radians(%s)) +
+                        sin(radians(%s)) * sin(radians(main.current_lat))
+                    )) <= %s
+                AND cab_driverstbl.category_id = vehiclestbl.category_id
+                AND cab_driverstbl.category_id = '1' AND  cab_driverstbl.vehicle_id=%s
+                ORDER BY distance ASC;
+
+                """
+                values = [pickup_lat, pickup_lng, pickup_lat,city_id,price_type, pickup_lat, pickup_lng, pickup_lat, radius_km,vehicle_id]
+
+                # Execute the query
+                nearby_drivers = select_query(query, values)
+                
+
+                # Format response
+                # drivers_list = [
+                #     {
+                #         "active_id": driver[0],
+                #         "goods_driver_id": driver[1],
+                #         "latitude": driver[2],
+                #         "longitude": driver[3],
+                #         "entry_time": driver[4],
+                #         "current_status": driver[5],
+                #         "driver_name": driver[6],
+                #         "driver_profile_pic": driver[7],
+                #         "vehicle_image": driver[8],
+                #         "vehicle_name": driver[9],
+                #         "weight": driver[10],
+                #         "starting_price_per_km": driver[11],
+                #         "base_fare": driver[12],
+                #         "vehicle_id": driver[13],
+                #         "size_image": driver[14],
+                #         "auth_token": driver[15],
+                #         "distance": driver[16]
+                #     }
+                #     for driver in nearby_drivers
+                # ]
+
+                # Send notifications to all the online drivers
+                # for driver in nearby_drivers:
+                #     driver_auth_token = get_goods_driver_auth_token(driver[1])
+                #     sendFMCMsg(
+                #         driver_auth_token,
+                #         f'You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}',
+                #         'New Goods Ride Request',
+                #         fcm_data,
+                #         server_access_token
+                #     )
+                for driver in nearby_drivers:
+                    try:
+                        
+                        driver_auth_token = get_cab_driver_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
+                        print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
+                        
+                        if driver_auth_token:
+                            sendFMCMsg(
+                                driver_auth_token,
+                                f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
+                                "New Cab Ride Request",
+                                fcm_data,
+                                server_access_token
+                            )
+                            print(f"Notification sent to cab driver ID {driver[1]}")
+                        else:
+                            print(f"Skipped notification for cab driver ID {driver[1]} due to missing auth token")
+                    except Exception as err:
+                        print(f"Error sending notification to cab driver ID {driver[1]}: {err}")
+
+
+                return JsonResponse({"result": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+
+#All Driver Api's
 @csrf_exempt
 def other_driver_login_view(request):
     if request.method == "POST":
