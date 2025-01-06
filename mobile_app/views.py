@@ -5573,7 +5573,7 @@ def generate_order_id_for_booking_id_cab_driver(request):
         try:
 
             query = """
-                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                update vtpartner.cab_bookings_tbl set booking_status=%s where booking_id=%s
                 """
             values = [
                     booking_status,
@@ -5587,7 +5587,7 @@ def generate_order_id_for_booking_id_cab_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -5602,27 +5602,27 @@ def generate_order_id_for_booking_id_cab_driver(request):
                 body = title = ""
                 data_map = {}
                 if booking_status == "Driver Arrived":
-                    body = "Our agent has arrived at your pickup location"
-                    title = "Agent Arrived"
+                    body = "Our cab agent has arrived at your pickup location"
+                    title = "Cab Agent Arrived"
                 elif booking_status == "OTP verified":
-                    body = "Your trip otp is verified"
-                    title = "Trip OTP Verified"
+                    body = "Your trip otp is verified for cab ride"
+                    title = "Cab Trip OTP Verified"
                 elif booking_status == "Start Trip":
-                    body = "Trip has been started from your pickup location"
-                    title = "Trip Started"
+                    body = "Cab Trip has been started from your pickup location"
+                    title = "Cab Trip Started"
                 elif booking_status == "Ongoing":
-                    body = "Trip has been started from your pickup location"
-                    title = "Ongoing"
+                    body = "Cab Trip has been started from your pickup location"
+                    title = "Cab Ongoing"
                 elif booking_status == "End Trip":
-                    body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
+                    body = "You have reached your destination successfully"
+                    title = "Cab Destination Arrived"
                 sendFMCMsg(auth_token,body,title,data_map,server_token)
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
                 #Generating Order ID
                 try:
                     query = """
-                    INSERT INTO vtpartner.orders_tbl (
+                    INSERT INTO vtpartner.cab_orders_tbl (
                         customer_id, 
                         driver_id, 
                         pickup_lat, 
@@ -5640,14 +5640,9 @@ def generate_order_id_for_booking_id_cab_driver(request):
                         otp, 
                         gst_amount, 
                         igst_amount, 
-                        goods_type_id, 
                         payment_method, 
                         city_id, 
                         booking_id, 
-                        sender_name, 
-                        sender_number, 
-                        receiver_name, 
-                        receiver_number, 
                         pickup_address, 
                         drop_address,
                         pickup_time,
@@ -5671,19 +5666,14 @@ def generate_order_id_for_booking_id_cab_driver(request):
                         otp, 
                         gst_amount, 
                         igst_amount, 
-                        goods_type_id, 
                         payment_method, 
                         city_id, 
                         booking_id, 
-                        sender_name, 
-                        sender_number, 
-                        receiver_name, 
-                        receiver_number, 
                         pickup_address, 
                         drop_address,
                         pickup_time,
                         drop_time
-                    FROM vtpartner.bookings_tbl
+                    FROM vtpartner.cab_bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
                     """
@@ -5708,7 +5698,7 @@ def generate_order_id_for_booking_id_cab_driver(request):
                             #success
                             try:
                                 query3 = """
-                                update vtpartner.bookings_tbl set booking_completed='1' where booking_id=%s
+                                update vtpartner.cab_bookings_tbl set booking_completed='1' where booking_id=%s
                                 """
                                 values3 = [
                                         booking_id
@@ -5718,7 +5708,7 @@ def generate_order_id_for_booking_id_cab_driver(request):
                                 row_count = update_query(query3, values3)
                                 
                                 query_update = """
-                                update vtpartner.orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
+                                update vtpartner.cab_orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
                                 """
                                 values_update = [
                                         payment_method,
