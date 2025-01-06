@@ -6196,7 +6196,7 @@ def generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token(reques
         otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
         gst_amount = data.get("gst_amount")
         igst_amount = data.get("igst_amount")
-        goods_type_id = data.get("goods_type_id")
+        
         payment_method = data.get("payment_method")
         city_id = data.get("city_id")
         pickup_address = data.get("pickup_address")
@@ -6221,7 +6221,7 @@ def generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token(reques
             "otp":str(otp),
             "gst_amount":gst_amount,
             "igst_amount":igst_amount,
-            "goods_type_id":goods_type_id,
+            
             "payment_method":payment_method,
             "city_id":city_id,
             "pickup_address":pickup_address,
