@@ -2927,13 +2927,32 @@ def get_all_goods_types(request):
 
 @csrf_exempt
 def get_all_guide_lines(request):
-    if request.method == "POST":        
+    if request.method == "POST":   
+        data = json.loads(request.body)
+        category_id = data.get("category_id",1)
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "category_id": category_id,
+            
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )     
         try:
             query = """
-            select guide_id,guide_line from vtpartner.guide_lines_tbl where category_id='1'
+            select guide_id,guide_line from vtpartner.guide_lines_tbl where category_id=%s
             """
             
-            result = select_query(query)
+            result = select_query(query,[category_id])
 
             if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
