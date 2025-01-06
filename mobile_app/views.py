@@ -5434,6 +5434,7 @@ def update_booking_status_cab_driver(request):
         booking_status = data.get("booking_status")
         server_token = data.get("server_token")
         customer_id = data.get("customer_id")
+        total_payment = data.get("total_payment")
 
         # List of required fields
         required_fields = {
@@ -5453,7 +5454,7 @@ def update_booking_status_cab_driver(request):
         try:
 
             query = """
-                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                update vtpartner.cab_bookings_tbl set booking_status=%s where booking_id=%s
                 """
             values = [
                     booking_status,
@@ -5467,7 +5468,7 @@ def update_booking_status_cab_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -5492,7 +5493,7 @@ def update_booking_status_cab_driver(request):
                     title = "Trip Started"
                     # Update Pickup epoch here
                     update_pickup_epoch_query = """
-                    UPDATE vtpartner.bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    UPDATE vtpartner.cab_bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
                     """
                     values = [
                             booking_id
@@ -5500,12 +5501,15 @@ def update_booking_status_cab_driver(request):
 
                     # Execute the query
                     row_count = update_query(update_pickup_epoch_query, values)
+                elif booking_status == "Make Payment":
+                   body = f"Please do the payment against Booking ID {booking_id}. Total Amount=Rs.{total_payment}/-"
+                   title = "Make Payment"
                 elif booking_status == "End Trip":
                     body = "Your package has been delivered successfully"
                     title = "Package Deliveried"
                     # Update Drop epoch here
                     update_drop_epoch_query = """
-                    UPDATE vtpartner.bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    UPDATE vtpartner.cab_bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
                     """
                     values = [
                             booking_id
@@ -5527,7 +5531,7 @@ def update_booking_status_cab_driver(request):
         
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
-    
+     
 @csrf_exempt 
 def generate_order_id_for_booking_id_cab_driver(request):
     if request.method == "POST":
