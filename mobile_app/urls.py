@@ -50,6 +50,8 @@ urlpatterns = [
     path('save_order_ratings',views.save_order_ratings,name='save_order_ratings'),
     #Goods Driver Live Location Tracking
     path('goods_driver_current_location',views.goods_driver_current_location,name='goods_driver_current_location'),
+    #Cab Driver Live Location Tracking
+    path('cab_driver_current_location',views.cab_driver_current_location,name='cab_driver_current_location'),
     #Getting all sub categories such as Plumber , LVM
     path('get_all_sub_categories',views.get_all_sub_categories,name='get_all_sub_categories'),
     #Getting all sub services such as Wireman
