@@ -5440,6 +5440,8 @@ def update_booking_status_cab_driver(request):
         required_fields = {
             "booking_id": booking_id,
             "booking_status": booking_status,
+            "server_token": server_token,
+            "customer_id": customer_id,
         }
         # Check for missing fields
         missing_fields = check_missing_fields(required_fields)
