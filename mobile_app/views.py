@@ -6325,7 +6325,7 @@ def generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token(reques
                         sin(radians(%s)) * sin(radians(main.current_lat))
                     )) <= %s
                 AND cab_driverstbl.category_id = vehiclestbl.category_id
-                AND cab_driverstbl.category_id = '1' AND  cab_driverstbl.vehicle_id=%s
+                AND cab_driverstbl.category_id = '2' AND  cab_driverstbl.vehicle_id=%s
                 ORDER BY distance ASC;
 
                 """
