@@ -42,8 +42,12 @@ urlpatterns = [
     path('customers_all_cab_bookings',views.customers_all_cab_bookings,name='customers_all_cab_bookings'),
     #Customers All Orders
     path('customers_all_orders',views.customers_all_orders,name='customers_all_orders'),
+    #Customers All Cab Orders
+    path('customers_all_cab_orders',views.customers_all_cab_orders,name='customers_all_cab_orders'),
     #Get Order Details
     path('goods_order_details',views.goods_order_details,name='goods_order_details'),
+    #Get Cab Order Details
+    path('cab_order_details',views.cab_order_details,name='cab_order_details'),
     #Cancel Booking
     path('cancel_booking',views.cancel_booking,name='cancel_booking'),
     #Save Order Review

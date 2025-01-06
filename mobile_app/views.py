@@ -1321,6 +1321,92 @@ def goods_order_details(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+@csrf_exempt 
+def cab_order_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        order_id = data.get("order_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "order_id": order_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                select booking_id,cab_orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,cab_orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,payment_method,cab_orders_tbl.city_id,order_id,driver_first_name,cab_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,cab_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,vehicle_plate_no,vehicle_fuel_type,cab_driverstbl.profile_pic,cab_orders_tbl.ratings,pickup_time,drop_time from vtpartner.vehiclestbl,vtpartner.cab_orders_tbl,vtpartner.cab_driverstbl,vtpartner.customers_tbl where cab_driverstbl.cab_driver_id=cab_orders_tbl.driver_id and customers_tbl.customer_id=cab_orders_tbl.customer_id and order_id=%s and vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id
+            """
+            result = select_query(query,[order_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            booking_details = [
+                {
+                    "booking_id": row[0],
+                    "customer_id": row[1],
+                    "driver_id": row[2],
+                    "pickup_lat": row[3],
+                    "pickup_lng": row[4],
+                    "destination_lat": row[5],
+                    "destination_lng": row[6],
+                    "distance": row[7],
+                    "total_time": row[8],
+                    "total_price": row[9],
+                    "base_price": row[10],
+                    "booking_timing": row[11],
+                    "booking_date": row[12],
+                    "booking_status": row[13],
+                    "driver_arrival_time": row[14],
+                    "otp": row[15],
+                    "gst_amount": row[16],
+                    "igst_amount": row[17],
+                    "payment_method": row[18],
+                    "city_id": row[19],
+                    "order_id": row[20],
+                    "driver_first_name": row[21],
+                    "goods_driver_auth_token": row[22],
+                    "customer_name": row[23],
+                    "customers_auth_token": row[24],
+                    "pickup_address": row[25],
+                    "drop_address": row[26],
+                    "customer_mobile_no": row[27],
+                    "driver_mobile_no": row[28],
+                    "vehicle_id": str(row[29]),
+                    "vehicle_name": str(row[30]),
+                    "vehicle_image": str(row[31]),
+                    "vehicle_plate_no": str(row[32]),
+                    "vehicle_fuel_type": str(row[33]),
+                    "profile_pic": str(row[34]),
+                    "ratings": str(row[35]),
+                    "pickup_time": str(row[36]),
+                    "drop_time": str(row[37]),
+
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": booking_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
 def cancel_booking(request):
@@ -1699,6 +1785,86 @@ def customers_all_orders(request):
                     "vehicle_id": str(row[34]),
                     "vehicle_name": str(row[35]),
                     "vehicle_image": str(row[36]),
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": booking_details}, status=200)
+
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def customers_all_cab_orders(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        customer_id = data.get("customer_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "customer_id": customer_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                select booking_id,cab_orders_tbl.customer_id,cab_orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,cab_orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,payment_method,cab_orders_tbl.city_id,order_id,driver_first_name,cab_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,cab_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image from vtpartner.vehiclestbl,vtpartner.cab_orders_tbl,vtpartner.cab_driverstbl,vtpartner.customers_tbl where cab_driverstbl.cab_driver_id=cab_orders_tbl.driver_id and customers_tbl.customer_id=cab_orders_tbl.customer_id and cab_orders_tbl.customer_id=%s and  vehiclestbl.vehicle_id=cab_driverstbl.vehicle_id order by order_id desc
+            """
+            result = select_query(query,[customer_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            booking_details = [
+                {
+                    "booking_id": str(row[0]),
+                    "customer_id": str(row[1]),
+                    "driver_id": str(row[2]),
+                    "pickup_lat": str(row[3]),
+                    "pickup_lng": str(row[4]),
+                    "destination_lat": str(row[5]),
+                    "destination_lng": str(row[6]),
+                    "distance": str(row[7]),
+                    "total_time": str(row[8]),
+                    "total_price": str(row[9]),
+                    "base_price": str(row[10]),
+                    "booking_timing": str(row[11]),
+                    "booking_date": str(row[12]),
+                    "booking_status": str(row[13]),
+                    "driver_arrival_time": str(row[14]),
+                    "otp": str(row[15]),
+                    "gst_amount": str(row[16]),
+                    "igst_amount": str(row[17]),
+                    "payment_method": str(row[18]),
+                    "city_id": str(row[19]),
+                    "order_id": str(row[20]),
+                    "driver_first_name": str(row[21]),
+                    "goods_driver_auth_token": str(row[22]),
+                    "customer_name": str(row[23]),
+                    "customers_auth_token": str(row[24]),
+                    "pickup_address": str(row[25]),
+                    "drop_address": str(row[26]),
+                    "customer_mobile_no": str(row[27]),
+                    "driver_mobile_no": str(row[28]),
+                    "vehicle_id": str(row[29]),
+                    "vehicle_name": str(row[30]),
+                    "vehicle_image": str(row[31]),
                 }
                 for row in result
             ]
@@ -6113,7 +6279,7 @@ def cab_driver_all_orders(request):
             
         try:
             query = """
-                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,cab_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,cab_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,orders_tbl.ratings,orders_tbl.rating_description from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.cab_driverstbl,vtpartner.customers_tbl where cab_driverstbl.cab_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.driver_id=%s and  vehiclestbl.vehicle_id=cab_driverstbl.vehicle_id order by order_id desc
+                select booking_id,cab_orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,cab_orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,payment_method,cab_orders_tbl.city_id,order_id,driver_first_name,cab_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,cab_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,cab_orders_tbl.ratings,cab_orders_tbl.rating_description from vtpartner.vehiclestbl,vtpartner.cab_orders_tbl,vtpartner.cab_driverstbl,vtpartner.customers_tbl where cab_driverstbl.cab_driver_id=cab_orders_tbl.driver_id and customers_tbl.customer_id=cab_orders_tbl.customer_id and cab_orders_tbl.driver_id=%s and  vehiclestbl.vehicle_id=cab_driverstbl.vehicle_id order by order_id desc
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
@@ -6141,27 +6307,22 @@ def cab_driver_all_orders(request):
                     "otp": str(row[15]),
                     "gst_amount": str(row[16]),
                     "igst_amount": str(row[17]),
-                    "goods_type_id": str(row[18]),
-                    "payment_method": str(row[19]),
-                    "city_id": str(row[20]),
-                    "order_id": str(row[21]),
-                    "sender_name": str(row[22]),
-                    "sender_number": str(row[23]),
-                    "receiver_name": str(row[24]),
-                    "receiver_number": str(row[25]),
-                    "driver_first_name": str(row[26]),
-                    "cab_driver_auth_token": str(row[27]),
-                    "customer_name": str(row[28]),
-                    "customers_auth_token": str(row[29]),
-                    "pickup_address": str(row[30]),
-                    "drop_address": str(row[31]),
-                    "customer_mobile_no": str(row[32]),
-                    "driver_mobile_no": str(row[33]),
-                    "vehicle_id": str(row[34]),
-                    "vehicle_name": str(row[35]),
-                    "vehicle_image": str(row[36]),
-                    "ratings": str(row[37]),
-                    "rating_description": str(row[38]),
+                    "payment_method": str(row[18]),
+                    "city_id": str(row[19]),
+                    "order_id": str(row[20]),
+                    "driver_first_name": str(row[21]),
+                    "cab_driver_auth_token": str(row[22]),
+                    "customer_name": str(row[23]),
+                    "customers_auth_token": str(row[24]),
+                    "pickup_address": str(row[25]),
+                    "drop_address": str(row[26]),
+                    "customer_mobile_no": str(row[27]),
+                    "driver_mobile_no": str(row[28]),
+                    "vehicle_id": str(row[29]),
+                    "vehicle_name": str(row[30]),
+                    "vehicle_image": str(row[31]),
+                    "ratings": str(row[32]),
+                    "rating_description": str(row[33]),
                 }
                 for row in result
             ]
