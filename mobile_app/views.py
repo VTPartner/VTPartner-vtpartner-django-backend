@@ -6261,7 +6261,7 @@ def generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token(reques
                 VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s, %s,%s, %s,%s, %s
+                    %s, %s,%s, %s
                 ) 
                 RETURNING booking_id;
             """
