@@ -806,6 +806,27 @@ def get_goods_driver_auth_token( goods_driver_id):
     except Exception as err:
         print("Error in finding the auth token for goods driver:", err)
         return auth_token
+    
+def get_cab_driver_auth_token( goods_driver_id):
+    auth_token = ""
+    try:
+        query = """
+        select authtoken from vtpartner.cab_driverstbl where cab_driver_id=%s 
+        """
+        params = [goods_driver_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            return JsonResponse({"message": "No Data Found"}, status=404)
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for goods driver:", err)
+        return auth_token
 
 def get_goods_driver_auth_token2(goods_driver_id):
     auth_token = ""
@@ -1505,6 +1526,103 @@ def cancel_booking(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+@csrf_exempt 
+def cancel_cab_booking(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        booking_id = data.get("booking_id")
+        customer_id = data.get("customer_id")
+        driver_id = data.get("driver_id")
+        server_token = data.get("server_token")
+        pickup_address = data.get("pickup_address")
+        cancel_reason = data.get("cancel_reason")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "booking_id": booking_id,
+            "server_token": server_token,
+            "customer_id": customer_id,
+            "driver_id": driver_id,
+            "cancel_reason": cancel_reason,
+        
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.cab_bookings_tbl set booking_status='Cancelled',cancelled_reason=%s WHERE booking_id=%s
+            """
+            row_count = update_query(query,[cancel_reason,booking_id])  
+            
+            #Updating it in Booking History Table to maintain record at what time it was cancelled
+            query2 = """
+                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    """
+            values2 = [
+                    booking_id,
+                    'Cancelled'
+                ]
+
+            # Execute the query
+            row_count = insert_query(query2, values2)
+            
+            query3 = """
+            update vtpartner.active_cab_drivertbl set current_status='1' where cab_driver_id=%s
+            """
+            values3 = [
+                    driver_id
+            ]
+            # Execute the query
+            row_count = update_query(query3, values3)
+            #Send Notitification to customer and driver
+            customer_auth_token = get_customer_auth_token(customer_id)
+            driver_auth_token = get_cab_driver_auth_token(driver_id)
+            
+            #send notification to cab driver for booking cancelled
+            fcm_data = {
+                'intent':'cab_driver_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+            driver_auth_token,
+            f'The Cab ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
+            f'Cab Ride Canceled - [Booking ID: {str(booking_id)}]',
+            fcm_data,
+            server_token
+            )
+
+            
+            #send notification to Customer for booking cancellation confirmation.
+            fcm_data2 = {
+                'intent':'customer_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+                customer_auth_token,
+                f'Your Cab ride request has been successfully canceled. \nPickup Location: {pickup_address}.',
+                'Cab Ride Cancellation Confirmation',
+                fcm_data2,
+                server_token
+            )
+
+            
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
 def save_order_ratings(request):
@@ -1536,6 +1654,45 @@ def save_order_ratings(request):
         try:
             query = """
                 UPDATE vtpartner.orders_tbl set ratings=%s,rating_description=%s WHERE order_id=%s
+            """
+            row_count = update_query(query,[ratings,ratings_description,order_id])  
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def save_cab_order_ratings(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        ratings = data.get("ratings")
+        ratings_description = data.get("ratings_description")
+        order_id = data.get("order_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "ratings": ratings,
+            "ratings_description": ratings_description,
+            "order_id": order_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.cab_orders_tbl set ratings=%s,rating_description=%s WHERE order_id=%s
             """
             row_count = update_query(query,[ratings,ratings_description,order_id])  
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
