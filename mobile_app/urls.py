@@ -14,6 +14,8 @@ urlpatterns = [
     path('login',views.login_view,name='login'),
     #New Customer Registration
     path('customer_registration',views.customer_registration,name='customer_registration'),
+    #Get Customer Details
+    path('customer_details',views.customer_details,name='customer_details'),
     #All Saved Addresses
     path('all_saved_addresses',views.all_saved_addresses,name='all_saved_addresses'),
     #All Services
