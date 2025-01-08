@@ -11749,6 +11749,23 @@ def delete_handyman_to_active_drivers_table(request):
                 handyman_id,
             ]
             row_count = delete_query(query, values)
+            try:
+                query2 = """
+                UPDATE vtpartner.handymans_tbl
+                SET is_online=0
+                WHERE handyman_id=%s
+                """
+                values2 = [
+                    handyman_id,
+                ]
+                row_count = update_query(query2, values2)
+                
+                # Send success response
+                return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+            except Exception as err:
+                print("Error executing query:", err)
+                return JsonResponse({"message": "An error occurred"}, status=500)
             
             # Send success response
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
