@@ -11688,7 +11688,7 @@ def add_handyman_to_active_drivers_table(request):
                 
         try:
             query = """
-            INSERT INTO vtpartner.active_handymantbl 
+            INSERT INTO vtpartner.active_handyman_tbl 
             (handyman_id,current_lat,current_lng,current_status)
             VALUES (%s,%s,%s,%s) RETURNING active_id
             """
@@ -11742,7 +11742,7 @@ def delete_handyman_to_active_drivers_table(request):
                 
         try:
             query = """
-            DELETE FROM vtpartner.active_handymantbl 
+            DELETE FROM vtpartner.active_handyman_tbl 
             WHERE handyman_id=%s
             """
             values = [
@@ -11786,7 +11786,7 @@ def update_handymans_current_location(request):
         try:
 
             query = """
-                UPDATE vtpartner.active_handymantbl 
+                UPDATE vtpartner.active_handyman_tbl 
                 SET 
                     current_lat = %s,
                     current_lng = %s
@@ -11836,10 +11836,10 @@ def get_nearby_handymans(request):
 #            cos(radians(main.current_lng) - radians(%s)) +
 #            sin(radians(%s)) * sin(radians(main.current_lat))
 #        )) AS distance
-# FROM vtpartner.active_handymantbl AS main
+# FROM vtpartner.active_handyman_tbl AS main
 # INNER JOIN (
 #     SELECT handyman_id, MAX(entry_time) AS max_entry_time
-#     FROM vtpartner.active_handymantbl
+#     FROM vtpartner.active_handyman_tbl
 #     GROUP BY handyman_id
 # ) AS latest ON main.handyman_id = latest.handyman_id
 #               AND main.entry_time = latest.max_entry_time
@@ -11879,10 +11879,10 @@ def get_nearby_handymans(request):
         cos(radians(main.current_lng) - radians(%s)) +
         sin(radians(%s)) * sin(radians(main.current_lat))
     )) AS distance
-FROM vtpartner.active_handymantbl AS main
+FROM vtpartner.active_handyman_tbl AS main
 INNER JOIN (
     SELECT handyman_id, MAX(entry_time) AS max_entry_time
-    FROM vtpartner.active_handymantbl
+    FROM vtpartner.active_handyman_tbl
     GROUP BY handyman_id
 ) AS latest ON main.handyman_id = latest.handyman_id
              AND main.entry_time = latest.max_entry_time
@@ -12136,7 +12136,7 @@ def handyman_booking_accepted(request):
                         try:
 
                             query = """
-                               update vtpartner.active_handymantbl set current_status='2' where handyman_id=%s
+                               update vtpartner.active_handyman_tbl set current_status='2' where handyman_id=%s
                                 """
                             values = [
                                     driver_id
@@ -12455,7 +12455,7 @@ def generate_order_id_for_booking_id_handyman(request):
                         order_id = ret_result[0][0]
                         try:
                             query2 = """
-                            update vtpartner.active_handymantbl set current_status='1' where handyman_id=%s
+                            update vtpartner.active_handyman_tbl set current_status='1' where handyman_id=%s
                             """
                             values2 = [
                                     driver_id
