@@ -7795,6 +7795,24 @@ def delete_other_driver_to_active_drivers_table(request):
                 other_driver_id,
             ]
             row_count = delete_query(query, values)
+            try:
+                query2 = """
+                UPDATE vtpartner.other_driverstbl
+                SET is_online=0
+                WHERE other_driver_id=%s
+                """
+                values2 = [
+                    other_driver_id,
+                ]
+                row_count = update_query(query2, values2)
+                
+                # Send success response
+                return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+            except Exception as err:
+                print("Error executing query:", err)
+                return JsonResponse({"message": "An error occurred"}, status=500)
+            
             
             # Send success response
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
@@ -9819,6 +9837,23 @@ def delete_jcb_crane_driver_to_active_drivers_table(request):
                 jcb_crane_driver_id,
             ]
             row_count = delete_query(query, values)
+            try:
+                query2 = """
+                UPDATE vtpartner.jcb_crane_driverstbl
+                SET is_online=0
+                WHERE jcb_crane_driver_id=%s
+                """
+                values2 = [
+                    jcb_crane_driver_id,
+                ]
+                row_count = update_query(query2, values2)
+                
+                # Send success response
+                return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+            except Exception as err:
+                print("Error executing query:", err)
+                return JsonResponse({"message": "An error occurred"}, status=500)
             
             # Send success response
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
