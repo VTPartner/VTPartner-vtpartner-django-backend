@@ -412,7 +412,7 @@ def add_or_update_customer_address(request):
                                 "customer_address_id":customer_address_id
                             }
                         ]
-                        return JsonResponse({"result": response_value}, status=200)
+                        return JsonResponse({"message": response_value}, status=200)
                 except Exception as err:
                     print("Error executing query:", err)
                     return JsonResponse({"message": "An error occurred"}, status=500)
