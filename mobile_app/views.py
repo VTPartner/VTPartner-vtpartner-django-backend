@@ -11638,7 +11638,7 @@ def handyman_update_online_status(request):
             
             #insert record in attendance table
             query_insert = """
-                    INSERT INTO vtpartner.handyman_attendance_tbl(driver_id, time, date, status) 
+                    INSERT INTO vtpartner.handyman_attendance_tbl(handy_man_id, time, date, status) 
                     VALUES (%s, EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE, %s)
                 """
 
