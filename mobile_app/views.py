@@ -388,9 +388,9 @@ def add_or_update_customer_address(request):
         
         try:
             query = """
-           select customer_address_id,place_id,location_name,location_lat,location_lng,pincode,address_type from vtpartner.customers_addresses_tbl where customer_id=%s
+           select customer_address_id,place_id,location_name,location_lat,location_lng,pincode,address_type from vtpartner.customers_addresses_tbl where customer_id=%s and address_type=%s
             """
-            params = [customer_id]
+            params = [customer_id,address_type]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
 
             if result == []:
