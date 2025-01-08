@@ -8326,6 +8326,7 @@ def update_booking_status_other_driver(request):
         booking_status = data.get("booking_status")
         server_token = data.get("server_token")
         customer_id = data.get("customer_id")
+        total_payment = data.get("total_payment")
 
         # List of required fields
         required_fields = {
@@ -8345,7 +8346,7 @@ def update_booking_status_other_driver(request):
         try:
 
             query = """
-                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                update vtpartner.other_driver_bookings_tbl set booking_status=%s where booking_id=%s
                 """
             values = [
                     booking_status,
@@ -8359,7 +8360,7 @@ def update_booking_status_other_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -8375,7 +8376,7 @@ def update_booking_status_other_driver(request):
                 data_map = {}
                 if booking_status == "Driver Arrived":
                     body = "Our agent has arrived at your pickup location"
-                    title = "Agent Arrived"
+                    title = "Driver Arrived"
                 elif booking_status == "OTP Verified":
                     body = "You're OTP is Verified Successfully!"
                     title = "OTP Verification"
@@ -8384,7 +8385,7 @@ def update_booking_status_other_driver(request):
                     title = "Trip Started"
                     # Update Pickup epoch here
                     update_pickup_epoch_query = """
-                    UPDATE vtpartner.bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    UPDATE vtpartner.other_driver_bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
                     """
                     values = [
                             booking_id
@@ -8392,12 +8393,15 @@ def update_booking_status_other_driver(request):
 
                     # Execute the query
                     row_count = update_query(update_pickup_epoch_query, values)
+                elif booking_status == "Make Payment":
+                   body = f"Please do the payment against Booking ID {booking_id} for Driver Service. Total Amount=Rs.{total_payment}/-"
+                   title = "Make Payment For Cab"
                 elif booking_status == "End Trip":
-                    body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
+                    body = "You have been successfully reached the destination"
+                    title = "Reached Destination"
                     # Update Drop epoch here
                     update_drop_epoch_query = """
-                    UPDATE vtpartner.bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    UPDATE vtpartner.other_driver_bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
                     """
                     values = [
                             booking_id
