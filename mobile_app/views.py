@@ -439,6 +439,55 @@ def add_or_update_customer_address(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def update_customer_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        customer_name = data.get("customer_name")
+        customer_id = data.get("customer_id")
+        email_id = data.get("email_id")
+        gst_no = data.get("gst_no")
+        gst_address = data.get("gst_address")
+        
+
+         # List of required fields
+        required_fields = {
+            "customer_name": customer_name,
+            "customer_id": customer_id,
+            "email_id": email_id,
+            "gst_no": gst_no,
+            "gst_address": gst_address,
+            
+            
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+        
+        try:
+            #Update if found
+            query = """
+                UPDATE vtpartner.customers_tbl SET
+                customer_name=%s,email=%s,gst_no=%s,gst_address=%s
+                WHERE customer_id=%s
+            """
+            values = [customer_name,email_id,gst_no,gst_address,customer_id]
+            row_count = update_query(query, values)
+            # Send success response
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 @csrf_exempt
 def login_view(request):
