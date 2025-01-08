@@ -213,6 +213,8 @@ urlpatterns = [
     path('other_driver_whole_year_earnings',views.other_driver_whole_year_earnings,name='other_driver_whole_year_earnings'),
     #My All Rides
     path('other_driver_todays_earnings',views.other_driver_todays_earnings,name='other_driver_todays_earnings'),
+    #My All Rides
+    path('other_driver_booking_details_live_track',views.other_driver_booking_details_live_track,name='other_driver_booking_details_live_track'),
     #Generating new booking id and sending notifications to nearby agents
     path('generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token',views.generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token,name='generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token'),
     
