@@ -9208,8 +9208,8 @@ def generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token(reques
         pickup_lng = data.get("pickup_lng")
         destination_lat = data.get("destination_lat")
         destination_lng = data.get("destination_lng")
-        distance = data.get("distance")
-        time = data.get("time")
+        distance = data.get("distance",0)
+        time = data.get("time","NA")
         total_price = data.get("total_price")
         base_price = data.get("base_price")
         otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
@@ -9221,13 +9221,12 @@ def generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token(reques
         pickup_address = data.get("pickup_address")
         drop_address = data.get("drop_address")
         server_access_token = data.get("server_access_token")
+        sub_cat_id = data.get("sub_cat_id")
+        service_id = data.get("service_id")
 
         # List of required fields
-        required_fields = {
-            "city_id":city_id,
-            
+        required_fields = {       
             "radius_km":radius_km,
-            
             "customer_id":customer_id,
             "pickup_lat":pickup_lat,
             "pickup_lng":pickup_lng,
@@ -9240,12 +9239,13 @@ def generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token(reques
             "otp":str(otp),
             "gst_amount":gst_amount,
             "igst_amount":igst_amount,
-            
             "payment_method":payment_method,
             "city_id":city_id,
             "pickup_address":pickup_address,
             "drop_address":drop_address,
             "server_access_token":server_access_token,
+            "sub_cat_id":sub_cat_id,
+            "service_id":service_id,
         }
 
         # Check for missing fields
@@ -9256,13 +9256,7 @@ def generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token(reques
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
                 status=400
             )
-        
-        
 
-        
-        
-        
-        
 
         if pickup_lat is None or pickup_lng is None:
             return JsonResponse({"message": "Latitude and Longitude are required"}, status=400)
@@ -11466,56 +11460,41 @@ def jcb_crane_driver_todays_earnings(request):
 def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        # lat = data.get("lat")
-        # lng = data.get("lng")
-        # city_id = data.get("city_id")
-        price_type = data.get("price_type", 1)
+       
         radius_km = data.get("radius_km", 5)  # Radius in kilometers
-        vehicle_id = data.get("vehicle_id")  # Vehicle ID
-        # Read the individual fields from the JSON data
         customer_id = data.get("customer_id")
         pickup_lat = data.get("pickup_lat")
         pickup_lng = data.get("pickup_lng")
-        destination_lat = data.get("destination_lat")
-        destination_lng = data.get("destination_lng")
-        distance = data.get("distance")
-        time = data.get("time")
         total_price = data.get("total_price")
         base_price = data.get("base_price")
         otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
         gst_amount = data.get("gst_amount")
         igst_amount = data.get("igst_amount")
-        
         payment_method = data.get("payment_method")
         city_id = data.get("city_id")
         pickup_address = data.get("pickup_address")
-        drop_address = data.get("drop_address")
         server_access_token = data.get("server_access_token")
+        sub_cat_id = data.get("sub_cat_id")
+        service_id = data.get("service_id")
 
         # List of required fields
         required_fields = {
             "city_id":city_id,
-            "price_type":price_type,
             "radius_km":radius_km,
-            "vehicle_id":vehicle_id,
             "customer_id":customer_id,
             "pickup_lat":pickup_lat,
             "pickup_lng":pickup_lng,
-            "destination_lat":destination_lat,
-            "destination_lng":destination_lng,
-            "distance":distance,
-            "time":time,
             "total_price":total_price,
             "base_price":base_price,
             "otp":str(otp),
             "gst_amount":gst_amount,
             "igst_amount":igst_amount,
-            
             "payment_method":payment_method,
             "city_id":city_id,
             "pickup_address":pickup_address,
-            "drop_address":drop_address,
             "server_access_token":server_access_token,
+            "sub_cat_id":sub_cat_id,
+            "service_id":service_id,
         }
 
         # Check for missing fields
@@ -11526,13 +11505,7 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
                 status=400
             )
-        
-        
 
-        
-        
-        
-        
 
         if pickup_lat is None or pickup_lng is None:
             return JsonResponse({"message": "Latitude and Longitude are required"}, status=400)
@@ -11541,24 +11514,22 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
             
             # Insert record in the booking table
             query_insert = """
-                INSERT INTO vtpartner.cab_bookings_tbl (
-                    customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
-                    distance, time, total_price, base_price, booking_timing, booking_date, 
+                INSERT INTO vtpartner.jcb_crane_bookings_tbl (
+                    customer_id, driver_id, pickup_lat, pickup_lng, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,pickup_address,drop_address
+                    payment_method, city_id,pickup_address
                 ) 
                 VALUES (
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                    %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s, %s
+                    %s, %s,%s
                 ) 
                 RETURNING booking_id;
             """
 
             insert_values = [
-                customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
-                distance, time, total_price, base_price, otp, 
-                gst_amount, igst_amount, payment_method, city_id,pickup_address,drop_address
+                customer_id, '-1', pickup_lat, pickup_lng, total_price, base_price, otp, 
+                gst_amount, igst_amount, payment_method, city_id,pickup_address
             ]
 
             # Assuming insert_query is a function that runs the query
@@ -11658,7 +11629,7 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
                 ORDER BY distance;
 
                 """
-                values = [pickup_lat, pickup_lng, pickup_lat,city_id,price_type, pickup_lat, pickup_lng, pickup_lat, radius_km,vehicle_id]
+                values = [pickup_lat, pickup_lng, pickup_lat, pickup_lat, pickup_lng, pickup_lat, sub_cat_id,service_id]
 
                 # Execute the query
                 nearby_drivers = select_query(query, values)
@@ -11667,22 +11638,22 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
                 for driver in nearby_drivers:
                     try:
                         
-                        driver_auth_token = get_cab_driver_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
+                        driver_auth_token = get_jcb_crane_driver_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
                         print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
                         
                         if driver_auth_token:
                             sendFMCMsg(
                                 driver_auth_token,
-                                f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
-                                "New Cab Ride Request",
+                                f"You have a new Work Request for \nWork Location: {pickup_address}.",
+                                "New JCB/Crane Ride Request",
                                 fcm_data,
                                 server_access_token
                             )
-                            print(f"Notification sent to cab driver ID {driver[1]}")
+                            print(f"Notification sent to jcb driver ID {driver[1]}")
                         else:
-                            print(f"Skipped notification for cab driver ID {driver[1]} due to missing auth token")
+                            print(f"Skipped notification for jcb driver ID {driver[1]} due to missing auth token")
                     except Exception as err:
-                        print(f"Error sending notification to cab driver ID {driver[1]}: {err}")
+                        print(f"Error sending notification to jcb driver ID {driver[1]}: {err}")
 
 
                 return JsonResponse({"result": response_value}, status=200)
@@ -13645,56 +13616,40 @@ def handyman_todays_earnings(request):
 def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        # lat = data.get("lat")
-        # lng = data.get("lng")
-        # city_id = data.get("city_id")
-        price_type = data.get("price_type", 1)
         radius_km = data.get("radius_km", 5)  # Radius in kilometers
-        vehicle_id = data.get("vehicle_id")  # Vehicle ID
-        # Read the individual fields from the JSON data
         customer_id = data.get("customer_id")
         pickup_lat = data.get("pickup_lat")
         pickup_lng = data.get("pickup_lng")
-        destination_lat = data.get("destination_lat")
-        destination_lng = data.get("destination_lng")
-        distance = data.get("distance")
-        time = data.get("time")
         total_price = data.get("total_price")
         base_price = data.get("base_price")
         otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
         gst_amount = data.get("gst_amount")
         igst_amount = data.get("igst_amount")
-        
         payment_method = data.get("payment_method")
         city_id = data.get("city_id")
         pickup_address = data.get("pickup_address")
-        drop_address = data.get("drop_address")
         server_access_token = data.get("server_access_token")
+        sub_cat_id = data.get("sub_cat_id")
+        service_id = data.get("service_id")
 
         # List of required fields
         required_fields = {
             "city_id":city_id,
-            "price_type":price_type,
             "radius_km":radius_km,
-            "vehicle_id":vehicle_id,
             "customer_id":customer_id,
             "pickup_lat":pickup_lat,
             "pickup_lng":pickup_lng,
-            "destination_lat":destination_lat,
-            "destination_lng":destination_lng,
-            "distance":distance,
-            "time":time,
             "total_price":total_price,
             "base_price":base_price,
             "otp":str(otp),
             "gst_amount":gst_amount,
             "igst_amount":igst_amount,
-            
             "payment_method":payment_method,
             "city_id":city_id,
             "pickup_address":pickup_address,
-            "drop_address":drop_address,
             "server_access_token":server_access_token,
+            "sub_cat_id":sub_cat_id,
+            "service_id":service_id,
         }
 
         # Check for missing fields
@@ -13706,12 +13661,6 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
                 status=400
             )
         
-        
-
-        
-        
-        
-        
 
         if pickup_lat is None or pickup_lng is None:
             return JsonResponse({"message": "Latitude and Longitude are required"}, status=400)
@@ -13720,24 +13669,22 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
             
             # Insert record in the booking table
             query_insert = """
-                INSERT INTO vtpartner.cab_bookings_tbl (
-                    customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
-                    distance, time, total_price, base_price, booking_timing, booking_date, 
+                INSERT INTO vtpartner.handyman_bookings_tbl (
+                    customer_id, driver_id, pickup_lat, pickup_lng, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,pickup_address,drop_address
+                    payment_method, city_id,pickup_address
                 ) 
                 VALUES (
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                    %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s, %s
+                    %s, %s,%s
                 ) 
                 RETURNING booking_id;
             """
 
             insert_values = [
-                customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
-                distance, time, total_price, base_price, otp, 
-                gst_amount, igst_amount, payment_method, city_id,pickup_address,drop_address
+                customer_id, '-1', pickup_lat, pickup_lng,  total_price, base_price, otp, 
+                gst_amount, igst_amount, payment_method, city_id,pickup_address
             ]
 
             # Assuming insert_query is a function that runs the query
@@ -13835,7 +13782,7 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
                 ORDER BY distance;
 
                 """
-                values = [pickup_lat, pickup_lng, pickup_lat,city_id,price_type, pickup_lat, pickup_lng, pickup_lat, radius_km,vehicle_id]
+                values = [pickup_lat, pickup_lng, pickup_lat, pickup_lat, pickup_lng, pickup_lat, sub_cat_id,service_id]
 
                 # Execute the query
                 nearby_drivers = select_query(query, values)
@@ -13844,22 +13791,22 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
                 for driver in nearby_drivers:
                     try:
                         
-                        driver_auth_token = get_cab_driver_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
+                        driver_auth_token = get_handyman_agent_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
                         print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
                         
                         if driver_auth_token:
                             sendFMCMsg(
                                 driver_auth_token,
-                                f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
-                                "New Cab Ride Request",
+                                f"You have a new Work Request for \nWork Location: {pickup_address}.",
+                                "New HandyMan Ride Request",
                                 fcm_data,
                                 server_access_token
                             )
-                            print(f"Notification sent to cab driver ID {driver[1]}")
+                            print(f"Notification sent to handyman agent ID {driver[1]}")
                         else:
-                            print(f"Skipped notification for cab driver ID {driver[1]} due to missing auth token")
+                            print(f"Skipped notification for handyman agent ID {driver[1]} due to missing auth token")
                     except Exception as err:
-                        print(f"Error sending notification to cab driver ID {driver[1]}: {err}")
+                        print(f"Error sending notification to handyman agent ID {driver[1]}: {err}")
 
 
                 return JsonResponse({"result": response_value}, status=200)
