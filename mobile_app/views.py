@@ -1112,6 +1112,72 @@ def get_cab_driver_auth_token2(cab_driver_id):
     except Exception as err:
         print("Error in finding the auth token for cab driver:", err)
         return None
+    
+def get_other_driver_auth_token2(other_driver_id):
+    auth_token = ""
+    try:
+        query = """
+        SELECT authtoken FROM vtpartner.other_driverstbl WHERE other_driver_id=%s
+        """
+        params = [other_driver_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            print(f"No auth token found for other_driver_id: {other_driver_id}")
+            return None  # Return None instead of empty string for clarity
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for other_driver_id driver:", err)
+        return None
+    
+def get_jcb_crane_driver_auth_token2(jcb_crane_driver_id):
+    auth_token = ""
+    try:
+        query = """
+        SELECT authtoken FROM vtpartner.jcb_crane_driverstbl WHERE jcb_crane_driver_id=%s
+        """
+        params = [jcb_crane_driver_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            print(f"No auth token found for jcb_crane_driver_id: {jcb_crane_driver_id}")
+            return None  # Return None instead of empty string for clarity
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for jcb_crane_driver_id driver:", err)
+        return None
+    
+def get_handyman_agent_auth_token2(handyman_id):
+    auth_token = ""
+    try:
+        query = """
+        SELECT authtoken FROM vtpartner.handymans_tbl WHERE handyman_id=%s
+        """
+        params = [handyman_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            print(f"No auth token found for handyman_id: {handyman_id}")
+            return None  # Return None instead of empty string for clarity
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for handyman_id agent:", err)
+        return None
 
 #New Booking 
 @csrf_exempt
@@ -9126,6 +9192,235 @@ def other_driver_todays_earnings(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        # lat = data.get("lat")
+        # lng = data.get("lng")
+        # city_id = data.get("city_id")
+        # price_type = data.get("price_type", 1)
+        radius_km = data.get("radius_km", 5)  # Radius in kilometers
+        # vehicle_id = data.get("vehicle_id")  # Vehicle ID
+        # Read the individual fields from the JSON data
+        customer_id = data.get("customer_id")
+        pickup_lat = data.get("pickup_lat")
+        pickup_lng = data.get("pickup_lng")
+        destination_lat = data.get("destination_lat")
+        destination_lng = data.get("destination_lng")
+        distance = data.get("distance")
+        time = data.get("time")
+        total_price = data.get("total_price")
+        base_price = data.get("base_price")
+        otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
+        gst_amount = data.get("gst_amount")
+        igst_amount = data.get("igst_amount")
+        
+        payment_method = data.get("payment_method")
+        city_id = data.get("city_id")
+        pickup_address = data.get("pickup_address")
+        drop_address = data.get("drop_address")
+        server_access_token = data.get("server_access_token")
+
+        # List of required fields
+        required_fields = {
+            "city_id":city_id,
+            
+            "radius_km":radius_km,
+            
+            "customer_id":customer_id,
+            "pickup_lat":pickup_lat,
+            "pickup_lng":pickup_lng,
+            "destination_lat":destination_lat,
+            "destination_lng":destination_lng,
+            "distance":distance,
+            "time":time,
+            "total_price":total_price,
+            "base_price":base_price,
+            "otp":str(otp),
+            "gst_amount":gst_amount,
+            "igst_amount":igst_amount,
+            
+            "payment_method":payment_method,
+            "city_id":city_id,
+            "pickup_address":pickup_address,
+            "drop_address":drop_address,
+            "server_access_token":server_access_token,
+        }
+
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
+        
+
+        
+        
+        
+        
+
+        if pickup_lat is None or pickup_lng is None:
+            return JsonResponse({"message": "Latitude and Longitude are required"}, status=400)
+
+        try:
+            
+            # Insert record in the booking table
+            query_insert = """
+                INSERT INTO vtpartner.other_driver_bookings_tbl (
+                    customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                    distance, time, total_price, base_price, booking_timing, booking_date, 
+                    otp, gst_amount, igst_amount, 
+                    payment_method, city_id,pickup_address,drop_address
+                ) 
+                VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                    EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
+                    %s, %s,%s, %s
+                ) 
+                RETURNING booking_id;
+            """
+
+            insert_values = [
+                customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                distance, time, total_price, base_price, otp, 
+                gst_amount, igst_amount, payment_method, city_id,pickup_address,drop_address
+            ]
+
+            # Assuming insert_query is a function that runs the query
+            new_result = insert_query(query_insert, insert_values)
+            
+            if new_result:
+                booking_id = new_result[0][0]  # Extracting booking_id from the result
+                response_value = [{"booking_id": booking_id}]
+                
+                #send notification to all goods driver
+                fcm_data = {
+                    'intent':'driver_agent',
+                    'booking_id':str(booking_id)
+                }
+# SELECT 
+#     main.active_id,
+#     main.other_driver_id,
+#     main.current_lat,
+#     main.current_lng,
+#     main.entry_time,
+#     main.current_status,
+#     other.driver_first_name,
+#     other.driver_last_name,
+#     other.profile_pic,
+#     sub_categorytbl.sub_cat_name,
+#     sub_categorytbl.price_per_hour,
+#     other_servicestbl.service_name,
+#     other_servicestbl.price_per_hour AS service_price_per_hour,
+#     (6371 * acos(
+#         cos(radians(15.901976560038078)) * cos(radians(main.current_lat)) *
+#         cos(radians(main.current_lng) - radians(74.51701417565346)) +
+#         sin(radians(15.901976560038078)) * sin(radians(main.current_lat))
+#     )) AS distance
+# FROM vtpartner.active_other_drivertbl AS main
+# INNER JOIN (
+#     SELECT other_driver_id, MAX(entry_time) AS max_entry_time
+#     FROM vtpartner.active_other_drivertbl
+#     GROUP BY other_driver_id
+# ) AS latest ON main.other_driver_id = latest.other_driver_id
+#              AND main.entry_time = latest.max_entry_time
+# JOIN vtpartner.other_driverstbl AS other ON main.other_driver_id = other.other_driver_id
+# LEFT JOIN vtpartner.sub_categorytbl ON other.sub_cat_id = sub_categorytbl.sub_cat_id
+# LEFT JOIN vtpartner.other_servicestbl ON other.service_id = other_servicestbl.service_id
+# WHERE main.current_status = 1
+#   AND (6371 * acos(
+#         cos(radians(15.901976560038078)) * cos(radians(main.current_lat)) *
+#         cos(radians(main.current_lng) - radians(74.51701417565346)) +
+#         sin(radians(15.901976560038078)) * sin(radians(main.current_lat))
+#       )) <= 5
+#   AND other.category_id = sub_categorytbl.cat_id
+#   AND other.sub_cat_id = 3 
+#   AND (other.service_id = -1 OR other.service_id = 21) 
+# ORDER BY distance
+                
+                
+                query = """
+                    SELECT 
+                    main.active_id,
+                    main.other_driver_id,
+                    main.current_lat,
+                    main.current_lng,
+                    main.entry_time,
+                    main.current_status,
+                    other.driver_first_name,
+                    other.driver_last_name,
+                    other.profile_pic,
+                    sub_categorytbl.sub_cat_name,
+                    sub_categorytbl.price_per_hour,
+                    other_servicestbl.service_name,
+                    other_servicestbl.price_per_hour AS service_price_per_hour,
+                    (6371 * acos(
+                        cos(radians(%s)) * cos(radians(main.current_lat)) *
+                        cos(radians(main.current_lng) - radians(%s)) +
+                        sin(radians(%s)) * sin(radians(main.current_lat))
+                    )) AS distance
+                FROM vtpartner.active_other_drivertbl AS main
+                INNER JOIN (
+                    SELECT other_driver_id, MAX(entry_time) AS max_entry_time
+                    FROM vtpartner.active_other_drivertbl
+                    GROUP BY other_driver_id
+                ) AS latest ON main.other_driver_id = latest.other_driver_id
+                            AND main.entry_time = latest.max_entry_time
+                JOIN vtpartner.other_driverstbl AS other ON main.other_driver_id = other.other_driver_id
+                LEFT JOIN vtpartner.sub_categorytbl ON other.sub_cat_id = sub_categorytbl.sub_cat_id
+                LEFT JOIN vtpartner.other_servicestbl ON other.service_id = other_servicestbl.service_id
+                WHERE main.current_status = 1
+                AND (6371 * acos(
+                        cos(radians(%s)) * cos(radians(main.current_lat)) *
+                        cos(radians(main.current_lng) - radians(%s)) +
+                        sin(radians(%s)) * sin(radians(main.current_lat))
+                    )) <= 5
+                AND other.category_id = sub_categorytbl.cat_id
+                AND other.sub_cat_id = %s 
+                AND (other.service_id = -1 OR other.service_id = %s) 
+                ORDER BY distance;
+
+                """
+                values = [pickup_lat, pickup_lng, pickup_lat, pickup_lat, pickup_lng, pickup_lat, sub_cat_id,service_id]
+
+                # Execute the query
+                nearby_drivers = select_query(query, values)
+                
+
+                for driver in nearby_drivers:
+                    try:
+                        
+                        driver_auth_token = get_other_driver_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
+                        print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
+                        
+                        if driver_auth_token:
+                            sendFMCMsg(
+                                driver_auth_token,
+                                f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
+                                "New Driver Ride Request",
+                                fcm_data,
+                                server_access_token
+                            )
+                            print(f"Notification sent to other driver ID {driver[1]}")
+                        else:
+                            print(f"Skipped notification for other driver ID {driver[1]} due to missing auth token")
+                    except Exception as err:
+                        print(f"Error sending notification to other driver ID {driver[1]}: {err}")
+
+
+                return JsonResponse({"result": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 #JCB Crane Driver Api's
 @csrf_exempt
@@ -11167,6 +11462,237 @@ def jcb_crane_driver_todays_earnings(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        # lat = data.get("lat")
+        # lng = data.get("lng")
+        # city_id = data.get("city_id")
+        price_type = data.get("price_type", 1)
+        radius_km = data.get("radius_km", 5)  # Radius in kilometers
+        vehicle_id = data.get("vehicle_id")  # Vehicle ID
+        # Read the individual fields from the JSON data
+        customer_id = data.get("customer_id")
+        pickup_lat = data.get("pickup_lat")
+        pickup_lng = data.get("pickup_lng")
+        destination_lat = data.get("destination_lat")
+        destination_lng = data.get("destination_lng")
+        distance = data.get("distance")
+        time = data.get("time")
+        total_price = data.get("total_price")
+        base_price = data.get("base_price")
+        otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
+        gst_amount = data.get("gst_amount")
+        igst_amount = data.get("igst_amount")
+        
+        payment_method = data.get("payment_method")
+        city_id = data.get("city_id")
+        pickup_address = data.get("pickup_address")
+        drop_address = data.get("drop_address")
+        server_access_token = data.get("server_access_token")
+
+        # List of required fields
+        required_fields = {
+            "city_id":city_id,
+            "price_type":price_type,
+            "radius_km":radius_km,
+            "vehicle_id":vehicle_id,
+            "customer_id":customer_id,
+            "pickup_lat":pickup_lat,
+            "pickup_lng":pickup_lng,
+            "destination_lat":destination_lat,
+            "destination_lng":destination_lng,
+            "distance":distance,
+            "time":time,
+            "total_price":total_price,
+            "base_price":base_price,
+            "otp":str(otp),
+            "gst_amount":gst_amount,
+            "igst_amount":igst_amount,
+            
+            "payment_method":payment_method,
+            "city_id":city_id,
+            "pickup_address":pickup_address,
+            "drop_address":drop_address,
+            "server_access_token":server_access_token,
+        }
+
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
+        
+
+        
+        
+        
+        
+
+        if pickup_lat is None or pickup_lng is None:
+            return JsonResponse({"message": "Latitude and Longitude are required"}, status=400)
+
+        try:
+            
+            # Insert record in the booking table
+            query_insert = """
+                INSERT INTO vtpartner.cab_bookings_tbl (
+                    customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                    distance, time, total_price, base_price, booking_timing, booking_date, 
+                    otp, gst_amount, igst_amount, 
+                    payment_method, city_id,pickup_address,drop_address
+                ) 
+                VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                    EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
+                    %s, %s,%s, %s
+                ) 
+                RETURNING booking_id;
+            """
+
+            insert_values = [
+                customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                distance, time, total_price, base_price, otp, 
+                gst_amount, igst_amount, payment_method, city_id,pickup_address,drop_address
+            ]
+
+            # Assuming insert_query is a function that runs the query
+            new_result = insert_query(query_insert, insert_values)
+            
+            if new_result:
+                booking_id = new_result[0][0]  # Extracting booking_id from the result
+                response_value = [{"booking_id": booking_id}]
+                
+                #send notification to all goods driver
+                fcm_data = {
+                    'intent':'jcb_crane_driver',
+                    'booking_id':str(booking_id)
+                }
+#              SELECT                                       
+#     main.active_id,
+#     main.jcb_crane_driver_id,
+#     main.current_lat,
+#     main.current_lng,
+#     main.entry_time,
+#     main.current_status,
+#     driver.driver_name AS jcb_crane_driver_name,
+#     driver.profile_pic,
+#     driver.vehicle_plate_no,
+#     driver.vehicle_fuel_type,
+#     sub_categorytbl.sub_cat_name,
+#     sub_categorytbl.price_per_hour,
+#     other_servicestbl.service_name,
+#     other_servicestbl.price_per_hour AS service_price_per_hour,
+#     (6371 * acos(
+#         cos(radians(15.901976560038078)) * cos(radians(main.current_lat)) *
+#         cos(radians(main.current_lng) - radians(74.51701417565346)) +
+#         sin(radians(15.901976560038078)) * sin(radians(main.current_lat))
+#     )) AS distance
+# FROM vtpartner.active_jcb_crane_drivertbl AS main
+# INNER JOIN (
+#     SELECT jcb_crane_driver_id, MAX(entry_time) AS max_entry_time
+#     FROM vtpartner.active_jcb_crane_drivertbl
+#     GROUP BY jcb_crane_driver_id
+# ) AS latest ON main.jcb_crane_driver_id = latest.jcb_crane_driver_id
+#              AND main.entry_time = latest.max_entry_time
+# JOIN vtpartner.jcb_crane_driverstbl AS driver ON main.jcb_crane_driver_id = driver.jcb_crane_driver_id
+# LEFT JOIN vtpartner.sub_categorytbl ON driver.sub_cat_id = sub_categorytbl.sub_cat_id
+# LEFT JOIN vtpartner.other_servicestbl ON driver.service_id = other_servicestbl.service_id
+# WHERE main.current_status = 1
+#   AND (6371 * acos(
+#         cos(radians(15.901976560038078)) * cos(radians(main.current_lat)) *
+#         cos(radians(main.current_lng) - radians(74.51701417565346)) +
+#         sin(radians(15.901976560038078)) * sin(radians(main.current_lat))
+#       )) <= 5
+#   AND driver.category_id = sub_categorytbl.cat_id
+#   AND driver.sub_cat_id = 15 
+#   AND (driver.service_id = -1 OR driver.service_id = 15) 
+# ORDER BY distance
+                
+                
+                query = """
+                    SELECT                                       
+                    main.active_id,
+                    main.jcb_crane_driver_id,
+                    main.current_lat,
+                    main.current_lng,
+                    main.entry_time,
+                    main.current_status,
+                    driver.driver_name AS jcb_crane_driver_name,
+                    driver.profile_pic,
+                    driver.vehicle_plate_no,
+                    driver.vehicle_fuel_type,
+                    sub_categorytbl.sub_cat_name,
+                    sub_categorytbl.price_per_hour,
+                    other_servicestbl.service_name,
+                    other_servicestbl.price_per_hour AS service_price_per_hour,
+                    (6371 * acos(
+                        cos(radians(%s)) * cos(radians(main.current_lat)) *
+                        cos(radians(main.current_lng) - radians(%s)) +
+                        sin(radians(%s)) * sin(radians(main.current_lat))
+                    )) AS distance
+                FROM vtpartner.active_jcb_crane_drivertbl AS main
+                INNER JOIN (
+                    SELECT jcb_crane_driver_id, MAX(entry_time) AS max_entry_time
+                    FROM vtpartner.active_jcb_crane_drivertbl
+                    GROUP BY jcb_crane_driver_id
+                ) AS latest ON main.jcb_crane_driver_id = latest.jcb_crane_driver_id
+                            AND main.entry_time = latest.max_entry_time
+                JOIN vtpartner.jcb_crane_driverstbl AS driver ON main.jcb_crane_driver_id = driver.jcb_crane_driver_id
+                LEFT JOIN vtpartner.sub_categorytbl ON driver.sub_cat_id = sub_categorytbl.sub_cat_id
+                LEFT JOIN vtpartner.other_servicestbl ON driver.service_id = other_servicestbl.service_id
+                WHERE main.current_status = 1
+                AND (6371 * acos(
+                        cos(radians(%s)) * cos(radians(main.current_lat)) *
+                        cos(radians(main.current_lng) - radians(%s)) +
+                        sin(radians(%s)) * sin(radians(main.current_lat))
+                    )) <= 5
+                AND driver.category_id = sub_categorytbl.cat_id
+                AND driver.sub_cat_id = %s
+                AND (driver.service_id = -1 OR driver.service_id = %s) 
+                ORDER BY distance;
+
+                """
+                values = [pickup_lat, pickup_lng, pickup_lat,city_id,price_type, pickup_lat, pickup_lng, pickup_lat, radius_km,vehicle_id]
+
+                # Execute the query
+                nearby_drivers = select_query(query, values)
+                
+
+                for driver in nearby_drivers:
+                    try:
+                        
+                        driver_auth_token = get_cab_driver_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
+                        print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
+                        
+                        if driver_auth_token:
+                            sendFMCMsg(
+                                driver_auth_token,
+                                f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
+                                "New Cab Ride Request",
+                                fcm_data,
+                                server_access_token
+                            )
+                            print(f"Notification sent to cab driver ID {driver[1]}")
+                        else:
+                            print(f"Skipped notification for cab driver ID {driver[1]} due to missing auth token")
+                    except Exception as err:
+                        print(f"Error sending notification to cab driver ID {driver[1]}: {err}")
+
+
+                return JsonResponse({"result": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 #Handy Man Agent Api's
 @csrf_exempt
@@ -13111,5 +13637,235 @@ def handyman_todays_earnings(request):
         except Exception as err:
             print("Error executing query:", err)
             return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        # lat = data.get("lat")
+        # lng = data.get("lng")
+        # city_id = data.get("city_id")
+        price_type = data.get("price_type", 1)
+        radius_km = data.get("radius_km", 5)  # Radius in kilometers
+        vehicle_id = data.get("vehicle_id")  # Vehicle ID
+        # Read the individual fields from the JSON data
+        customer_id = data.get("customer_id")
+        pickup_lat = data.get("pickup_lat")
+        pickup_lng = data.get("pickup_lng")
+        destination_lat = data.get("destination_lat")
+        destination_lng = data.get("destination_lng")
+        distance = data.get("distance")
+        time = data.get("time")
+        total_price = data.get("total_price")
+        base_price = data.get("base_price")
+        otp = random.randint(1000, 9999)  # Generate a random 4-digit OTP
+        gst_amount = data.get("gst_amount")
+        igst_amount = data.get("igst_amount")
+        
+        payment_method = data.get("payment_method")
+        city_id = data.get("city_id")
+        pickup_address = data.get("pickup_address")
+        drop_address = data.get("drop_address")
+        server_access_token = data.get("server_access_token")
+
+        # List of required fields
+        required_fields = {
+            "city_id":city_id,
+            "price_type":price_type,
+            "radius_km":radius_km,
+            "vehicle_id":vehicle_id,
+            "customer_id":customer_id,
+            "pickup_lat":pickup_lat,
+            "pickup_lng":pickup_lng,
+            "destination_lat":destination_lat,
+            "destination_lng":destination_lng,
+            "distance":distance,
+            "time":time,
+            "total_price":total_price,
+            "base_price":base_price,
+            "otp":str(otp),
+            "gst_amount":gst_amount,
+            "igst_amount":igst_amount,
+            
+            "payment_method":payment_method,
+            "city_id":city_id,
+            "pickup_address":pickup_address,
+            "drop_address":drop_address,
+            "server_access_token":server_access_token,
+        }
+
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+        
+        
+
+        
+        
+        
+        
+
+        if pickup_lat is None or pickup_lng is None:
+            return JsonResponse({"message": "Latitude and Longitude are required"}, status=400)
+
+        try:
+            
+            # Insert record in the booking table
+            query_insert = """
+                INSERT INTO vtpartner.cab_bookings_tbl (
+                    customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                    distance, time, total_price, base_price, booking_timing, booking_date, 
+                    otp, gst_amount, igst_amount, 
+                    payment_method, city_id,pickup_address,drop_address
+                ) 
+                VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                    EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
+                    %s, %s,%s, %s
+                ) 
+                RETURNING booking_id;
+            """
+
+            insert_values = [
+                customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
+                distance, time, total_price, base_price, otp, 
+                gst_amount, igst_amount, payment_method, city_id,pickup_address,drop_address
+            ]
+
+            # Assuming insert_query is a function that runs the query
+            new_result = insert_query(query_insert, insert_values)
+            
+            if new_result:
+                booking_id = new_result[0][0]  # Extracting booking_id from the result
+                response_value = [{"booking_id": booking_id}]
+                
+                #send notification to all goods driver
+                fcm_data = {
+                    'intent':'handy_man_agent',
+                    'booking_id':str(booking_id)
+                }
+                
+                
+#                 SELECT                            
+#     main.active_id,
+#     main.handyman_id,
+#     main.current_lat,
+#     main.current_lng,
+#     main.entry_time,
+#     main.current_status,
+#     handyman.name AS handyman_name,
+#     handyman.profile_pic,
+#     sub_categorytbl.sub_cat_name,
+#     sub_categorytbl.price_per_hour,
+#     other_servicestbl.service_name,
+#     other_servicestbl.price_per_hour AS service_price_per_hour,
+#     (6371 * acos(
+#         cos(radians(15.901976560038078)) * cos(radians(main.current_lat)) *
+#         cos(radians(main.current_lng) - radians(74.51701417565346)) +
+#         sin(radians(15.901976560038078)) * sin(radians(main.current_lat))
+#     )) AS distance
+# FROM vtpartner.active_handyman_tbl AS main
+# INNER JOIN (
+#     SELECT handyman_id, MAX(entry_time) AS max_entry_time
+#     FROM vtpartner.active_handyman_tbl
+#     GROUP BY handyman_id
+# ) AS latest ON main.handyman_id = latest.handyman_id
+#              AND main.entry_time = latest.max_entry_time
+# JOIN vtpartner.handymans_tbl AS handyman ON main.handyman_id = handyman.handyman_id
+# LEFT JOIN vtpartner.sub_categorytbl ON handyman.sub_cat_id = sub_categorytbl.sub_cat_id
+# LEFT JOIN vtpartner.other_servicestbl ON handyman.service_id = other_servicestbl.service_id
+# WHERE main.current_status = 1
+#   AND (6371 * acos(
+#         cos(radians(15.901976560038078)) * cos(radians(main.current_lat)) *
+#         cos(radians(main.current_lng) - radians(74.51701417565346)) +
+#         sin(radians(15.901976560038078)) * sin(radians(main.current_lat))
+#       )) <= 5
+#   AND handyman.category_id = sub_categorytbl.cat_id
+#   AND handyman.sub_cat_id = 19 
+#   AND (handyman.service_id = -1 OR handyman.service_id = 27) 
+# ORDER BY distance
+                
+                
+                query = """
+                    SELECT                            
+                    main.active_id,
+                    main.handyman_id,
+                    main.current_lat,
+                    main.current_lng,
+                    main.entry_time,
+                    main.current_status,
+                    handyman.name AS handyman_name,
+                    handyman.profile_pic,
+                    sub_categorytbl.sub_cat_name,
+                    sub_categorytbl.price_per_hour,
+                    other_servicestbl.service_name,
+                    other_servicestbl.price_per_hour AS service_price_per_hour,
+                    (6371 * acos(
+                        cos(radians(%s)) * cos(radians(main.current_lat)) *
+                        cos(radians(main.current_lng) - radians(%s)) +
+                        sin(radians(%s)) * sin(radians(main.current_lat))
+                    )) AS distance
+                FROM vtpartner.active_handyman_tbl AS main
+                INNER JOIN (
+                    SELECT handyman_id, MAX(entry_time) AS max_entry_time
+                    FROM vtpartner.active_handyman_tbl
+                    GROUP BY handyman_id
+                ) AS latest ON main.handyman_id = latest.handyman_id
+                            AND main.entry_time = latest.max_entry_time
+                JOIN vtpartner.handymans_tbl AS handyman ON main.handyman_id = handyman.handyman_id
+                LEFT JOIN vtpartner.sub_categorytbl ON handyman.sub_cat_id = sub_categorytbl.sub_cat_id
+                LEFT JOIN vtpartner.other_servicestbl ON handyman.service_id = other_servicestbl.service_id
+                WHERE main.current_status = 1
+                AND (6371 * acos(
+                        cos(radians(%s)) * cos(radians(main.current_lat)) *
+                        cos(radians(main.current_lng) - radians(%s)) +
+                        sin(radians(%s)) * sin(radians(main.current_lat))
+                    )) <= 5
+                AND handyman.category_id = sub_categorytbl.cat_id
+                AND handyman.sub_cat_id = %s 
+                AND (handyman.service_id = -1 OR handyman.service_id = %s) 
+                ORDER BY distance;
+
+                """
+                values = [pickup_lat, pickup_lng, pickup_lat,city_id,price_type, pickup_lat, pickup_lng, pickup_lat, radius_km,vehicle_id]
+
+                # Execute the query
+                nearby_drivers = select_query(query, values)
+                
+
+                for driver in nearby_drivers:
+                    try:
+                        
+                        driver_auth_token = get_cab_driver_auth_token2(driver[1])  # driver[1] assumed to be goods_driver_id
+                        print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
+                        
+                        if driver_auth_token:
+                            sendFMCMsg(
+                                driver_auth_token,
+                                f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
+                                "New Cab Ride Request",
+                                fcm_data,
+                                server_access_token
+                            )
+                            print(f"Notification sent to cab driver ID {driver[1]}")
+                        else:
+                            print(f"Skipped notification for cab driver ID {driver[1]} due to missing auth token")
+                    except Exception as err:
+                        print(f"Error sending notification to cab driver ID {driver[1]}: {err}")
+
+
+                return JsonResponse({"result": response_value}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
