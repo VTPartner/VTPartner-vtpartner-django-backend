@@ -8232,7 +8232,7 @@ def other_driver_booking_accepted(request):
             
         try:
             query = """
-                select driver_id from vtpartner.bookings_tbl where booking_id=%s and driver_id!='-1'
+                select driver_id from vtpartner.other_driver_bookings_tbl where booking_id=%s and driver_id!='-1'
             """
             result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
 
@@ -8241,7 +8241,7 @@ def other_driver_booking_accepted(request):
                 try:
 
                     query = """
-                       update vtpartner.bookings_tbl set driver_id=%s ,booking_status='Driver Accepted' where booking_id=%s
+                       update vtpartner.other_driver_bookings_tbl set driver_id=%s ,booking_status='Driver Accepted' where booking_id=%s
                         """
                     values = [
                             driver_id,
@@ -8254,7 +8254,7 @@ def other_driver_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
+                           insert into vtpartner.other_driver_bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
                             """
                         values = [
                                 booking_id
@@ -8282,7 +8282,7 @@ def other_driver_booking_accepted(request):
                             
                             #send Fcm notification to customer saying driver assigned
                             customer_data = {
-                                'intent':'live_tracking',
+                                'intent':'driver_live_tracking',
                                 'booking_id':str(booking_id)
                             }
                             sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token)
