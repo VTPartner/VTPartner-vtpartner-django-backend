@@ -8,10 +8,14 @@ urlpatterns = [
     path('send_otp',views.send_otp,name='send_otp'),
     #Upload Images
     path('upload',views.upload_image,name='upload'),
+    #Customer Saved addresses
+    path('add_or_update_customer_address',views.add_or_update_customer_address,name='add_or_update_customer_address'),
     #Customer Login
     path('login',views.login_view,name='login'),
     #New Customer Registration
     path('customer_registration',views.customer_registration,name='customer_registration'),
+    #All Saved Addresses
+    path('all_saved_addresses',views.all_saved_addresses,name='all_saved_addresses'),
     #All Services
     path('all_services',views.all_services,name='all_services'),
     #All Cities

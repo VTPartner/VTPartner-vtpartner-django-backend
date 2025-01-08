@@ -352,6 +352,93 @@ def send_otp(request):
 
     return JsonResponse({"error_message": "Method not allowed."}, status=405)
 
+@csrf_exempt
+def add_or_update_customer_address(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        place_id = data.get("place_id")
+        customer_id = data.get("customer_id")
+        location_name = data.get("location_name")
+        lat = data.get("lat")
+        lng = data.get("lng")
+        pincode = data.get("pincode")
+        address_type = data.get("address_type")
+
+         # List of required fields
+        required_fields = {
+            "place_id": place_id,
+            "customer_id": customer_id,
+            "location_name": location_name,
+            "lat": lat,
+            "lng": lng,
+            "pincode": pincode,
+            "address_type": address_type,
+            
+        }
+        # Check for missing fields
+         # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=400
+        )
+        
+        try:
+            query = """
+           select customer_address_id,place_id,location_name,location_lat,location_lng,pincode,address_type from vtpartner.customers_addresses_tbl where customer_id=%s
+            """
+            params = [customer_id]
+            result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                try:
+                    #Insert if not found
+                    query = """
+                        INSERT INTO vtpartner.customers_addresses_tbl (
+                            place_id,location_name,location_lat,location_lng,pincode,address_type,customer_id
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING customer_address_id
+                    """
+                    values = [place_id,location_name,lat,lng,pincode,address_type,customer_id]
+                    new_result = insert_query(query, values)
+                    print("new_result::",new_result)
+                    if new_result:
+                        print("new_result[0][0]::",new_result[0][0])
+                        customer_address_id = new_result[0][0]
+                        response_value = [
+                            {
+                                "customer_address_id":customer_address_id
+                            }
+                        ]
+                        return JsonResponse({"result": response_value}, status=200)
+                except Exception as err:
+                    print("Error executing query:", err)
+                    return JsonResponse({"message": "An error occurred"}, status=500)
+                
+            else:
+                try:
+                    #Update if found
+                    query = """
+                        UPDATE vtpartner.customers_addresses_tbl SET
+                        place_id=%s,location_name=%s,location_lat=%s,location_lng=%s,pincode=%s
+                        WHERE customer_id=%s AND address_type=%s
+                    """
+                    values = [place_id,location_name,lat,lng,pincode,customer_id,address_type]
+                    row_count = update_query(query, values)
+                    # Send success response
+                    return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+                except Exception as err:
+                    print("Error executing query:", err)
+                    return JsonResponse({"message": "An error occurred"}, status=500)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 @csrf_exempt
 def login_view(request):
@@ -484,7 +571,8 @@ def customer_registration(request):
         
         query = """
             UPDATE vtpartner.customers_tbl 
-            SET customer_name=%s, r_lat=%s, r_lng=%s, current_lat=%s, current_lng=%s, full_address=%s, purpose=%s, email=%s, pincode=%s
+            SET customer_name=%s, r_lat=%s, r_lng=%s, current_lat=%s, current_lng=%s, full_address=%s, purpose=%s, 
+            email=%s, pincode=%s
             WHERE customer_id=%s
         """
         values = [
@@ -507,6 +595,58 @@ def customer_registration(request):
     except Exception as err:
         print("Error executing add new faq query", err)
         return JsonResponse({"message": "Error executing add new faq query"}, status=500)
+
+@csrf_exempt 
+def all_saved_addresses(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        customer_id = data.get("customer_id")
+
+        # List of required fields
+        required_fields = {
+            "customer_id":customer_id,
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        try:
+            query = """
+                select customer_address_id,place_id,location_name,location_lat,location_lng,pincode,address_type from vtpartner.customers_addresses_tbl where customer_id=%s
+            """
+            result = select_query(query,[customer_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            address_details = [
+                {
+                    "customer_address_id": row[0],
+                    "place_id": row[1],
+                    "location_name": row[2],
+                    "location_lat": row[3],
+                    "location_lng": row[4],
+                    "pincode": row[5],
+                    "address_type": row[6],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": address_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
 def all_services(request):
