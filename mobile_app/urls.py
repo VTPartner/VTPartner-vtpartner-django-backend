@@ -271,6 +271,8 @@ urlpatterns = [
     path('jcb_crane_driver_whole_year_earnings',views.jcb_crane_driver_whole_year_earnings,name='jcb_crane_driver_whole_year_earnings'),
     #My All Rides
     path('jcb_crane_driver_todays_earnings',views.jcb_crane_driver_todays_earnings,name='jcb_crane_driver_todays_earnings'),
+    #My All Rides
+    path('jcb_crane_driver_booking_details_live_track',views.jcb_crane_driver_booking_details_live_track,name='jcb_crane_driver_booking_details_live_track'),
     #My Near by agents and generating booking id
     path('generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token',views.generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token,name='generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token'),
     
@@ -318,6 +320,8 @@ urlpatterns = [
     path('handyman_whole_year_earnings',views.handyman_whole_year_earnings,name='handyman_whole_year_earnings'),
     #My All Rides
     path('handyman_todays_earnings',views.handyman_todays_earnings,name='handyman_todays_earnings'),
+    #My All Rides
+    path('handyman_agent_booking_details_live_track',views.handyman_agent_booking_details_live_track,name='handyman_agent_booking_details_live_track'),
     #Generating Booking ID and searching nearby handyman agents
     path('generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token',views.generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token,name='generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token'),
 ]
