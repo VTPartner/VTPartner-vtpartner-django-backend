@@ -5260,6 +5260,17 @@ def new_goods_driver_recharge(request):
                     # Execute the query
                     row_count = insert_query(query, values)
                 else:
+                    query1 = """
+                    delete from vtpartner.goods_driver_topup_recharge_current_points_tbl where driver_id=%s
+                    """
+                    values1 = [
+                           
+                            driver_id
+                        ]
+
+                    # Execute the query
+                    row_count = delete_query(query1, values1)
+                    
                     query = """
                         INSERT INTO vtpartner.goods_driver_topup_recharge_current_points_tbl (recharge_id,allotted_points,valid_till_date,driver_id,remaining_points) VALUES (%s,%s,%s,%s,%s)
                         """
@@ -7282,6 +7293,17 @@ def new_cab_driver_recharge(request):
                     # Execute the query
                     row_count = insert_query(query, values)
                 else:
+                    query1 = """
+                    delete from vtpartner.cab_driver_topup_recharge_current_points_tbl where driver_id=%s
+                    """
+                    values1 = [
+                           
+                            driver_id
+                        ]
+
+                    # Execute the query
+                    row_count = delete_query(query1, values1)
+                    
                     query = """
                         INSERT INTO vtpartner.cab_driver_topup_recharge_current_points_tbl (recharge_id,allotted_points,valid_till_date,driver_id,remaining_points) VALUES (%s,%s,%s,%s,%s)
                         """
@@ -14370,6 +14392,15 @@ def new_handyman_recharge(request):
                     # Execute the query
                     row_count = insert_query(query, values)
                 else:
+                    query1 = """
+                    delete from vtpartner.handyman_topup_recharge_current_points_tbl where handy_man_id=%s
+                    """
+                    values1 = [
+                            driver_id
+                        ]
+
+                    # Execute the query
+                    row_count = delete_query(query1, values1)
                     query = """
                         INSERT INTO vtpartner.handyman_topup_recharge_current_points_tbl (recharge_id,allotted_points,valid_till_date,handy_man_id,remaining_points) VALUES (%s,%s,%s,%s,%s)
                         """
