@@ -13712,7 +13712,7 @@ def handyman_booking_accepted(request):
                                 'intent':'handyman_live_tracking',
                                 'booking_id':str(booking_id)
                             }
-                            sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token)
+                            sendFMCMsg(auth_token,'You have been assigned a driver','Agent Assigned',customer_data,server_token)
 
                             # Send success response
                             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
