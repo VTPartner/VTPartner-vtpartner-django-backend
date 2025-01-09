@@ -2130,13 +2130,13 @@ def cancel_jcb_crane_driver_booking(request):
             
         try:
             query = """
-                UPDATE vtpartner.jcb_crane_driver_bookings_tbl set booking_status='Cancelled',cancelled_reason=%s WHERE booking_id=%s
+                UPDATE vtpartner.jcb_crane_bookings_tbl set booking_status='Cancelled',cancelled_reason=%s WHERE booking_id=%s
             """
             row_count = update_query(query,[cancel_reason,booking_id])  
             
             #Updating it in Booking History Table to maintain record at what time it was cancelled
             query2 = """
-                    insert into vtpartner.jcb_crane_driver_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
             values2 = [
                     booking_id,
@@ -8972,7 +8972,7 @@ def generate_order_id_for_booking_id_other_driver(request):
         try:
 
             query = """
-                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                update vtpartner.other_driver_bookings_tbl set booking_status=%s where booking_id=%s
                 """
             values = [
                     booking_status,
@@ -8986,7 +8986,7 @@ def generate_order_id_for_booking_id_other_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -9007,29 +9007,25 @@ def generate_order_id_for_booking_id_other_driver(request):
                     body = "Your trip otp is verified"
                     title = "Trip OTP Verified"
                 elif booking_status == "Start Trip":
-                    body = "Trip has been started from your pickup location"
+                    body = "Trip has been started from your work location"
                     title = "Trip Started"
                 elif booking_status == "Ongoing":
-                    body = "Trip has been started from your pickup location"
+                    body = "Trip has been started from your work location"
                     title = "Ongoing"
                 elif booking_status == "End Trip":
-                    body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
+                    body = "Your has been successfully done."
+                    title = "Service Successful"
                 sendFMCMsg(auth_token,body,title,data_map,server_token)
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
                 #Generating Order ID
                 try:
                     query = """
-                    INSERT INTO vtpartner.orders_tbl (
+                    INSERT INTO vtpartner.other_driver_orders_tbl (
                         customer_id, 
                         driver_id, 
                         pickup_lat, 
                         pickup_lng, 
-                        destination_lat, 
-                        destination_lng, 
-                        distance, 
-                        time, 
                         total_price, 
                         base_price, 
                         booking_timing, 
@@ -9039,28 +9035,20 @@ def generate_order_id_for_booking_id_other_driver(request):
                         otp, 
                         gst_amount, 
                         igst_amount, 
-                        goods_type_id, 
                         payment_method, 
                         city_id, 
                         booking_id, 
-                        sender_name, 
-                        sender_number, 
-                        receiver_name, 
-                        receiver_number, 
                         pickup_address, 
-                        drop_address,
                         pickup_time,
-                        drop_time
+                        drop_time,
+                        service_id,
+                        sub_cat_id
                     )
                     SELECT 
                         customer_id, 
                         driver_id, 
                         pickup_lat, 
                         pickup_lng, 
-                        destination_lat, 
-                        destination_lng, 
-                        distance, 
-                        time, 
                         total_price, 
                         base_price, 
                         booking_timing, 
@@ -9070,19 +9058,15 @@ def generate_order_id_for_booking_id_other_driver(request):
                         otp, 
                         gst_amount, 
                         igst_amount, 
-                        goods_type_id, 
                         payment_method, 
                         city_id, 
                         booking_id, 
-                        sender_name, 
-                        sender_number, 
-                        receiver_name, 
-                        receiver_number, 
                         pickup_address, 
-                        drop_address,
                         pickup_time,
-                        drop_time
-                    FROM vtpartner.bookings_tbl
+                        drop_time,
+                        service_id,
+                        sub_cat_id
+                    FROM vtpartner.other_driver_bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
                     """
@@ -9107,7 +9091,7 @@ def generate_order_id_for_booking_id_other_driver(request):
                             #success
                             try:
                                 query3 = """
-                                update vtpartner.bookings_tbl set booking_completed='1' where booking_id=%s
+                                update vtpartner.other_driver_bookings_tbl set booking_completed='1' where booking_id=%s
                                 """
                                 values3 = [
                                         booking_id
@@ -9117,7 +9101,7 @@ def generate_order_id_for_booking_id_other_driver(request):
                                 row_count = update_query(query3, values3)
                                 
                                 query_update = """
-                                update vtpartner.orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
+                                update vtpartner.other_driver_orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
                                 """
                                 values_update = [
                                         payment_method,
@@ -11365,7 +11349,7 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
         try:
 
             query = """
-                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                update vtpartner.jcb_crane_bookings_tbl set booking_status=%s where booking_id=%s
                 """
             values = [
                     booking_status,
@@ -11379,7 +11363,7 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -11400,29 +11384,25 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                     body = "Your trip otp is verified"
                     title = "Trip OTP Verified"
                 elif booking_status == "Start Trip":
-                    body = "Trip has been started from your pickup location"
-                    title = "Trip Started"
+                    body = "Service has been started on your work location"
+                    title = "Service Started"
                 elif booking_status == "Ongoing":
-                    body = "Trip has been started from your pickup location"
+                    body = "Trip has been started from your work location"
                     title = "Ongoing"
                 elif booking_status == "End Trip":
-                    body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
+                    body = "Your JCB / Crane Service Finished Successfully"
+                    title = "Service Done Successfully"
                 sendFMCMsg(auth_token,body,title,data_map,server_token)
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
                 #Generating Order ID
                 try:
                     query = """
-                    INSERT INTO vtpartner.orders_tbl (
+                    INSERT INTO vtpartner.jcb_crane_orders_tbl (
                         customer_id, 
                         driver_id, 
                         pickup_lat, 
                         pickup_lng, 
-                        destination_lat, 
-                        destination_lng, 
-                        distance, 
-                        time, 
                         total_price, 
                         base_price, 
                         booking_timing, 
@@ -11432,28 +11412,20 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                         otp, 
                         gst_amount, 
                         igst_amount, 
-                        goods_type_id, 
                         payment_method, 
                         city_id, 
-                        booking_id, 
-                        sender_name, 
-                        sender_number, 
-                        receiver_name, 
-                        receiver_number, 
+                        booking_id,  
                         pickup_address, 
-                        drop_address,
                         pickup_time,
-                        drop_time
+                        drop_time,
+                        sub_cat_id,
+                        service_id
                     )
                     SELECT 
                         customer_id, 
                         driver_id, 
                         pickup_lat, 
                         pickup_lng, 
-                        destination_lat, 
-                        destination_lng, 
-                        distance, 
-                        time, 
                         total_price, 
                         base_price, 
                         booking_timing, 
@@ -11463,19 +11435,15 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                         otp, 
                         gst_amount, 
                         igst_amount, 
-                        goods_type_id, 
                         payment_method, 
                         city_id, 
                         booking_id, 
-                        sender_name, 
-                        sender_number, 
-                        receiver_name, 
-                        receiver_number, 
                         pickup_address, 
-                        drop_address,
                         pickup_time,
-                        drop_time
-                    FROM vtpartner.bookings_tbl
+                        drop_time,
+                        sub_cat_id,
+                        service_id
+                    FROM vtpartner.jcb_crane_bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
                     """
@@ -11500,7 +11468,7 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                             #success
                             try:
                                 query3 = """
-                                update vtpartner.bookings_tbl set booking_completed='1' where booking_id=%s
+                                update vtpartner.jcb_crane_bookings_tbl set booking_completed='1' where booking_id=%s
                                 """
                                 values3 = [
                                         booking_id
@@ -11510,7 +11478,7 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                                 row_count = update_query(query3, values3)
                                 
                                 query_update = """
-                                update vtpartner.orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
+                                update vtpartner.jcb_crane_orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
                                 """
                                 values_update = [
                                         payment_method,
@@ -13520,7 +13488,7 @@ def generate_order_id_for_booking_id_handyman(request):
         try:
 
             query = """
-                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                update vtpartner.handyman_bookings_tbl set booking_status=%s where booking_id=%s
                 """
             values = [
                     booking_status,
@@ -13534,7 +13502,7 @@ def generate_order_id_for_booking_id_handyman(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.handyman_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -13548,21 +13516,21 @@ def generate_order_id_for_booking_id_handyman(request):
                 auth_token = get_customer_auth_token(customer_id)
                 body = title = ""
                 data_map = {}
-                if booking_status == "Driver Arrived":
+                if booking_status == "HandyMan Agent Arrived":
                     body = "Our agent has arrived at your pickup location"
-                    title = "Agent Arrived"
+                    title = "HandyMan Agent Arrived"
                 elif booking_status == "OTP verified":
                     body = "Your trip otp is verified"
                     title = "Trip OTP Verified"
-                elif booking_status == "Start Trip":
-                    body = "Trip has been started from your pickup location"
-                    title = "Trip Started"
+                elif booking_status == "Start Service":
+                    body = "Service has been started on your work location"
+                    title = "Service Started"
                 elif booking_status == "Ongoing":
-                    body = "Trip has been started from your pickup location"
+                    body = "Trip has been started from your work location"
                     title = "Ongoing"
-                elif booking_status == "End Trip":
-                    body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
+                elif booking_status == "End Service":
+                    body = "Your service was done successfully"
+                    title = "Service Done Successfully"
                 sendFMCMsg(auth_token,body,title,data_map,server_token)
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
