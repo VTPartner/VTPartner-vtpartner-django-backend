@@ -8902,7 +8902,7 @@ def update_booking_status_other_driver(request):
                     row_count = update_query(update_pickup_epoch_query, values)
                 elif booking_status == "Make Payment":
                    body = f"Please do the payment against Booking ID {booking_id} for Driver Service. Total Amount=Rs.{total_payment}/-"
-                   title = "Make Payment For Cab"
+                   title = "Make Payment For Driver Service"
                 elif booking_status == "End Trip":
                     body = "You have been successfully reached the destination"
                     title = "Reached Destination"
@@ -11221,6 +11221,7 @@ def update_booking_status_jcb_crane_driver(request):
         booking_status = data.get("booking_status")
         server_token = data.get("server_token")
         customer_id = data.get("customer_id")
+        total_payment = data.get("total_payment")
 
         # List of required fields
         required_fields = {
@@ -11240,7 +11241,7 @@ def update_booking_status_jcb_crane_driver(request):
         try:
 
             query = """
-                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                update vtpartner.jcb_crane_bookings_tbl set booking_status=%s where booking_id=%s
                 """
             values = [
                     booking_status,
@@ -11254,7 +11255,7 @@ def update_booking_status_jcb_crane_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -11269,17 +11270,17 @@ def update_booking_status_jcb_crane_driver(request):
                 body = title = ""
                 data_map = {}
                 if booking_status == "Driver Arrived":
-                    body = "Our agent has arrived at your pickup location"
+                    body = "Our agent has arrived at your work location"
                     title = "Agent Arrived"
                 elif booking_status == "OTP Verified":
                     body = "You're OTP is Verified Successfully!"
                     title = "OTP Verification"
-                elif booking_status == "Start Trip":
-                    body = "Trip has been started from your pickup location"
-                    title = "Trip Started"
+                elif booking_status == "Start Service":
+                    body = "Your service has been started from your work location"
+                    title = "Service Started"
                     # Update Pickup epoch here
                     update_pickup_epoch_query = """
-                    UPDATE vtpartner.bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    UPDATE vtpartner.jcb_crane_bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
                     """
                     values = [
                             booking_id
@@ -11287,12 +11288,15 @@ def update_booking_status_jcb_crane_driver(request):
 
                     # Execute the query
                     row_count = update_query(update_pickup_epoch_query, values)
+                elif booking_status == "Make Payment":
+                    body = f"Please make payment for the JCB/Crane Service your work has been finished.\nBooking ID - {booking_id}\nPay Rs.{total_payment}/-"
+                    title = "Make Payment for JCB/Crane Service"
                 elif booking_status == "End Trip":
                     body = "Your package has been delivered successfully"
                     title = "Package Deliveried"
                     # Update Drop epoch here
                     update_drop_epoch_query = """
-                    UPDATE vtpartner.bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    UPDATE vtpartner.jcb_crane_bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
                     """
                     values = [
                             booking_id
@@ -13364,6 +13368,7 @@ def update_booking_status_handyman(request):
         booking_status = data.get("booking_status")
         server_token = data.get("server_token")
         customer_id = data.get("customer_id")
+        total_payment = data.get("total_payment")
 
         # List of required fields
         required_fields = {
@@ -13383,7 +13388,7 @@ def update_booking_status_handyman(request):
         try:
 
             query = """
-                update vtpartner.bookings_tbl set booking_status=%s where booking_id=%s
+                update vtpartner.handyman_bookings_tbl set booking_status=%s where booking_id=%s
                 """
             values = [
                     booking_status,
@@ -13397,7 +13402,7 @@ def update_booking_status_handyman(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.handyman_bookings_history_tbl(booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -13412,17 +13417,17 @@ def update_booking_status_handyman(request):
                 body = title = ""
                 data_map = {}
                 if booking_status == "Driver Arrived":
-                    body = "Our agent has arrived at your pickup location"
+                    body = "Our agent has arrived at your work location"
                     title = "Agent Arrived"
                 elif booking_status == "OTP Verified":
                     body = "You're OTP is Verified Successfully!"
                     title = "OTP Verification"
-                elif booking_status == "Start Trip":
-                    body = "Trip has been started from your pickup location"
-                    title = "Trip Started"
+                elif booking_status == "Start Service":
+                    body = "Your Service has been started from your work location"
+                    title = "Work Started"
                     # Update Pickup epoch here
                     update_pickup_epoch_query = """
-                    UPDATE vtpartner.bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    UPDATE vtpartner.handyman_bookings_tbl SET pickup_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
                     """
                     values = [
                             booking_id
@@ -13430,12 +13435,15 @@ def update_booking_status_handyman(request):
 
                     # Execute the query
                     row_count = update_query(update_pickup_epoch_query, values)
-                elif booking_status == "End Trip":
+                elif booking_status == "Make Payment":
+                    body = f"Please make payment for the HandyMan Service your work has been finished.\nBooking ID - {booking_id}\nPay Rs.{total_payment}/-"
+                    title = "Make Payment For HandyMan Service"
+                elif booking_status == "End Service":
                     body = "Your package has been delivered successfully"
                     title = "Package Deliveried"
                     # Update Drop epoch here
                     update_drop_epoch_query = """
-                    UPDATE vtpartner.bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
+                    UPDATE vtpartner.handyman_bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
                     """
                     values = [
                             booking_id
