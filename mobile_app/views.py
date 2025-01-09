@@ -1068,6 +1068,71 @@ def get_cab_driver_auth_token( goods_driver_id):
     except Exception as err:
         print("Error in finding the auth token for goods driver:", err)
         return auth_token
+    
+def get_other_driver_auth_token( other_driver_id):
+    auth_token = ""
+    try:
+        query = """
+        select authtoken from vtpartner.other_driverstbl where cab_driver_id=%s 
+        """
+        params = [other_driver_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            return JsonResponse({"message": "No Data Found"}, status=404)
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for  driver agent:", err)
+        return auth_token
+
+    
+def get_jcb_crane_driver_auth_token( jcb_crane_driver_id):
+    auth_token = ""
+    try:
+        query = """
+        select authtoken from vtpartner.jcb_crane_driverstbl where cab_driver_id=%s 
+        """
+        params = [jcb_crane_driver_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            return JsonResponse({"message": "No Data Found"}, status=404)
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for jcb crane driver:", err)
+        return auth_token
+    
+def get_handyman_agent_auth_token( handyman_agent_id):
+    auth_token = ""
+    try:
+        query = """
+        select authtoken from vtpartner.handymans_tbl where cab_driver_id=%s 
+        """
+        params = [handyman_agent_id]
+        result = select_query(query, params)  # Assuming select_query is defined elsewhere
+
+        if not result:
+            return JsonResponse({"message": "No Data Found"}, status=404)
+
+        # Extract auth_token from the result
+        auth_token = result[0][0]  # Get the first row, first column (auth token)
+        
+        return auth_token
+
+    except Exception as err:
+        print("Error in finding the auth token for handyman agent:", err)
+        return auth_token
+
 
 def get_goods_driver_auth_token2(goods_driver_id):
     auth_token = ""
@@ -1833,6 +1898,7 @@ def cancel_booking(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
 @csrf_exempt 
 def cancel_cab_booking(request):
     if request.method == "POST":
@@ -1919,6 +1985,300 @@ def cancel_cab_booking(request):
                 customer_auth_token,
                 f'Your Cab ride request has been successfully canceled. \nPickup Location: {pickup_address}.',
                 'Cab Ride Cancellation Confirmation',
+                fcm_data2,
+                server_token
+            )
+
+            
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def cancel_other_driver_booking(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        booking_id = data.get("booking_id")
+        customer_id = data.get("customer_id")
+        driver_id = data.get("driver_id")
+        server_token = data.get("server_token")
+        pickup_address = data.get("pickup_address")
+        cancel_reason = data.get("cancel_reason")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "booking_id": booking_id,
+            "server_token": server_token,
+            "customer_id": customer_id,
+            "driver_id": driver_id,
+            "cancel_reason": cancel_reason,
+        
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.other_driver_bookings_tbl set booking_status='Cancelled',cancelled_reason=%s WHERE booking_id=%s
+            """
+            row_count = update_query(query,[cancel_reason,booking_id])  
+            
+            #Updating it in Booking History Table to maintain record at what time it was cancelled
+            query2 = """
+                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    """
+            values2 = [
+                    booking_id,
+                    'Cancelled'
+                ]
+
+            # Execute the query
+            row_count = insert_query(query2, values2)
+            
+            query3 = """
+            update vtpartner.active_other_drivertbl set current_status='1' where other_driver_id=%s
+            """
+            values3 = [
+                    driver_id
+            ]
+            # Execute the query
+            row_count = update_query(query3, values3)
+            #Send Notitification to customer and driver
+            customer_auth_token = get_customer_auth_token(customer_id)
+            driver_auth_token = get_other_driver_auth_token(driver_id)
+            
+            #send notification to cab driver for booking cancelled
+            fcm_data = {
+                'intent':'cab_driver_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+            driver_auth_token,
+            f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
+            f'Driver Ride Canceled - [Booking ID: {str(booking_id)}]',
+            fcm_data,
+            server_token
+            )
+
+            
+            #send notification to Customer for booking cancellation confirmation.
+            fcm_data2 = {
+                'intent':'customer_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+                customer_auth_token,
+                f'Your Driver ride request has been successfully canceled. \nPickup Location: {pickup_address}.',
+                f'Driver Ride Cancellation Confirmation - [Booking ID: {str(booking_id)}]',
+                fcm_data2,
+                server_token
+            )
+
+            
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def cancel_jcb_crane_driver_booking(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        booking_id = data.get("booking_id")
+        customer_id = data.get("customer_id")
+        driver_id = data.get("driver_id")
+        server_token = data.get("server_token")
+        pickup_address = data.get("pickup_address")
+        cancel_reason = data.get("cancel_reason")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "booking_id": booking_id,
+            "server_token": server_token,
+            "customer_id": customer_id,
+            "driver_id": driver_id,
+            "cancel_reason": cancel_reason,
+        
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.jcb_crane_driver_bookings_tbl set booking_status='Cancelled',cancelled_reason=%s WHERE booking_id=%s
+            """
+            row_count = update_query(query,[cancel_reason,booking_id])  
+            
+            #Updating it in Booking History Table to maintain record at what time it was cancelled
+            query2 = """
+                    insert into vtpartner.jcb_crane_driver_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    """
+            values2 = [
+                    booking_id,
+                    'Cancelled'
+                ]
+
+            # Execute the query
+            row_count = insert_query(query2, values2)
+            
+            query3 = """
+            update vtpartner.active_jcb_crane_drivertbl set current_status='1' where jcb_crane_driver_id=%s
+            """
+            values3 = [
+                    driver_id
+            ]
+            # Execute the query
+            row_count = update_query(query3, values3)
+            #Send Notitification to customer and driver
+            customer_auth_token = get_customer_auth_token(customer_id)
+            driver_auth_token = get_jcb_crane_driver_auth_token(driver_id)
+            
+            #send notification to cab driver for booking cancelled
+            fcm_data = {
+                'intent':'jcb_crane_driver_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+            driver_auth_token,
+            f'The Jcb/Crane ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
+            f'JCB Crane Ride Canceled - [Booking ID: {str(booking_id)}]',
+            fcm_data,
+            server_token
+            )
+
+            
+            #send notification to Customer for booking cancellation confirmation.
+            fcm_data2 = {
+                'intent':'customer_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+                customer_auth_token,
+                f'Your JCB /Crane ride request has been successfully canceled. \nPickup Location: {pickup_address}.',
+                f'JCB/Crane Ride Cancellation Confirmation - [Booking ID: {str(booking_id)}]',
+                fcm_data2,
+                server_token
+            )
+
+            
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def cancel_handyman_agent_booking(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        booking_id = data.get("booking_id")
+        customer_id = data.get("customer_id")
+        driver_id = data.get("driver_id")
+        server_token = data.get("server_token")
+        pickup_address = data.get("pickup_address")
+        cancel_reason = data.get("cancel_reason")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "booking_id": booking_id,
+            "server_token": server_token,
+            "customer_id": customer_id,
+            "driver_id": driver_id,
+            "cancel_reason": cancel_reason,
+        
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.handyman_bookings_tbl set booking_status='Cancelled',cancelled_reason=%s WHERE booking_id=%s
+            """
+            row_count = update_query(query,[cancel_reason,booking_id])  
+            
+            #Updating it in Booking History Table to maintain record at what time it was cancelled
+            query2 = """
+                    insert into vtpartner.handyman_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    """
+            values2 = [
+                    booking_id,
+                    'Cancelled'
+                ]
+
+            # Execute the query
+            row_count = insert_query(query2, values2)
+            
+            query3 = """
+            update vtpartner.active_handyman_tbl set current_status='1' where handyman_id=%s
+            """
+            values3 = [
+                    driver_id
+            ]
+            # Execute the query
+            row_count = update_query(query3, values3)
+            #Send Notitification to customer and driver
+            customer_auth_token = get_customer_auth_token(customer_id)
+            driver_auth_token = get_handyman_agent_auth_token(driver_id)
+            
+            #send notification to cab driver for booking cancelled
+            fcm_data = {
+                'intent':'handyman_agent_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+            driver_auth_token,
+            f'The HandyMan Service request has been canceled by the customer. \Work Location: {pickup_address}.',
+            f'HandyMan Service Canceled - [Booking ID: {str(booking_id)}]',
+            fcm_data,
+            server_token
+            )
+
+            
+            #send notification to Customer for booking cancellation confirmation.
+            fcm_data2 = {
+                'intent':'customer_home',
+                'booking_id':str(booking_id)
+            }
+            sendFMCMsg(
+                customer_auth_token,
+                f'Your HandyMan Service request has been successfully canceled. \nPickup Location: {pickup_address}.',
+                f'HandyMan Service Cancellation Confirmation - [Booking ID: {str(booking_id)}]',
                 fcm_data2,
                 server_token
             )
@@ -2418,6 +2778,153 @@ def cab_driver_current_location(request):
         try:
             query = """
                select current_lat,current_lng from vtpartner.active_cab_drivertbl where cab_driver_id=%s
+            """
+            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "current_lat": row[0],
+                    "current_lng": row[1],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def other_driver_current_location(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+       
+        try:
+            query = """
+               select current_lat,current_lng from vtpartner.active_other_drivertbl where other_driver_id=%s
+            """
+            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "current_lat": row[0],
+                    "current_lng": row[1],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def jcb_crane_driver_current_location(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+       
+        try:
+            query = """
+               select current_lat,current_lng from vtpartner.active_jcb_crane_drivertb where jcb_crane_driver_id=%s
+            """
+            result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "current_lat": row[0],
+                    "current_lng": row[1],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def handyman_agent_current_location(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+       
+        try:
+            query = """
+               select current_lat,current_lng from vtpartner.active_handyman_tbl where handyman_id=%s
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
@@ -9219,10 +9726,54 @@ def other_driver_booking_details_live_track(request):
                 {"message": f"Missing required fields: {', '.join(missing_fields)}"},
                 status=400
             )
-            
+        #select booking_id,other_driver_bookings_tbl.customer_id,other_driver_bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,other_driver_bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,payment_method,other_driver_bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,driver_first_name,other_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,other_driverstbl.mobile_no,sub_cat_name,service_name,other_driverstbl.profile_pic from vtpartner.other_servicestbl,vtpartner.sub_categorytbl,vtpartner.other_driver_bookings_tbl,vtpartner.other_driverstbl,vtpartner.customers_tbl where sub_categorytbl.sub_cat_id=other_driver_bookings_tbl.sub_cat_id and other_driver_bookings_tbl.service_id=other_servicestbl.service_id and other_driverstbl.other_driver_id=other_driver_bookings_tbl.driver_id and other_driver_bookings_tbl.customer_id=customers_tbl.customer_id and booking_id=%s and booking_status!='End Trip'
         try:
             query = """
-                select booking_id,other_driver_bookings_tbl.customer_id,other_driver_bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,other_driver_bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,payment_method,other_driver_bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,driver_first_name,other_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,other_driverstbl.mobile_no,sub_cat_name,service_name,other_driverstbl.profile_pic from vtpartner.other_servicestbl,vtpartner.sub_categorytbl,vtpartner.other_driver_bookings_tbl,vtpartner.other_driverstbl,vtpartner.customers_tbl where sub_categorytbl.sub_cat_id=other_driver_bookings_tbl.sub_cat_id and other_driver_bookings_tbl.service_id=other_servicestbl.service_id and other_driverstbl.other_driver_id=other_driver_bookings_tbl.driver_id and other_driver_bookings_tbl.customer_id=customers_tbl.customer_id and booking_id=%s and booking_status!='End Trip'
+                SELECT                                                                                                                                                                                                                                                                booking_id,                                                                                                                                                                                                                                                                     other_driver_bookings_tbl.customer_id,                                                                                                                                                                                                                                          other_driver_bookings_tbl.driver_id,                                                                                                                                                                       
+                pickup_lat,
+                pickup_lng,
+                destination_lat,
+                destination_lng,
+                distance,
+                other_driver_bookings_tbl.time,
+                total_price,
+                base_price,
+                booking_timing,
+                booking_date,
+                booking_status,
+                driver_arrival_time,
+                otp,
+                gst_amount,
+                igst_amount,
+                payment_method,
+                other_driver_bookings_tbl.city_id,
+                cancelled_reason,
+                cancel_time,
+                order_id,
+                driver_first_name,
+                other_driverstbl.authtoken AS driver_authtoken,
+                customer_name,
+                customers_tbl.authtoken AS customer_authtoken,
+                pickup_address,
+                drop_address,
+                customers_tbl.mobile_no AS customer_mobile_no,
+                other_driverstbl.mobile_no AS driver_mobile_no,
+                sub_cat_name,
+                service_name,
+                other_driverstbl.profile_pic
+            FROM 
+                vtpartner.other_driver_bookings_tbl
+            LEFT JOIN 
+                vtpartner.sub_categorytbl ON sub_categorytbl.sub_cat_id = other_driver_bookings_tbl.sub_cat_id
+            LEFT JOIN 
+                vtpartner.other_servicestbl ON other_driver_bookings_tbl.service_id = other_servicestbl.service_id AND other_driver_bookings_tbl.service_id != '-1'
+            LEFT JOIN 
+                vtpartner.other_driverstbl ON other_driverstbl.other_driver_id = other_driver_bookings_tbl.driver_id
+            LEFT JOIN 
+                vtpartner.customers_tbl ON customers_tbl.customer_id = other_driver_bookings_tbl.customer_id
+            WHERE 
+                booking_id = %s
+                AND booking_status != 'End Trip'
             """
             result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
 

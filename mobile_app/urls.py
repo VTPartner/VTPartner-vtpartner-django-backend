@@ -68,6 +68,12 @@ urlpatterns = [
     path('goods_driver_current_location',views.goods_driver_current_location,name='goods_driver_current_location'),
     #Cab Driver Live Location Tracking
     path('cab_driver_current_location',views.cab_driver_current_location,name='cab_driver_current_location'),
+    # Other Driver Live Location Tracking
+    path('other_driver_current_location',views.other_driver_current_location,name='other_driver_current_location'),
+    # JCB Crane Driver Live Location Tracking
+    path('jcb_crane_driver_current_location',views.jcb_crane_driver_current_location,name='jcb_crane_driver_current_location'),
+    # Handy Man Agent Live Location Tracking
+    path('handyman_agent_current_location',views.handyman_agent_current_location,name='handyman_agent_current_location'),
     #Getting all sub categories such as Plumber , LVM
     path('get_all_sub_categories',views.get_all_sub_categories,name='get_all_sub_categories'),
     #Getting all sub services such as Wireman
@@ -214,6 +220,8 @@ urlpatterns = [
     #My All Rides
     path('other_driver_todays_earnings',views.other_driver_todays_earnings,name='other_driver_todays_earnings'),
     #My All Rides
+    path('cancel_other_driver_booking',views.cancel_other_driver_booking,name='cancel_other_driver_booking'),
+    #My All Rides
     path('other_driver_booking_details_live_track',views.other_driver_booking_details_live_track,name='other_driver_booking_details_live_track'),
     #Generating new booking id and sending notifications to nearby agents
     path('generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token',views.generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token,name='generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token'),
@@ -253,6 +261,8 @@ urlpatterns = [
     path('get_jcb_crane_driver_recharge_list',views.get_jcb_crane_driver_recharge_list,name='get_jcb_crane_driver_recharge_list'),
     #Insert the Goods Driver New Recharge
     path('new_jcb_crane_driver_recharge',views.new_jcb_crane_driver_recharge,name='new_jcb_crane_driver_recharge'),
+    #My All Rides
+    path('cancel_jcb_crane_driver_booking',views.cancel_jcb_crane_driver_booking,name='cancel_jcb_crane_driver_booking'),
     #My All Rides
     path('jcb_crane_driver_all_orders',views.jcb_crane_driver_all_orders,name='jcb_crane_driver_all_orders'),
     #My Whole Years Earnings
@@ -298,6 +308,8 @@ urlpatterns = [
     path('get_handyman_recharge_list',views.get_handyman_recharge_list,name='get_handyman_recharge_list'),
     #Insert the Goods Driver New Recharge
     path('new_handyman_recharge',views.new_handyman_recharge,name='new_handyman_recharge'),
+    #Insert the Goods Driver New Recharge
+    path('cancel_handyman_agent_booking',views.cancel_handyman_agent_booking,name='cancel_handyman_agent_booking'),
     #My All Rides
     path('handyman_all_orders',views.handyman_all_orders,name='handyman_all_orders'),
     #My Whole Years Earnings
