@@ -7850,7 +7850,10 @@ def jcb_crane_driver_booking_details_live_track(request):
             
         try:
             query = """
-                SELECT                                                                                                                                                                                                                                                                booking_id,                                                                                                                                                                                                                                                                     other_driver_bookings_tbl.customer_id,                                                                                                                                                                                                                                          other_driver_bookings_tbl.driver_id,                                                                                                                                                                       
+               SELECT
+               booking_id,
+                jcb_crane_bookings_tbl.customer_id,
+                jcb_crane_bookings_tbl.driver_id,  
                 pickup_lat,
                 pickup_lng,
                 distance,
@@ -7971,7 +7974,10 @@ def handyman_agent_booking_details_live_track(request):
             
         try:
             query = """
-                SELECT                                                                                                                                                                                                                                                                booking_id,                                                                                                                                                                                                                                                                     other_driver_bookings_tbl.customer_id,                                                                                                                                                                                                                                          other_driver_bookings_tbl.driver_id,                                                                                                                                                                       
+                SELECT
+                booking_id, 
+                handyman_bookings_tbl.customer_id,
+                handyman_bookings_tbl.driver_id,
                 pickup_lat,
                 pickup_lng,
                 distance,
