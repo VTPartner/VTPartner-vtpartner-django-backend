@@ -9222,7 +9222,7 @@ def other_driver_booking_details_live_track(request):
             
         try:
             query = """
-                select booking_id,cab_bookings_tbl.customer_id,cab_bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,cab_bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,payment_method,cab_bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,driver_first_name,cab_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,cab_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,vehicle_plate_no,vehicle_fuel_type,cab_driverstbl.profile_pic from vtpartner.vehiclestbl,vtpartner.cab_bookings_tbl,vtpartner.cab_driverstbl,vtpartner.customers_tbl where cab_driverstbl.cab_driver_id=cab_bookings_tbl.driver_id and customers_tbl.customer_id=cab_bookings_tbl.customer_id and booking_id=%s and booking_status!='End Trip' and vehiclestbl.vehicle_id=cab_driverstbl.vehicle_id
+                select booking_id,other_driver_bookings_tbl.customer_id,other_driver_bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,other_driver_bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,payment_method,other_driver_bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,driver_first_name,other_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,other_driverstbl.mobile_no,sub_cat_name,service_name,other_driverstbl.profile_pic from vtpartner.other_servicestbl,vtpartner.sub_categorytbl,vtpartner.other_driver_bookings_tbl,vtpartner.other_driverstbl,vtpartner.customers_tbl where sub_categorytbl.sub_cat_id=other_driver_bookings_tbl.sub_cat_id and other_driver_bookings_tbl.service_id=other_servicestbl.service_id and other_driverstbl.other_driver_id=other_driver_bookings_tbl.driver_id and other_driver_bookings_tbl.customer_id=customers_tbl.customer_id and booking_id=%s and booking_status!='End Trip'
             """
             result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
 
@@ -9263,12 +9263,9 @@ def other_driver_booking_details_live_track(request):
                     "drop_address": row[28],
                     "customer_mobile_no": row[29],
                     "driver_mobile_no": row[30],
-                    "vehicle_id": str(row[31]),
-                    "vehicle_name": str(row[32]),
-                    "vehicle_image": str(row[33]),
-                    "vehicle_plate_no": str(row[34]),
-                    "vehicle_fuel_type": str(row[35]),
-                    "profile_pic": str(row[36]),
+                    "sub_cat_name": str(row[31]),
+                    "service_name": str(row[32]),
+                    "profile_pic": str(row[33]),
 
                     
                 }
@@ -9361,12 +9358,12 @@ def generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token(reques
                     customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
                     distance, time, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,pickup_address,drop_address
+                    payment_method, city_id,pickup_address,drop_address,sub_cat_id,service_id
                 ) 
                 VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s, %s
+                    %s, %s,%s, %s,%s,%s
                 ) 
                 RETURNING booking_id;
             """
@@ -9374,7 +9371,7 @@ def generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token(reques
             insert_values = [
                 customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
                 distance, time, total_price, base_price, otp, 
-                gst_amount, igst_amount, payment_method, city_id,pickup_address,drop_address
+                gst_amount, igst_amount, payment_method, city_id,pickup_address,drop_address,sub_cat_id,service_id
             ]
 
             # Assuming insert_query is a function that runs the query
@@ -11609,19 +11606,19 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
                 INSERT INTO vtpartner.jcb_crane_bookings_tbl (
                     customer_id, driver_id, pickup_lat, pickup_lng, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,pickup_address
+                    payment_method, city_id,pickup_address,sub_cat_id,service_id
                 ) 
                 VALUES (
                     %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s
+                    %s, %s,%s,%s,%s
                 ) 
                 RETURNING booking_id;
             """
 
             insert_values = [
                 customer_id, '-1', pickup_lat, pickup_lng, total_price, base_price, otp, 
-                gst_amount, igst_amount, payment_method, city_id,pickup_address
+                gst_amount, igst_amount, payment_method, city_id,pickup_address,sub_cat_id,service_id
             ]
 
             # Assuming insert_query is a function that runs the query
@@ -13764,19 +13761,19 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
                 INSERT INTO vtpartner.handyman_bookings_tbl (
                     customer_id, driver_id, pickup_lat, pickup_lng, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,pickup_address
+                    payment_method, city_id,pickup_address,sub_cat_id,service_id
                 ) 
                 VALUES (
                     %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s
+                    %s, %s,%s,%s,%s
                 ) 
                 RETURNING booking_id;
             """
 
             insert_values = [
                 customer_id, '-1', pickup_lat, pickup_lng,  total_price, base_price, otp, 
-                gst_amount, igst_amount, payment_method, city_id,pickup_address
+                gst_amount, igst_amount, payment_method, city_id,pickup_address,sub_cat_id,service_id
             ]
 
             # Assuming insert_query is a function that runs the query
