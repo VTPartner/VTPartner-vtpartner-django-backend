@@ -8013,7 +8013,7 @@ def handyman_agent_booking_details_live_track(request):
             LEFT JOIN 
                 vtpartner.other_servicestbl ON handyman_bookings_tbl.service_id = other_servicestbl.service_id AND handyman_bookings_tbl.service_id != '-1'
             LEFT JOIN 
-                vtpartner.handymans_tbl ON handymandriverstbl.other_driver_id = handyman_bookings_tbl.driver_id
+                vtpartner.handymans_tbl ON handymans_tbl.handyman_id = handyman_bookings_tbl.driver_id
             LEFT JOIN 
                 vtpartner.customers_tbl ON customers_tbl.customer_id = handyman_bookings_tbl.customer_id
             WHERE 
