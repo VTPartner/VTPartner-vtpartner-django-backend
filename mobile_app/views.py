@@ -2277,7 +2277,7 @@ def cancel_handyman_agent_booking(request):
             }
             sendFMCMsg(
                 customer_auth_token,
-                f'Your HandyMan Service request has been successfully canceled. \nPickup Location: {pickup_address}.',
+                f'Your HandyMan Service request has been successfully canceled. \Work Location: {pickup_address}.',
                 f'HandyMan Service Cancellation Confirmation - [Booking ID: {str(booking_id)}]',
                 fcm_data2,
                 server_token
