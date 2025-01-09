@@ -12278,16 +12278,7 @@ def new_jcb_crane_driver_recharge(request):
             # Updating Booking History Table
             try:
                 if negative_points >= 0 :
-                    query1 = """
-                    delete from vtpartner.jcb_crane_driver_topup_recharge_current_points_tbl where driver_id=%s
-                    """
-                    values1 = [
-                           
-                            driver_id
-                        ]
-
-                    # Execute the query
-                    row_count = delete_query(query1, values1)
+                    
                     
                     query = """
                     update vtpartner.jcb_crane_driver_topup_recharge_current_points_tbl set recharge_id=%s,allotted_points=%s,valid_till_date=%s,remaining_points=%s,negative_points='0',used_points='0' where topup_id=%s and driver_id=%s
