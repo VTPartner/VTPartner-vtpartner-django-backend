@@ -13863,6 +13863,7 @@ def generate_order_id_for_booking_id_handyman(request):
         server_token = data.get("server_token")
         customer_id = data.get("customer_id")
         total_amount = data.get("total_amount")
+        service_name = data.get("service_name")
         
 
         # List of required fields
@@ -13875,6 +13876,7 @@ def generate_order_id_for_booking_id_handyman(request):
             "server_token": server_token,
             "customer_id": customer_id,
             "total_amount": total_amount,
+            "service_name": service_name,
             
         }
         # Check for missing fields
@@ -13906,7 +13908,7 @@ def generate_order_id_for_booking_id_handyman(request):
             try:
 
                 query = """
-                    insert into vtpartner.handyman_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.handyman_bookings_history_tbl (booking_id,status) values (%s,%s)
                     """
                 values = [
                         booking_id,
@@ -13921,20 +13923,20 @@ def generate_order_id_for_booking_id_handyman(request):
                 body = title = ""
                 data_map = {}
                 if booking_status == "Agent Arrived":
-                    body = "Our agent has arrived at your pickup location"
+                    body = "Our agent has arrived at your specified location and is ready to assist you."
                     title = "HandyMan Agent Arrived"
                 elif booking_status == "OTP verified":
-                    body = "Your trip otp is verified"
+                    body = "The OTP for your service has been successfully verified."
                     title = "Trip OTP Verified"
                 elif booking_status == "Start Service":
-                    body = "Service has been started on your work location"
+                    body = "The service has commenced at your designated location. Thank you for choosing us."
                     title = "Service Started"
                 elif booking_status == "Ongoing":
                     body = "Trip has been started from your work location"
                     title = "Ongoing"
                 elif booking_status == "End Service":
-                    body = "Your service was done successfully"
-                    title = "Service Finished Successfully!"
+                    body = f"Thank you for choosing our services. Your Handy Man Service for '{service_name}' has been successfully completed."
+                    title = "Handy Man Service Successfully Completed!"
                 sendFMCMsg(auth_token,body,title,data_map,server_token)
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
