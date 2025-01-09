@@ -7886,7 +7886,7 @@ def jcb_crane_driver_booking_details_live_track(request):
             LEFT JOIN 
                 vtpartner.other_servicestbl ON jcb_crane_bookings_tbl.service_id = other_servicestbl.service_id AND jcb_crane_bookings_tbl.service_id != '-1'
             LEFT JOIN 
-                vtpartner.jcb_crane_driverstbl ON jcb_crane_driverstbl.other_driver_id = jcb_crane_bookings_tbl.driver_id
+                vtpartner.jcb_crane_driverstbl ON jcb_crane_driverstbl.jcb_crane_driver_id = jcb_crane_bookings_tbl.driver_id
             LEFT JOIN 
                 vtpartner.customers_tbl ON customers_tbl.customer_id = jcb_crane_bookings_tbl.customer_id
             WHERE 
