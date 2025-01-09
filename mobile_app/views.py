@@ -8005,7 +8005,7 @@ def handyman_agent_booking_details_live_track(request):
                 handymans_tbl.mobile_no AS driver_mobile_no,
                 sub_cat_name,
                 service_name,
-                handyman_driverstbl.profile_pic
+                handymans_tbl.profile_pic
             FROM 
                 vtpartner.handyman_bookings_tbl
             LEFT JOIN 
