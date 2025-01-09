@@ -9026,6 +9026,11 @@ def generate_order_id_for_booking_id_other_driver(request):
                         driver_id, 
                         pickup_lat, 
                         pickup_lng, 
+                        destination_lat,
+                        destination_lng,
+                        time,
+                        distance,
+                        drop_address,
                         total_price, 
                         base_price, 
                         booking_timing, 
@@ -9043,12 +9048,18 @@ def generate_order_id_for_booking_id_other_driver(request):
                         drop_time,
                         service_id,
                         sub_cat_id
+                        
                     )
                     SELECT 
                         customer_id, 
                         driver_id, 
                         pickup_lat, 
                         pickup_lng, 
+                        destination_lat,
+                        destination_lng,
+                        time,
+                        distance,
+                        drop_address,
                         total_price, 
                         base_price, 
                         booking_timing, 
@@ -9066,6 +9077,7 @@ def generate_order_id_for_booking_id_other_driver(request):
                         drop_time,
                         service_id,
                         sub_cat_id
+                        
                     FROM vtpartner.other_driver_bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
@@ -11419,7 +11431,8 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                         pickup_time,
                         drop_time,
                         sub_cat_id,
-                        service_id
+                        service_id,
+                        time
                     )
                     SELECT 
                         customer_id, 
@@ -11442,7 +11455,8 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                         pickup_time,
                         drop_time,
                         sub_cat_id,
-                        service_id
+                        service_id,
+                        time
                     FROM vtpartner.jcb_crane_bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
@@ -12084,6 +12098,7 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
         server_access_token = data.get("server_access_token")
         sub_cat_id = data.get("sub_cat_id")
         service_id = data.get("service_id")
+        service_hour = data.get("service_hour")
 
         # List of required fields
         required_fields = {
@@ -12103,6 +12118,7 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
             "server_access_token":server_access_token,
             "sub_cat_id":sub_cat_id,
             "service_id":service_id,
+            "service_hour":service_hour,
         }
 
         # Check for missing fields
@@ -12125,19 +12141,19 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
                 INSERT INTO vtpartner.jcb_crane_bookings_tbl (
                     customer_id, driver_id, pickup_lat, pickup_lng, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,pickup_address,sub_cat_id,service_id
+                    payment_method, city_id,pickup_address,sub_cat_id,service_id,time
                 ) 
                 VALUES (
                     %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s,%s,%s
+                    %s, %s,%s,%s,%s,%s
                 ) 
                 RETURNING booking_id;
             """
 
             insert_values = [
                 customer_id, '-1', pickup_lat, pickup_lng, total_price, base_price, otp, 
-                gst_amount, igst_amount, payment_method, city_id,pickup_address,sub_cat_id,service_id
+                gst_amount, igst_amount, payment_method, city_id,pickup_address,sub_cat_id,service_id,service_hour
             ]
 
             # Assuming insert_query is a function that runs the query
@@ -13537,14 +13553,11 @@ def generate_order_id_for_booking_id_handyman(request):
                 #Generating Order ID
                 try:
                     query = """
-                    INSERT INTO vtpartner.orders_tbl (
+                    INSERT INTO vtpartner.handyman_orders_tbl (
                         customer_id, 
                         driver_id, 
                         pickup_lat, 
-                        pickup_lng, 
-                        destination_lat, 
-                        destination_lng, 
-                        distance, 
+                        pickup_lng,  
                         time, 
                         total_price, 
                         base_price, 
@@ -13555,16 +13568,10 @@ def generate_order_id_for_booking_id_handyman(request):
                         otp, 
                         gst_amount, 
                         igst_amount, 
-                        goods_type_id, 
                         payment_method, 
                         city_id, 
                         booking_id, 
-                        sender_name, 
-                        sender_number, 
-                        receiver_name, 
-                        receiver_number, 
                         pickup_address, 
-                        drop_address,
                         pickup_time,
                         drop_time
                     )
@@ -13573,9 +13580,6 @@ def generate_order_id_for_booking_id_handyman(request):
                         driver_id, 
                         pickup_lat, 
                         pickup_lng, 
-                        destination_lat, 
-                        destination_lng, 
-                        distance, 
                         time, 
                         total_price, 
                         base_price, 
@@ -13585,20 +13589,14 @@ def generate_order_id_for_booking_id_handyman(request):
                         driver_arrival_time, 
                         otp, 
                         gst_amount, 
-                        igst_amount, 
-                        goods_type_id, 
+                        igst_amount,  
                         payment_method, 
                         city_id, 
                         booking_id, 
-                        sender_name, 
-                        sender_number, 
-                        receiver_name, 
-                        receiver_number, 
                         pickup_address, 
-                        drop_address,
                         pickup_time,
                         drop_time
-                    FROM vtpartner.bookings_tbl
+                    FROM vtpartner.handyman_bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
                     """
@@ -14239,6 +14237,7 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
         server_access_token = data.get("server_access_token")
         sub_cat_id = data.get("sub_cat_id")
         service_id = data.get("service_id")
+        service_hour = data.get("service_hour")
 
         # List of required fields
         required_fields = {
@@ -14258,6 +14257,7 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
             "server_access_token":server_access_token,
             "sub_cat_id":sub_cat_id,
             "service_id":service_id,
+            "service_hour":service_hour,
         }
 
         # Check for missing fields
@@ -14280,12 +14280,12 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
                 INSERT INTO vtpartner.handyman_bookings_tbl (
                     customer_id, driver_id, pickup_lat, pickup_lng, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,pickup_address,sub_cat_id,service_id
+                    payment_method, city_id,pickup_address,sub_cat_id,service_id,time
                 ) 
                 VALUES (
                     %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s,%s,%s
+                    %s, %s,%s,%s,%s,%s
                 ) 
                 RETURNING booking_id;
             """
