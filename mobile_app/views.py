@@ -8734,7 +8734,35 @@ def jcb_crane_booking_details_for_ride_acceptance(request):
             
         try:
             query = """
-                select booking_id,bookings_tbl.customer_id,bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,customer_name,customers_tbl.authtoken,pickup_address,drop_address from vtpartner.bookings_tbl,vtpartner.customers_tbl where customers_tbl.customer_id=bookings_tbl.customer_id and booking_id=%s
+                select booking_id,
+                jcb_crane_bookings_tbl.customer_id,
+                jcb_crane_bookings_tbl.driver_id,
+                pickup_lat,
+                pickup_lng,
+                distance,
+                jcb_crane_bookings_tbl.time,
+                total_price,
+                base_price,
+                booking_timing,
+                booking_date,
+                booking_status,
+                driver_arrival_time,
+                otp,
+                gst_amount,
+                igst_amount,
+                payment_method,
+                jcb_crane_bookings_tbl.city_id,
+                cancelled_reason,
+                cancel_time,
+                order_id,
+                customer_name,
+                customers_tbl.authtoken,
+                pickup_address,
+                sub_cat_name,
+                service_name
+                from vtpartner.sub_categorytbl,vtpartner.other_servicestbl,vtpartner.jcb_crane_bookings_tbl,vtpartner.customers_tbl 
+                where customers_tbl.customer_id=jcb_crane_bookings_tbl.customer_id and jcb_crane_bookings_tbl.sub_cat_id=sub_categorytbl.sub_cat_id
+                and jcb_crane_bookings_tbl.service_id=other_servicestbl.service_id  and booking_id=%s
             """
             result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
 
@@ -8749,33 +8777,27 @@ def jcb_crane_booking_details_for_ride_acceptance(request):
                     "driver_id": row[2],
                     "pickup_lat": row[3],
                     "pickup_lng": row[4],
-                    "destination_lat": row[5],
-                    "destination_lng": row[6],
-                    "distance": row[7],
-                    "total_time": row[8],
-                    "total_price": row[9],
-                    "base_price": row[10],
-                    "booking_timing": row[11],
-                    "booking_date": row[12],
-                    "booking_status": row[13],
-                    "driver_arrival_time": row[14],
-                    "otp": row[15],
-                    "gst_amount": row[16],
-                    "igst_amount": row[17],
-                    "goods_type_id": row[18],
-                    "payment_method": row[19],
-                    "city_id": row[20],
-                    "cancelled_reason": row[21],
-                    "cancel_time": row[22],
-                    "order_id": row[23],
-                    "sender_name": row[24],
-                    "sender_number": row[25],
-                    "receiver_name": row[26],
-                    "receiver_number": row[27],
-                    "customer_name": row[28],
-                    "customers_auth_token": row[29],
-                    "pickup_address": row[30],
-                    "drop_address": row[31],
+                    "distance": row[5],
+                    "total_time": row[6],
+                    "total_price": row[7],
+                    "base_price": row[8],
+                    "booking_timing": row[9],
+                    "booking_date": row[10],
+                    "booking_status": row[11],
+                    "driver_arrival_time": row[12],
+                    "otp": row[13],
+                    "gst_amount": row[14],
+                    "igst_amount": row[15],
+                    "payment_method": row[16],
+                    "city_id": row[17],
+                    "cancelled_reason": row[18],
+                    "cancel_time": row[19],
+                    "order_id": row[20],
+                    "customer_name": row[21],
+                    "customers_auth_token": row[22],
+                    "pickup_address": row[23],
+                    "sub_cat_name": row[24],
+                    "service_name": row[25],
                     
                 }
                 for row in result
@@ -8789,6 +8811,107 @@ def jcb_crane_booking_details_for_ride_acceptance(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt 
+def handyman_agent_booking_details_for_ride_acceptance(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        booking_id = data.get("booking_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "booking_id": booking_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                select booking_id,
+                handyman_bookings_tbl.customer_id,
+                handyman_bookings_tbl.driver_id,
+                pickup_lat,
+                pickup_lng,
+                distance,
+                handyman_bookings_tbl.time,
+                total_price,
+                base_price,
+                booking_timing,
+                booking_date,
+                booking_status,
+                driver_arrival_time,
+                otp,
+                gst_amount,
+                igst_amount,
+                payment_method,
+                handyman_bookings_tbl.city_id,
+                cancelled_reason,
+                cancel_time,
+                order_id,
+                customer_name,
+                customers_tbl.authtoken,
+                pickup_address,
+                sub_cat_name,
+                service_name
+                from vtpartner.sub_categorytbl,vtpartner.other_servicestbl,vtpartner.handyman_bookings_tbl,vtpartner.customers_tbl 
+                where customers_tbl.customer_id=handyman_bookings_tbl.customer_id and handyman_bookings_tbl.sub_cat_id=sub_categorytbl.sub_cat_id
+                and handyman_bookings_tbl.service_id=other_servicestbl.service_id  and booking_id=%s
+            """
+            result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            booking_details = [
+                {
+                    "booking_id": row[0],
+                    "customer_id": row[1],
+                    "driver_id": row[2],
+                    "pickup_lat": row[3],
+                    "pickup_lng": row[4],
+                    "distance": row[5],
+                    "total_time": row[6],
+                    "total_price": row[7],
+                    "base_price": row[8],
+                    "booking_timing": row[9],
+                    "booking_date": row[10],
+                    "booking_status": row[11],
+                    "driver_arrival_time": row[12],
+                    "otp": row[13],
+                    "gst_amount": row[14],
+                    "igst_amount": row[15],
+                    "payment_method": row[16],
+                    "city_id": row[17],
+                    "cancelled_reason": row[18],
+                    "cancel_time": row[19],
+                    "order_id": row[20],
+                    "customer_name": row[21],
+                    "customers_auth_token": row[22],
+                    "pickup_address": row[23],
+                    "sub_cat_name": row[24],
+                    "service_name": row[25],
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": booking_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
 def other_driver_booking_accepted(request):
@@ -11209,7 +11332,7 @@ def jcb_crane_driver_booking_accepted(request):
             
         try:
             query = """
-                select driver_id from vtpartner.bookings_tbl where booking_id=%s and driver_id!='-1'
+                select driver_id from vtpartner.jcb_crane_bookings_tbl where booking_id=%s and driver_id!='-1'
             """
             result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
 
@@ -11218,7 +11341,7 @@ def jcb_crane_driver_booking_accepted(request):
                 try:
 
                     query = """
-                       update vtpartner.bookings_tbl set driver_id=%s ,booking_status='Driver Accepted' where booking_id=%s
+                       update vtpartner.jcb_crane_bookings_tbl set driver_id=%s ,booking_status='Driver Accepted' where booking_id=%s
                         """
                     values = [
                             driver_id,
@@ -11231,7 +11354,7 @@ def jcb_crane_driver_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
+                           insert into vtpartner.jcb_crane_bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
                             """
                         values = [
                                 booking_id
@@ -11259,10 +11382,10 @@ def jcb_crane_driver_booking_accepted(request):
                             
                             #send Fcm notification to customer saying driver assigned
                             customer_data = {
-                                'intent':'live_tracking',
+                                'intent':'jcb_crane_live_tracking',
                                 'booking_id':str(booking_id)
                             }
-                            sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token)
+                            sendFMCMsg(auth_token,'You have been assigned a driver','JCB / Crane Driver Assigned',customer_data,server_token)
 
                             # Send success response
                             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
@@ -13244,86 +13367,6 @@ def update_firebase_handyman_token(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 
-@csrf_exempt 
-def handyman_booking_details_for_ride_acceptance(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        booking_id = data.get("booking_id")
-        
-        
-
-        # List of required fields
-        required_fields = {
-            "booking_id": booking_id,
-        
-        }
-        # Check for missing fields
-        missing_fields = check_missing_fields(required_fields)
-        
-        # If there are missing fields, return an error response
-        if missing_fields:
-            return JsonResponse(
-                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
-                status=400
-            )
-            
-        try:
-            query = """
-                select booking_id,bookings_tbl.customer_id,bookings_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,bookings_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,bookings_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,customer_name,customers_tbl.authtoken,pickup_address,drop_address from vtpartner.bookings_tbl,vtpartner.customers_tbl where customers_tbl.customer_id=bookings_tbl.customer_id and booking_id=%s
-            """
-            result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
-
-            if result == []:
-                return JsonResponse({"message": "No Data Found"}, status=404)
-
-            # Map each row to a dictionary with appropriate keys
-            booking_details = [
-                {
-                    "booking_id": row[0],
-                    "customer_id": row[1],
-                    "driver_id": row[2],
-                    "pickup_lat": row[3],
-                    "pickup_lng": row[4],
-                    "destination_lat": row[5],
-                    "destination_lng": row[6],
-                    "distance": row[7],
-                    "total_time": row[8],
-                    "total_price": row[9],
-                    "base_price": row[10],
-                    "booking_timing": row[11],
-                    "booking_date": row[12],
-                    "booking_status": row[13],
-                    "driver_arrival_time": row[14],
-                    "otp": row[15],
-                    "gst_amount": row[16],
-                    "igst_amount": row[17],
-                    "goods_type_id": row[18],
-                    "payment_method": row[19],
-                    "city_id": row[20],
-                    "cancelled_reason": row[21],
-                    "cancel_time": row[22],
-                    "order_id": row[23],
-                    "sender_name": row[24],
-                    "sender_number": row[25],
-                    "receiver_name": row[26],
-                    "receiver_number": row[27],
-                    "customer_name": row[28],
-                    "customers_auth_token": row[29],
-                    "pickup_address": row[30],
-                    "drop_address": row[31],
-                    
-                }
-                for row in result
-            ]
-
-            return JsonResponse({"results": booking_details}, status=200)
-
-        except Exception as err:
-            print("Error executing query:", err)
-            return JsonResponse({"message": "Internal Server Error"}, status=500)
-
-    return JsonResponse({"message": "Method not allowed"}, status=405)
-
 
 @csrf_exempt 
 def handyman_booking_accepted(request):
@@ -13356,7 +13399,7 @@ def handyman_booking_accepted(request):
             
         try:
             query = """
-                select driver_id from vtpartner.bookings_tbl where booking_id=%s and driver_id!='-1'
+                select driver_id from vtpartner.handyman_bookings_tbl where booking_id=%s and driver_id!='-1'
             """
             result = select_query(query,[booking_id])  # Assuming select_query is defined elsewhere
 
@@ -13365,7 +13408,7 @@ def handyman_booking_accepted(request):
                 try:
 
                     query = """
-                       update vtpartner.bookings_tbl set driver_id=%s ,booking_status='Driver Accepted' where booking_id=%s
+                       update vtpartner.handyman_bookings_tbl set driver_id=%s ,booking_status='Driver Accepted' where booking_id=%s
                         """
                     values = [
                             driver_id,
@@ -13378,7 +13421,7 @@ def handyman_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
+                           insert into vtpartner.handyman_bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
                             """
                         values = [
                                 booking_id
@@ -13406,7 +13449,7 @@ def handyman_booking_accepted(request):
                             
                             #send Fcm notification to customer saying driver assigned
                             customer_data = {
-                                'intent':'live_tracking',
+                                'intent':'handyman_live_tracking',
                                 'booking_id':str(booking_id)
                             }
                             sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token)

@@ -295,7 +295,7 @@ urlpatterns = [
     #Update Goods Driver Firebase Token
     path('update_firebase_handyman_token',views.update_firebase_handyman_token,name='update_firebase_handyman_token'),
     #Booking Details for ride acceptance
-    path('handyman_booking_details_for_ride_acceptance',views.handyman_booking_details_for_ride_acceptance,name='handyman_booking_details_for_ride_acceptance'),
+    path('handyman_agent_booking_details_for_ride_acceptance',views.handyman_agent_booking_details_for_ride_acceptance,name='handyman_agent_booking_details_for_ride_acceptance'),
     #Booking accepted
     path('handyman_booking_accepted',views.handyman_booking_accepted,name='handyman_booking_accepted'),
     #Update Booking Status Done by Goods Driver
