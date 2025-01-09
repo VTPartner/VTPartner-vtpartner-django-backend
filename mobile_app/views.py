@@ -2957,7 +2957,7 @@ def jcb_crane_driver_current_location(request):
        
         try:
             query = """
-               select current_lat,current_lng from vtpartner.active_jcb_crane_driverstbl where jcb_crane_driver_id=%s
+               select current_lat,current_lng from vtpartner.active_jcb_crane_drivertbl where jcb_crane_driver_id=%s
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
