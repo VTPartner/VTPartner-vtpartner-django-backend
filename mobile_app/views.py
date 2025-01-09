@@ -14035,7 +14035,7 @@ def generate_order_id_for_booking_id_handyman(request):
                                 #Adding the amount to driver earnings table
                                 try:
                                     query4 = """
-                                    insert into vtpartner.handyman_earningstbl(driver_id,amount,order_id,payment_id,payment_mode) values (%s,%s,%s,%s,%s)
+                                    insert into vtpartner.handyman_earningstbl(handy_man_id,amount,order_id,payment_id,payment_mode) values (%s,%s,%s,%s,%s)
                                     """
                                     values4 = [
                                             driver_id,
@@ -14063,7 +14063,7 @@ def generate_order_id_for_booking_id_handyman(request):
                                                     ELSE negative_points
                                                 END,
                                                 last_updated_time = date_part('epoch'::text, CURRENT_TIMESTAMP)
-                                            WHERE driver_id = %s
+                                            WHERE handy_man_id = %s
                                         """
                                         values5 = [
                                                 total_amount,  # %s for updating used_points
