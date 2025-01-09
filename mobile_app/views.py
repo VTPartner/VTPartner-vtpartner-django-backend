@@ -11737,9 +11737,9 @@ def update_booking_status_jcb_crane_driver(request):
                 elif booking_status == "Make Payment":
                     body = f"Please make payment for the JCB/Crane Service your work has been finished.\nBooking ID - {booking_id}\nPay Rs.{total_payment}/-"
                     title = "Make Payment for JCB/Crane Service"
-                elif booking_status == "End Trip":
+                elif booking_status == "End Service":
                     body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
+                    title = "End Of Service"
                     # Update Drop epoch here
                     update_drop_epoch_query = """
                     UPDATE vtpartner.jcb_crane_bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
@@ -11840,13 +11840,13 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                 elif booking_status == "OTP verified":
                     body = "Your trip otp is verified"
                     title = "Trip OTP Verified"
-                elif booking_status == "Start Trip":
+                elif booking_status == "Start Service":
                     body = "Service has been started on your work location"
                     title = "Service Started"
                 elif booking_status == "Ongoing":
                     body = "Trip has been started from your work location"
                     title = "Ongoing"
-                elif booking_status == "End Trip":
+                elif booking_status == "End Service":
                     body = "Your JCB / Crane Service Finished Successfully"
                     title = "Service Done Successfully"
                 sendFMCMsg(auth_token,body,title,data_map,server_token)
