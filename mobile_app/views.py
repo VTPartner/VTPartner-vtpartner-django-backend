@@ -13782,7 +13782,7 @@ def update_booking_status_handyman(request):
                 auth_token = get_customer_auth_token(customer_id)
                 body = title = ""
                 data_map = {}
-                if booking_status == "Driver Arrived":
+                if booking_status == "Agent Arrived":
                     body = "Our agent has arrived at your work location"
                     title = "Agent Arrived"
                 elif booking_status == "OTP Verified":
@@ -13806,7 +13806,7 @@ def update_booking_status_handyman(request):
                     title = "Make Payment For HandyMan Service"
                 elif booking_status == "End Service":
                     body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
+                    title = "Service Finished Successfully!"
                     # Update Drop epoch here
                     update_drop_epoch_query = """
                     UPDATE vtpartner.handyman_bookings_tbl SET drop_time=EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) where booking_id=%s
@@ -13901,7 +13901,7 @@ def generate_order_id_for_booking_id_handyman(request):
                 auth_token = get_customer_auth_token(customer_id)
                 body = title = ""
                 data_map = {}
-                if booking_status == "HandyMan Agent Arrived":
+                if booking_status == "Agent Arrived":
                     body = "Our agent has arrived at your pickup location"
                     title = "HandyMan Agent Arrived"
                 elif booking_status == "OTP verified":
@@ -13915,7 +13915,7 @@ def generate_order_id_for_booking_id_handyman(request):
                     title = "Ongoing"
                 elif booking_status == "End Service":
                     body = "Your service was done successfully"
-                    title = "Service Done Successfully"
+                    title = "Service Finished Successfully!"
                 sendFMCMsg(auth_token,body,title,data_map,server_token)
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
@@ -13990,7 +13990,7 @@ def generate_order_id_for_booking_id_handyman(request):
                             #success
                             try:
                                 query3 = """
-                                update vtpartner.bookings_tbl set booking_completed='1' where booking_id=%s
+                                update vtpartner.handyman_bookings_tbl set booking_completed='1' where booking_id=%s
                                 """
                                 values3 = [
                                         booking_id
@@ -14000,7 +14000,7 @@ def generate_order_id_for_booking_id_handyman(request):
                                 row_count = update_query(query3, values3)
                                 
                                 query_update = """
-                                update vtpartner.orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
+                                update vtpartner.handyman_orders_tbl set payment_method=%s,payment_id=%s where order_id=%s
                                 """
                                 values_update = [
                                         payment_method,
