@@ -720,7 +720,7 @@ def customer_reward_points_details(request):
 
         try:
             query = """
-                select reward_point_id,reward_points,time,added_date from vtpartner.reward_points_tbl where customer_id=%s
+                select reward_point_id,reward_points,time,added_date,booking_id from vtpartner.reward_points_tbl where customer_id=%s
             """
             result = select_query(query,[customer_id])  # Assuming select_query is defined elsewhere
 
@@ -733,7 +733,8 @@ def customer_reward_points_details(request):
                     "reward_point_id": row[0],
                     "reward_points": row[1],
                     "time": row[2],
-                    "added_date": row[3]
+                    "added_date": row[3],
+                    "booking_id": row[4],
                     
                     
                 }
