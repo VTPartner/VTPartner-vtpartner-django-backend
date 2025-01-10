@@ -11267,7 +11267,62 @@ def other_driver_all_orders(request):
             
         try:
             query = """
-                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,other_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,other_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,orders_tbl.ratings,orders_tbl.rating_description from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.other_driverstbl,vtpartner.customers_tbl where other_driverstbl.other_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.driver_id=%s and  vehiclestbl.vehicle_id=other_driverstbl.vehicle_id order by order_id desc
+                SELECT 
+    order_id,
+    other_driver_orders_tbl.customer_id,
+    other_driver_orders_tbl.driver_id,
+    pickup_lat,
+    pickup_lng,
+    destination_lat,
+    destination_lng,
+    distance,
+    other_driver_orders_tbl.time,
+    total_price,
+    base_price,
+    booking_timing,
+    booking_date,
+    booking_status,
+    driver_arrival_time,
+    otp,
+    gst_amount,
+    igst_amount,
+    payment_method,
+    other_driver_orders_tbl.city_id,
+    order_id,
+    driver_first_name AS driver_name,
+    other_driverstbl.authtoken AS driver_authtoken,
+    customer_name,
+    customers_tbl.authtoken AS customer_authtoken,
+    pickup_address,
+    drop_address,
+    customers_tbl.mobile_no AS customer_mobile_no,
+    other_driverstbl.mobile_no AS driver_mobile_no,
+    other_servicestbl.service_name,
+    sub_categorytbl.sub_cat_name,
+    other_driver_orders_tbl.ratings,
+    other_driver_orders_tbl.rating_description
+FROM 
+    vtpartner.other_driver_orders_tbl
+JOIN 
+    vtpartner.other_driverstbl 
+    ON other_driverstbl.other_driver_id = other_driver_orders_tbl.driver_id
+JOIN 
+    vtpartner.customers_tbl 
+    ON customers_tbl.customer_id = other_driver_orders_tbl.customer_id
+LEFT JOIN 
+    vtpartner.sub_categorytbl 
+    ON sub_categorytbl.sub_cat_id = other_driver_orders_tbl.sub_cat_id
+LEFT JOIN 
+    vtpartner.other_servicestbl 
+    ON other_driver_orders_tbl.service_id = other_servicestbl.service_id 
+    AND other_driver_orders_tbl.service_id != '-1'
+WHERE 
+    other_driver_orders_tbl.customer_id = %s
+ORDER BY 
+    order_id DESC;
+
+
+
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
@@ -11295,27 +11350,22 @@ def other_driver_all_orders(request):
                     "otp": str(row[15]),
                     "gst_amount": str(row[16]),
                     "igst_amount": str(row[17]),
-                    "goods_type_id": str(row[18]),
-                    "payment_method": str(row[19]),
-                    "city_id": str(row[20]),
-                    "order_id": str(row[21]),
-                    "sender_name": str(row[22]),
-                    "sender_number": str(row[23]),
-                    "receiver_name": str(row[24]),
-                    "receiver_number": str(row[25]),
-                    "driver_first_name": str(row[26]),
-                    "other_driver_auth_token": str(row[27]),
-                    "customer_name": str(row[28]),
-                    "customers_auth_token": str(row[29]),
-                    "pickup_address": str(row[30]),
-                    "drop_address": str(row[31]),
-                    "customer_mobile_no": str(row[32]),
-                    "driver_mobile_no": str(row[33]),
-                    "vehicle_id": str(row[34]),
-                    "vehicle_name": str(row[35]),
-                    "vehicle_image": str(row[36]),
-                    "ratings": str(row[37]),
-                    "rating_description": str(row[38]),
+                    "payment_method": str(row[18]),
+                    "city_id": str(row[19]),
+                    "order_id": str(row[20]),
+                    "driver_first_name": str(row[21]),
+                    "goods_driver_auth_token": str(row[22]),
+                    "customer_name": str(row[23]),
+                    "customers_auth_token": str(row[24]),
+                    "pickup_address": str(row[25]),
+                    "drop_address": str(row[26]),
+                    "customer_mobile_no": str(row[27]),
+                    "driver_mobile_no": str(row[28]),
+                    "service_name": str(row[29]),
+                    "sub_cat_name": str(row[30]),
+                    "ratings": str(row[31]),
+                    "rating_description": str(row[32])
+                    
                 }
                 for row in result
             ]
