@@ -1862,8 +1862,8 @@ def other_driver_order_details(request):
     pickup_time,
     drop_time,
     other_servicestbl.service_name,
-    sub_categorytbl.sub_cat_name
 FROM 
+    sub_categorytbl.sub_cat_name
     vtpartner.other_driver_orders_tbl
 JOIN 
     vtpartner.other_driverstbl 
@@ -1930,8 +1930,8 @@ ORDER BY
                     "ratings": str(row[30]),
                     "pickup_time": str(row[31]),
                     "drop_time": str(row[32]),
-                    "sub_cat_name": str(row[33]),
-                    "service_name": str(row[34]),
+                    "service_name": str(row[33]),
+                    "sub_cat_name": str(row[34]),
 
                     
                 }
