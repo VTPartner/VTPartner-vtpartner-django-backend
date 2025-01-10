@@ -13658,7 +13658,58 @@ def jcb_crane_driver_all_orders(request):
             
         try:
             query = """
-                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_name,jcb_crane_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,jcb_crane_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,orders_tbl.ratings,orders_tbl.rating_description from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.jcb_crane_driverstbl,vtpartner.customers_tbl where jcb_crane_driverstbl.jcb_crane_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.driver_id=%s and  vehiclestbl.vehicle_id=jcb_crane_driverstbl.vehicle_id order by order_id desc
+                SELECT 
+    order_id,
+    jcb_crane_orders_tbl.customer_id,
+    jcb_crane_orders_tbl.driver_id,
+    pickup_lat,
+    pickup_lng,
+    destination_lat,
+    destination_lng,
+    distance,
+    jcb_crane_orders_tbl.time,
+    total_price,
+    base_price,
+    booking_timing,
+    booking_date,
+    booking_status,
+    driver_arrival_time,
+    otp,
+    gst_amount,
+    igst_amount,
+    payment_method,
+    jcb_crane_orders_tbl.city_id,
+    order_id,
+    driver_name,
+    jcb_crane_driverstbl.authtoken AS driver_authtoken,
+    customer_name,
+    customers_tbl.authtoken AS customer_authtoken,
+    pickup_address,
+    drop_address,
+    customers_tbl.mobile_no AS customer_mobile_no,
+    jcb_crane_driverstbl.mobile_no AS driver_mobile_no,
+    other_servicestbl.service_name,
+    sub_categorytbl.sub_cat_name
+FROM 
+    vtpartner.jcb_crane_orders_tbl
+JOIN 
+    vtpartner.jcb_crane_driverstbl 
+    ON jcb_crane_driverstbl.jcb_crane_driver_id = jcb_crane_orders_tbl.driver_id
+JOIN 
+    vtpartner.customers_tbl 
+    ON customers_tbl.customer_id = jcb_crane_orders_tbl.customer_id
+LEFT JOIN 
+    vtpartner.sub_categorytbl 
+    ON sub_categorytbl.sub_cat_id = jcb_crane_orders_tbl.sub_cat_id
+LEFT JOIN 
+    vtpartner.other_servicestbl 
+    ON jcb_crane_orders_tbl.service_id = other_servicestbl.service_id 
+    AND jcb_crane_orders_tbl.service_id != '-1'
+WHERE 
+    jcb_crane_orders_tbl.driver_id = %s
+ORDER BY 
+    order_id DESC;
+
             """
             result = select_query(query,[driver_id])  # Assuming select_query is defined elsewhere
 
