@@ -240,6 +240,8 @@ urlpatterns = [
     path('new_other_driver_recharge',views.new_other_driver_recharge,name='new_other_driver_recharge'),
     #My All Rides
     path('other_driver_all_orders',views.other_driver_all_orders,name='other_driver_all_orders'),
+    #My All Rides
+    path('handyman_agent_all_orders',views.handyman_agent_all_orders,name='handyman_agent_all_orders'),
     #My Whole Years Earnings
     path('other_driver_whole_year_earnings',views.other_driver_whole_year_earnings,name='other_driver_whole_year_earnings'),
     #My All Rides
