@@ -59,6 +59,12 @@ urlpatterns = [
     path('customers_all_orders',views.customers_all_orders,name='customers_all_orders'),
     #Customers All Cab Orders
     path('customers_all_cab_orders',views.customers_all_cab_orders,name='customers_all_cab_orders'),
+    #Customers All JCB Crane Orders
+    path('customers_all_jcb_crane_orders',views.customers_all_jcb_crane_orders,name='customers_all_jcb_crane_orders'),
+    #Customers All Other Drivers Orders
+    path('customers_all_other_driver_orders',views.customers_all_other_driver_orders,name='customers_all_other_driver_orders'),
+    #Customers All Handymans Orders
+    path('customers_all_handyman_orders',views.customers_all_handyman_orders,name='customers_all_handyman_orders'),
     #Get Order Details
     path('goods_order_details',views.goods_order_details,name='goods_order_details'),
     #Get Cab Order Details
