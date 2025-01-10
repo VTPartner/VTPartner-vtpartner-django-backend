@@ -14826,7 +14826,9 @@ def generate_order_id_for_booking_id_handyman(request):
                         booking_id, 
                         pickup_address, 
                         pickup_time,
-                        drop_time
+                        drop_time,
+                        sub_cat_id,
+                        service_id
                     )
                     SELECT 
                         customer_id, 
@@ -14848,7 +14850,9 @@ def generate_order_id_for_booking_id_handyman(request):
                         booking_id, 
                         pickup_address, 
                         pickup_time,
-                        drop_time
+                        drop_time,
+                        sub_cat_id,
+                        service_id
                     FROM vtpartner.handyman_bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
