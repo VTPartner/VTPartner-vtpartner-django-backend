@@ -1881,8 +1881,8 @@ LEFT JOIN
 WHERE 
     other_driver_orders_tbl.customer_id = %s
 ORDER BY 
-    order_id DESC
-                select booking_id,cab_orders_tbl.customer_id,cab_orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,cab_orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,payment_method,cab_orders_tbl.city_id,order_id,driver_first_name,cab_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,cab_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,vehicle_plate_no,vehicle_fuel_type,cab_driverstbl.profile_pic,cab_orders_tbl.ratings,pickup_time,drop_time from vtpartner.vehiclestbl,vtpartner.cab_orders_tbl,vtpartner.cab_driverstbl,vtpartner.customers_tbl where cab_driverstbl.cab_driver_id=cab_orders_tbl.driver_id and customers_tbl.customer_id=cab_orders_tbl.customer_id and order_id=%s and vehiclestbl.vehicle_id=cab_driverstbl.vehicle_id
+    order_id DESC;
+               
             """
             result = select_query(query,[order_id])  # Assuming select_query is defined elsewhere
 
