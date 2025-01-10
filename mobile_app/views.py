@@ -5851,7 +5851,18 @@ def goods_driver_booking_accepted(request):
 
                             # Execute the query
                             row_count = update_query(query, values)
+                            random_number = random.randint(1, 10)
+                            query2 = """
+                           insert into vtpartner.reward_points_tbl (reward_points,customer_id,booking_id) values (%s,%s,%s)
+                            """
+                            values2 = [
+                                    random_number,
+                                    customer_id,
+                                    booking_id
+                                ]
 
+                            # Execute the query
+                            row_count = insert_query(query2, values2)
 
 
                             #get the customer auth token
