@@ -13689,7 +13689,10 @@ def jcb_crane_driver_all_orders(request):
     customers_tbl.mobile_no AS customer_mobile_no,
     jcb_crane_driverstbl.mobile_no AS driver_mobile_no,
     other_servicestbl.service_name,
-    sub_categorytbl.sub_cat_name
+    sub_categorytbl.sub_cat_name,
+    jcb_crane_orders_tbl.ratings,
+    jcb_crane_orders_tbl.rating_description
+    
 FROM 
     vtpartner.jcb_crane_orders_tbl
 JOIN 
@@ -13737,30 +13740,69 @@ ORDER BY
                     "otp": str(row[15]),
                     "gst_amount": str(row[16]),
                     "igst_amount": str(row[17]),
-                    "goods_type_id": str(row[18]),
-                    "payment_method": str(row[19]),
-                    "city_id": str(row[20]),
-                    "order_id": str(row[21]),
-                    "sender_name": str(row[22]),
-                    "sender_number": str(row[23]),
-                    "receiver_name": str(row[24]),
-                    "receiver_number": str(row[25]),
-                    "driver_first_name": str(row[26]),
-                    "jcb_crane_driver_auth_token": str(row[27]),
-                    "customer_name": str(row[28]),
-                    "customers_auth_token": str(row[29]),
-                    "pickup_address": str(row[30]),
-                    "drop_address": str(row[31]),
-                    "customer_mobile_no": str(row[32]),
-                    "driver_mobile_no": str(row[33]),
-                    "vehicle_id": str(row[34]),
-                    "vehicle_name": str(row[35]),
-                    "vehicle_image": str(row[36]),
-                    "ratings": str(row[37]),
-                    "rating_description": str(row[38]),
+                    "payment_method": str(row[18]),
+                    "city_id": str(row[19]),
+                    "order_id": str(row[20]),
+                    "driver_first_name": str(row[21]),
+                    "goods_driver_auth_token": str(row[22]),
+                    "customer_name": str(row[23]),
+                    "customers_auth_token": str(row[24]),
+                    "pickup_address": str(row[25]),
+                    "drop_address": str(row[26]),
+                    "customer_mobile_no": str(row[27]),
+                    "driver_mobile_no": str(row[28]),
+                    "service_name": str(row[29]),
+                    "sub_cat_name": str(row[30]),
+                    "ratings": str(row[31]),
+                    "rating_description": str(row[32])
+                    
                 }
                 for row in result
             ]
+            # booking_details = [
+            #     {
+            #         "booking_id": str(row[0]),
+            #         "customer_id": str(row[1]),
+            #         "driver_id": str(row[2]),
+            #         "pickup_lat": str(row[3]),
+            #         "pickup_lng": str(row[4]),
+            #         "destination_lat": str(row[5]),
+            #         "destination_lng": str(row[6]),
+            #         "distance": str(row[7]),
+            #         "total_time": str(row[8]),
+            #         "total_price": str(row[9]),
+            #         "base_price": str(row[10]),
+            #         "booking_timing": str(row[11]),
+            #         "booking_date": str(row[12]),
+            #         "booking_status": str(row[13]),
+            #         "driver_arrival_time": str(row[14]),
+            #         "otp": str(row[15]),
+            #         "gst_amount": str(row[16]),
+            #         "igst_amount": str(row[17]),
+            #         "goods_type_id": str(row[18]),
+            #         "payment_method": str(row[19]),
+            #         "city_id": str(row[20]),
+            #         "order_id": str(row[21]),
+            #         "sender_name": str(row[22]),
+            #         "sender_number": str(row[23]),
+            #         "receiver_name": str(row[24]),
+            #         "receiver_number": str(row[25]),
+            #         "driver_first_name": str(row[26]),
+            #         "jcb_crane_driver_auth_token": str(row[27]),
+            #         "customer_name": str(row[28]),
+            #         "customers_auth_token": str(row[29]),
+            #         "pickup_address": str(row[30]),
+            #         "drop_address": str(row[31]),
+            #         "customer_mobile_no": str(row[32]),
+            #         "driver_mobile_no": str(row[33]),
+            #         "vehicle_id": str(row[34]),
+            #         "vehicle_name": str(row[35]),
+            #         "vehicle_image": str(row[36]),
+            #         "ratings": str(row[37]),
+            #         "rating_description": str(row[38]),
+            #     }
+            #     for row in result
+            # ]
 
             return JsonResponse({"results": booking_details}, status=200)
 
