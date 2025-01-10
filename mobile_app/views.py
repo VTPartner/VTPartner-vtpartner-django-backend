@@ -2169,7 +2169,7 @@ LEFT JOIN
     ON jcb_crane_orders_tbl.service_id = other_servicestbl.service_id 
     AND jcb_crane_orders_tbl.service_id != '-1'
 WHERE 
-    jcb_crane_orders_tbl.customer_id = %s
+    jcb_crane_orders_tbl.order_id = %s
 ORDER BY 
     order_id DESC;
 
