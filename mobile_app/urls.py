@@ -69,6 +69,8 @@ urlpatterns = [
     path('goods_order_details',views.goods_order_details,name='goods_order_details'),
     #Get Cab Order Details
     path('cab_order_details',views.cab_order_details,name='cab_order_details'),
+    #Get JCB Crane Order Details
+    path('jcb_crane_order_details',views.jcb_crane_order_details,name='jcb_crane_order_details'),
     #Get Other Driver Order Details
     path('other_driver_order_details',views.other_driver_order_details,name='other_driver_order_details'),
     #Get Other HandyMan Order Details

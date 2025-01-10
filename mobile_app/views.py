@@ -2093,6 +2093,151 @@ ORDER BY
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
+def jcb_crane_order_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        order_id = data.get("order_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "order_id": order_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                SELECT 
+    booking_id,
+    jcb_crane_orders_tbl.customer_id,
+    jcb_crane_orders_tbl.driver_id,
+    pickup_lat,
+    pickup_lng,
+    destination_lat,
+    destination_lng,
+    distance,
+    jcb_crane_orders_tbl.time,
+    total_price,
+    base_price,
+    booking_timing,
+    booking_date,
+    booking_status,
+    driver_arrival_time,
+    otp,
+    gst_amount,
+    igst_amount,
+    payment_method,
+    jcb_crane_orders_tbl.city_id,
+    order_id,
+    driver_name,
+    jcb_crane_driverstbl.authtoken AS driver_authtoken,
+    customer_name,
+    customers_tbl.authtoken AS customer_authtoken,
+    pickup_address,
+    drop_address,
+    customers_tbl.mobile_no AS customer_mobile_no,
+    jcb_crane_driverstbl.mobile_no AS driver_mobile_no,
+    jcb_crane_driverstbl.profile_pic,
+    jcb_crane_orders_tbl.ratings,
+    pickup_time,
+    drop_time,
+    other_servicestbl.service_name,
+    sub_categorytbl.sub_cat_name
+FROM 
+    vtpartner.jcb_crane_orders_tbl
+JOIN 
+    vtpartner.jcb_crane_driverstbl 
+    ON jcb_crane_driverstbl.jcb_crane_driver_id = jcb_crane_orders_tbl.driver_id
+JOIN 
+    vtpartner.customers_tbl 
+    ON customers_tbl.customer_id = jcb_crane_orders_tbl.customer_id
+LEFT JOIN 
+    vtpartner.sub_categorytbl 
+    ON sub_categorytbl.sub_cat_id = jcb_crane_orders_tbl.sub_cat_id
+LEFT JOIN 
+    vtpartner.other_servicestbl 
+    ON jcb_crane_orders_tbl.service_id = other_servicestbl.service_id 
+    AND jcb_crane_orders_tbl.service_id != '-1'
+WHERE 
+    jcb_crane_orders_tbl.customer_id = %s
+ORDER BY 
+    order_id DESC;
+
+
+            """
+            result = select_query(query,[order_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            booking_details = [
+                {
+                    "booking_id": row[0],
+                    "customer_id": row[1],
+                    "driver_id": row[2],
+                    "pickup_lat": row[3],
+                    "pickup_lng": row[4],
+                    "destination_lat": row[5],
+                    "destination_lng": row[6],
+                    "distance": row[7],
+                    "total_time": row[8],
+                    "total_price": row[9],
+                    "base_price": row[10],
+                    "booking_timing": row[11],
+                    "booking_date": row[12],
+                    "booking_status": row[13],
+                    "driver_arrival_time": row[14],
+                    "otp": row[15],
+                    "gst_amount": row[16],
+                    "igst_amount": row[17],
+                    "payment_method": row[18],
+                    "city_id": row[19],
+                    "order_id": row[20],
+                    "driver_first_name": row[21],
+                    "goods_driver_auth_token": row[22],
+                    "customer_name": row[23],
+                    "customers_auth_token": row[24],
+                    "pickup_address": row[25],
+                    "drop_address": row[26],
+                    "customer_mobile_no": row[27],
+                    "driver_mobile_no": row[28],
+                    # "vehicle_id": str(row[29]),
+                    # "vehicle_name": str(row[30]),
+                    # "vehicle_image": str(row[31]),
+                    # "vehicle_plate_no": str(row[32]),
+                    # "vehicle_fuel_type": str(row[33]),
+                    "profile_pic": str(row[29]),
+                    "ratings": str(row[30]),
+                    "pickup_time": str(row[31]),
+                    "drop_time": str(row[32]),
+                    "service_name": str(row[33]),
+                    "sub_cat_name": str(row[34]),
+
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": booking_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
 def cancel_booking(request):
     if request.method == "POST":
         data = json.loads(request.body)
