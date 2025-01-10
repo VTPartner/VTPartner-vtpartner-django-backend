@@ -2767,7 +2767,7 @@ def save_handyman_order_ratings(request):
             
         try:
             query = """
-                UPDATE vtpartner.other_driver_orders_tbl set ratings=%s,rating_description=%s WHERE order_id=%s
+                UPDATE vtpartner.handyman_orders_tbl set ratings=%s,rating_description=%s WHERE order_id=%s
             """
             row_count = update_query(query,[ratings,ratings_description,order_id])  
             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
