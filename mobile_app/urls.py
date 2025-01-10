@@ -16,6 +16,8 @@ urlpatterns = [
     path('customer_registration',views.customer_registration,name='customer_registration'),
     #Get Customer Details
     path('customer_details',views.customer_details,name='customer_details'),
+    #Get Customer Reward Points Details
+    path('customer_reward_points_details',views.customer_reward_points_details,name='customer_reward_points_details'),
     #Update Customer Details
     path('update_customer_details',views.update_customer_details,name='update_customer_details'),
     #All Saved Addresses

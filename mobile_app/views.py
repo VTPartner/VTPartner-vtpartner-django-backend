@@ -698,6 +698,57 @@ def customer_details(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
+def customer_reward_points_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        customer_id = data.get("customer_id")
+
+        # List of required fields
+        required_fields = {
+            "customer_id":customer_id,
+        }
+
+        # Use the utility function to check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        try:
+            query = """
+                select reward_point_id,reward_points,time,added_date from vtpartner.reward_points_tbl where customer_id=%s
+            """
+            result = select_query(query,[customer_id])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            customer_details = [
+                {
+                    "reward_point_id": row[0],
+                    "reward_points": row[1],
+                    "time": row[2],
+                    "added_date": row[3]
+                    
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": customer_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
 def all_saved_addresses(request):
     if request.method == "POST":
         data = json.loads(request.body)
