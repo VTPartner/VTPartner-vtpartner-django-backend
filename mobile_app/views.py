@@ -1862,8 +1862,8 @@ def other_driver_order_details(request):
     pickup_time,
     drop_time,
     other_servicestbl.service_name,
-FROM 
     sub_categorytbl.sub_cat_name
+FROM 
     vtpartner.other_driver_orders_tbl
 JOIN 
     vtpartner.other_driverstbl 
