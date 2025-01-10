@@ -71,6 +71,8 @@ urlpatterns = [
     path('cab_order_details',views.cab_order_details,name='cab_order_details'),
     #Get Other Driver Order Details
     path('other_driver_order_details',views.other_driver_order_details,name='other_driver_order_details'),
+    #Get Other HandyMan Order Details
+    path('handyman_order_details',views.handyman_order_details,name='handyman_order_details'),
     #Cancel Booking
     path('cancel_booking',views.cancel_booking,name='cancel_booking'),
     #Cancel Cab Booking
