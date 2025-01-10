@@ -2370,6 +2370,123 @@ def save_cab_order_ratings(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
+def save_jcb_crane_order_ratings(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        ratings = data.get("ratings")
+        ratings_description = data.get("ratings_description")
+        order_id = data.get("order_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "ratings": ratings,
+            "ratings_description": ratings_description,
+            "order_id": order_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.jcb_crane_orders_tbl set ratings=%s,rating_description=%s WHERE order_id=%s
+            """
+            row_count = update_query(query,[ratings,ratings_description,order_id])  
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def save_other_driver_order_ratings(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        ratings = data.get("ratings")
+        ratings_description = data.get("ratings_description")
+        order_id = data.get("order_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "ratings": ratings,
+            "ratings_description": ratings_description,
+            "order_id": order_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.other_driver_orders_tbl set ratings=%s,rating_description=%s WHERE order_id=%s
+            """
+            row_count = update_query(query,[ratings,ratings_description,order_id])  
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
+def save_handyman_order_ratings(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        ratings = data.get("ratings")
+        ratings_description = data.get("ratings_description")
+        order_id = data.get("order_id")
+        
+        
+
+        # List of required fields
+        required_fields = {
+            "ratings": ratings,
+            "ratings_description": ratings_description,
+            "order_id": order_id,
+        
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+                UPDATE vtpartner.other_driver_orders_tbl set ratings=%s,rating_description=%s WHERE order_id=%s
+            """
+            row_count = update_query(query,[ratings,ratings_description,order_id])  
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
 def customers_all_bookings(request):
     if request.method == "POST":
         data = json.loads(request.body)

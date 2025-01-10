@@ -66,6 +66,12 @@ urlpatterns = [
     path('save_order_ratings',views.save_order_ratings,name='save_order_ratings'),
     #Save Cab Order Review
     path('save_cab_order_ratings',views.save_cab_order_ratings,name='save_cab_order_ratings'),
+    #Save Cab Order Review
+    path('save_jcb_crane_order_ratings',views.save_jcb_crane_order_ratings,name='save_jcb_crane_order_ratings'),
+    #Save Cab Order Review
+    path('save_other_driver_order_ratings',views.save_other_driver_order_ratings,name='save_other_driver_order_ratings'),
+    #Save Cab Order Review
+    path('save_handyman_order_ratings',views.save_handyman_order_ratings,name='save_handyman_order_ratings'),
     #Goods Driver Live Location Tracking
     path('goods_driver_current_location',views.goods_driver_current_location,name='goods_driver_current_location'),
     #Cab Driver Live Location Tracking
