@@ -1926,12 +1926,12 @@ ORDER BY
                     # "vehicle_image": str(row[31]),
                     # "vehicle_plate_no": str(row[32]),
                     # "vehicle_fuel_type": str(row[33]),
-                    "profile_pic": str(row[30]),
-                    "ratings": str(row[31]),
-                    "pickup_time": str(row[32]),
-                    "drop_time": str(row[33]),
-                    "sub_cat_name": str(row[34]),
-                    "service_name": str(row[35]),
+                    "profile_pic": str(row[29]),
+                    "ratings": str(row[30]),
+                    "pickup_time": str(row[31]),
+                    "drop_time": str(row[32]),
+                    "sub_cat_name": str(row[33]),
+                    "service_name": str(row[34]),
 
                     
                 }
