@@ -1879,7 +1879,7 @@ LEFT JOIN
     ON other_driver_orders_tbl.service_id = other_servicestbl.service_id 
     AND other_driver_orders_tbl.service_id != '-1'
 WHERE 
-    other_driver_orders_tbl.customer_id = %s
+    other_driver_orders_tbl.order_id = %s
 ORDER BY 
     order_id DESC;
                
