@@ -6129,26 +6129,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
                 # Execute the query
                 row_count = insert_query(query, values)
 
-                # Send success response
-                auth_token = get_customer_auth_token(customer_id)
-                body = title = ""
-                data_map = {}
-                if booking_status == "Driver Arrived":
-                    body = "Our agent has arrived at your pickup location"
-                    title = "Agent Arrived"
-                elif booking_status == "OTP verified":
-                    body = "Your trip otp is verified"
-                    title = "Trip OTP Verified"
-                elif booking_status == "Start Trip":
-                    body = "Trip has been started from your pickup location"
-                    title = "Trip Started"
-                elif booking_status == "Ongoing":
-                    body = "Trip has been started from your pickup location"
-                    title = "Ongoing"
-                elif booking_status == "End Trip":
-                    body = "Your package has been delivered successfully"
-                    title = "Package Deliveried"
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
                 #Generating Order ID
@@ -6227,6 +6208,30 @@ def generate_order_id_for_booking_id_goods_driver(request):
                     #get order_id from here
                     if ret_result!=None:
                         order_id = ret_result[0][0]
+                        # Send success response
+                        auth_token = get_customer_auth_token(customer_id)
+                        body = title = ""
+                        data_map = {}
+                        if booking_status == "Driver Arrived":
+                            body = "Our agent has arrived at your pickup location"
+                            title = "Agent Arrived"
+                        elif booking_status == "OTP verified":
+                            body = "Your trip otp is verified"
+                            title = "Trip OTP Verified"
+                        elif booking_status == "Start Trip":
+                            body = "Trip has been started from your pickup location"
+                            title = "Trip Started"
+                        elif booking_status == "Ongoing":
+                            body = "Trip has been started from your pickup location"
+                            title = "Ongoing"
+                        elif booking_status == "End Trip":
+                            body = "Your package has been delivered successfully"
+                            title = "Package Deliveried"
+                            data_map = {
+                                        'intent':'end_live_tracking',
+                                        'order_id':str(order_id)
+                                    }
+                        sendFMCMsg(auth_token,body,title,data_map,server_token)
                         try:
                             query2 = """
                             update vtpartner.active_goods_drivertbl set current_status='1' where goods_driver_id=%s
