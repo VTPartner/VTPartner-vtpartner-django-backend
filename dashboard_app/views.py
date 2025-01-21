@@ -4161,6 +4161,166 @@ def get_total_goods_drivers_un_verified_with_count(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def get_total_goods_drivers_blocked_with_count(request):
+    if request.method == "POST":
+        try:
+            query = """
+                SELECT *, 
+                       (SELECT COUNT(*) 
+                        FROM vtpartner.goods_driverstbl 
+                        WHERE status = 2) AS total_count
+                FROM vtpartner.goods_driverstbl
+                WHERE status = 2 ORDER BY goods_driver_id DESC;
+            """
+
+            result = select_query(query)  # Assuming select_query returns a list of tuples
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map the results to a list of dictionaries
+            mapped_results = []
+            for row in result:
+                # Map columns to their values
+                mapped_results.append({
+                    "goods_driver_id": row[0],
+                    "driver_first_name": row[1],
+                    "driver_last_name": row[2],
+                    "profile_pic": row[3],
+                    "is_online": row[4],
+                    "ratings": row[5],
+                    "mobile_no": row[6],
+                    "registration_date": row[7],
+                    "time": row[8],
+                    "r_lat": row[9],
+                    "r_lng": row[10],
+                    "current_lat": row[11],
+                    "current_lng": row[12],
+                    "status": row[13],
+                    "recent_online_pic": row[14],
+                    "is_verified": row[15],
+                    "category_id": row[16],
+                    "vehicle_id": row[17],
+                    "city_id": row[18],
+                    "aadhar_no": row[19],
+                    "pan_card_no": row[20],
+                    "house_no": row[21],
+                    "city_name": row[22],
+                    "full_address": row[23],
+                    "gender": row[24],
+                    "owner_id": row[25],
+                    "aadhar_card_front": row[26],
+                    "aadhar_card_back": row[27],
+                    "pan_card_front": row[28],
+                    "pan_card_back": row[29],
+                    "license_front": row[30],
+                    "license_back": row[31],
+                    "insurance_image": row[32],
+                    "noc_image": row[33],
+                    "pollution_certificate_image": row[34],
+                    "rc_image": row[35],
+                    "vehicle_image": row[36],
+                    "vehicle_plate_image": row[37],
+                    "driving_license_no": row[38],
+                    "vehicle_plate_no": row[39],
+                    "rc_no": row[40],
+                    "insurance_no": row[41],
+                    "noc_no": row[42],
+                    "vehicle_fuel_type": row[43],
+                    "authtoken": row[44],
+                    "otp_no": row[45],
+                    "total_count": row[-1],  # The total count is the last column
+                })
+
+            return JsonResponse({"drivers": mapped_results}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_total_goods_drivers_rejected_with_count(request):
+    if request.method == "POST":
+        try:
+            query = """
+                SELECT *, 
+                       (SELECT COUNT(*) 
+                        FROM vtpartner.goods_driverstbl 
+                        WHERE status = 3) AS total_count
+                FROM vtpartner.goods_driverstbl
+                WHERE status = 3 ORDER BY goods_driver_id DESC;
+            """
+
+            result = select_query(query)  # Assuming select_query returns a list of tuples
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map the results to a list of dictionaries
+            mapped_results = []
+            for row in result:
+                # Map columns to their values
+                mapped_results.append({
+                    "goods_driver_id": row[0],
+                    "driver_first_name": row[1],
+                    "driver_last_name": row[2],
+                    "profile_pic": row[3],
+                    "is_online": row[4],
+                    "ratings": row[5],
+                    "mobile_no": row[6],
+                    "registration_date": row[7],
+                    "time": row[8],
+                    "r_lat": row[9],
+                    "r_lng": row[10],
+                    "current_lat": row[11],
+                    "current_lng": row[12],
+                    "status": row[13],
+                    "recent_online_pic": row[14],
+                    "is_verified": row[15],
+                    "category_id": row[16],
+                    "vehicle_id": row[17],
+                    "city_id": row[18],
+                    "aadhar_no": row[19],
+                    "pan_card_no": row[20],
+                    "house_no": row[21],
+                    "city_name": row[22],
+                    "full_address": row[23],
+                    "gender": row[24],
+                    "owner_id": row[25],
+                    "aadhar_card_front": row[26],
+                    "aadhar_card_back": row[27],
+                    "pan_card_front": row[28],
+                    "pan_card_back": row[29],
+                    "license_front": row[30],
+                    "license_back": row[31],
+                    "insurance_image": row[32],
+                    "noc_image": row[33],
+                    "pollution_certificate_image": row[34],
+                    "rc_image": row[35],
+                    "vehicle_image": row[36],
+                    "vehicle_plate_image": row[37],
+                    "driving_license_no": row[38],
+                    "vehicle_plate_no": row[39],
+                    "rc_no": row[40],
+                    "insurance_no": row[41],
+                    "noc_no": row[42],
+                    "vehicle_fuel_type": row[43],
+                    "authtoken": row[44],
+                    "otp_no": row[45],
+                    "total_count": row[-1],  # The total count is the last column
+                })
+
+            return JsonResponse({"drivers": mapped_results}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 # 1. Get total orders count and total earnings
 @csrf_exempt
 def get_total_goods_drivers_orders_and_earnings(request):
