@@ -120,6 +120,14 @@ urlpatterns = [
     path('update_goods_driver_status',views.update_goods_driver_status,name='update_goods_driver_status'),
     # Admin Login
     path('get_total_goods_drivers_verified_with_count',views.get_total_goods_drivers_verified_with_count,name='get_total_goods_drivers_verified_with_count'),
+    # Admin Login
+    path('get_total_goods_drivers_un_verified_with_count',views.get_total_goods_drivers_un_verified_with_count,name='get_total_goods_drivers_un_verified_with_count'),
+    # Admin Login
+    path('get_total_goods_drivers_orders_and_earnings',views.get_total_goods_drivers_orders_and_earnings,name='get_total_goods_drivers_orders_and_earnings'),
+    # Admin Login
+    path('get_goods_drivers_today_earnings',views.get_goods_drivers_today_earnings,name='get_goods_drivers_today_earnings'),
+    # Admin Login
+    path('get_goods_drivers_current_month_earnings',views.get_goods_drivers_current_month_earnings,name='get_goods_drivers_current_month_earnings'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
