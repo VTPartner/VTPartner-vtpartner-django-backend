@@ -4188,7 +4188,7 @@ def get_total_goods_drivers_orders_and_earnings(request):
 # 2. Get today's earnings
 @csrf_exempt
 def get_goods_drivers_today_earnings(request):
-    if request.method == "GET":
+    if request.method == "POST":
         try:
             query = """
                 SELECT SUM(total_price) AS today_earnings
@@ -4209,7 +4209,7 @@ def get_goods_drivers_today_earnings(request):
 # 3. Get current month's earnings
 @csrf_exempt
 def get_goods_drivers_current_month_earnings(request):
-    if request.method == "GET":
+    if request.method == "POST":
         try:
             query = """
                 SELECT SUM(total_price) AS current_month_earnings
