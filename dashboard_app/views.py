@@ -4162,6 +4162,7 @@ def get_total_goods_drivers_un_verified_with_count(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 # 1. Get total orders count and total earnings
+@csrf_exempt
 def get_total_goods_drivers_orders_and_earnings(request):
     if request.method == "POST":
         try:
@@ -4185,6 +4186,7 @@ def get_total_goods_drivers_orders_and_earnings(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 # 2. Get today's earnings
+@csrf_exempt
 def get_goods_drivers_today_earnings(request):
     if request.method == "GET":
         try:
@@ -4205,6 +4207,7 @@ def get_goods_drivers_today_earnings(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 # 3. Get current month's earnings
+@csrf_exempt
 def get_goods_drivers_current_month_earnings(request):
     if request.method == "GET":
         try:
