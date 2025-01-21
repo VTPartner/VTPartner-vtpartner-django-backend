@@ -4010,7 +4010,7 @@ def get_total_goods_drivers_verified_with_count(request):
                         FROM vtpartner.goods_driverstbl 
                         WHERE status = 1) AS total_count
                 FROM vtpartner.goods_driverstbl
-                WHERE status = 1;
+                WHERE status = 1 ORDER BY goods_driver_id DESC;
             """
 
             result = select_query(query)  # Assuming select_query returns a list of tuples
