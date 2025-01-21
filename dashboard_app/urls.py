@@ -118,6 +118,8 @@ urlpatterns = [
     path('update_cab_driver_status',views.update_cab_driver_status,name='update_cab_driver_status'),
     #Admin Login
     path('update_goods_driver_status',views.update_goods_driver_status,name='update_goods_driver_status'),
+    # Admin Login
+    path('get_total_goods_drivers_verified_with_count',views.get_total_goods_drivers_verified_with_count,name='get_total_goods_drivers_verified_with_count'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
