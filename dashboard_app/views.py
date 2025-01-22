@@ -4609,7 +4609,7 @@ def get_goods_all_ongoing_bookings_details(request):
                 INNER JOIN 
                     vtpartner.vehiclestbl 
                     ON vehiclestbl.vehicle_id = goods_driverstbl.vehicle_id
-                WHERE bookings_tbl.booking_status!='Cancelled'
+                WHERE bookings_tbl.booking_status!='Cancelled' AND bookings_tbl.booking_status!='End Trip'
                 ORDER BY 
                     bookings_tbl.booking_id DESC;
             """
