@@ -2330,7 +2330,7 @@ def cancel_booking(request):
             
             #Updating it in Booking History Table to maintain record at what time it was cancelled
             query2 = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
             values2 = [
                     booking_id,
@@ -2428,7 +2428,7 @@ def cancel_cab_booking(request):
             
             #Updating it in Booking History Table to maintain record at what time it was cancelled
             query2 = """
-                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
             values2 = [
                     booking_id,
@@ -2526,7 +2526,7 @@ def cancel_other_driver_booking(request):
             
             #Updating it in Booking History Table to maintain record at what time it was cancelled
             query2 = """
-                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
             values2 = [
                     booking_id,
@@ -2624,7 +2624,7 @@ def cancel_jcb_crane_driver_booking(request):
             
             #Updating it in Booking History Table to maintain record at what time it was cancelled
             query2 = """
-                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
             values2 = [
                     booking_id,
@@ -2722,7 +2722,7 @@ def cancel_handyman_agent_booking(request):
             
             #Updating it in Booking History Table to maintain record at what time it was cancelled
             query2 = """
-                    insert into vtpartner.handyman_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.handyman_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
             values2 = [
                     booking_id,
@@ -5883,7 +5883,7 @@ def goods_driver_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
+                           insert into vtpartner.bookings_history_tbl (status,booking_id,time) values ('Driver Accepted',%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                             """
                         values = [
                                 booking_id
@@ -6000,7 +6000,7 @@ def update_booking_status_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -6119,7 +6119,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -7941,7 +7941,7 @@ def cab_driver_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.cab_bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
+                           insert into vtpartner.cab_bookings_history_tbl (status,booking_id,time) values ('Driver Accepted',%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                             """
                         values = [
                                 booking_id
@@ -8049,7 +8049,7 @@ def update_booking_status_cab_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -8168,7 +8168,7 @@ def generate_order_id_for_booking_id_cab_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.cab_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -10580,7 +10580,7 @@ def other_driver_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.other_driver_bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
+                           insert into vtpartner.other_driver_bookings_history_tbl (status,booking_id,time) values ('Driver Accepted',%s,,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                             """
                         values = [
                                 booking_id
@@ -10686,7 +10686,7 @@ def update_booking_status_other_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -10805,7 +10805,7 @@ def generate_order_id_for_booking_id_other_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.other_driver_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -13156,7 +13156,7 @@ def jcb_crane_driver_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.jcb_crane_bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
+                           insert into vtpartner.jcb_crane_bookings_history_tbl (status,booking_id,time) values ('Driver Accepted',%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                             """
                         values = [
                                 booking_id
@@ -13262,7 +13262,7 @@ def update_booking_status_jcb_crane_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -13381,7 +13381,7 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
             try:
 
                 query = """
-                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.jcb_crane_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -15329,7 +15329,7 @@ def handyman_booking_accepted(request):
                     try:
 
                         query = """
-                           insert into vtpartner.handyman_bookings_history_tbl (status,booking_id) values ('Driver Accepted',%s)
+                           insert into vtpartner.handyman_bookings_history_tbl (status,booking_id,time) values ('Driver Accepted',%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                             """
                         values = [
                                 booking_id
@@ -15435,7 +15435,7 @@ def update_booking_status_handyman(request):
             try:
 
                 query = """
-                    insert into vtpartner.handyman_bookings_history_tbl(booking_id,status) values (%s,%s)
+                    insert into vtpartner.handyman_bookings_history_tbl(booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
@@ -15556,7 +15556,7 @@ def generate_order_id_for_booking_id_handyman(request):
             try:
 
                 query = """
-                    insert into vtpartner.handyman_bookings_history_tbl (booking_id,status) values (%s,%s)
+                    insert into vtpartner.handyman_bookings_history_tbl (booking_id,status,time) values (%s,%s,EXTRACT(EPOCH FROM CURRENT_TIMESTAMP))
                     """
                 values = [
                         booking_id,
