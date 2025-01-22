@@ -4441,6 +4441,7 @@ def get_goods_all_ongoing_bookings_details(request):
         try:
             data = json.loads(request.body)
             key = data.get("key")
+            allBookings = data.get("allBookings")
             if key !=None:
                 query = """
                     SELECT 
@@ -4498,6 +4499,63 @@ def get_goods_all_ongoing_bookings_details(request):
                 ORDER BY 
                     bookings_tbl.booking_id DESC LIMIT 10;
                 """
+            elif allBookings!=None:
+                query = """
+                SELECT 
+                    bookings_tbl.booking_id,
+                    bookings_tbl.customer_id,
+                    bookings_tbl.driver_id,
+                    bookings_tbl.pickup_lat,
+                    bookings_tbl.pickup_lng,
+                    bookings_tbl.destination_lat,
+                    bookings_tbl.destination_lng,
+                    bookings_tbl.distance,
+                    bookings_tbl.time,
+                    bookings_tbl.total_price,
+                    bookings_tbl.base_price,
+                    bookings_tbl.booking_timing,
+                    bookings_tbl.booking_date,
+                    bookings_tbl.booking_status,
+                    bookings_tbl.driver_arrival_time,
+                    bookings_tbl.otp,
+                    bookings_tbl.gst_amount,
+                    bookings_tbl.igst_amount,
+                    bookings_tbl.goods_type_id,
+                    bookings_tbl.payment_method,
+                    bookings_tbl.city_id,
+                    bookings_tbl.cancelled_reason,
+                    bookings_tbl.cancel_time,
+                    bookings_tbl.order_id,
+                    bookings_tbl.sender_name,
+                    bookings_tbl.sender_number,
+                    bookings_tbl.receiver_name,
+                    bookings_tbl.receiver_number,
+                    goods_driverstbl.driver_first_name,
+                    goods_driverstbl.authtoken AS driver_authtoken,
+                    customers_tbl.customer_name,
+                    customers_tbl.authtoken AS customer_authtoken,
+                    bookings_tbl.pickup_address,
+                    bookings_tbl.drop_address,
+                    customers_tbl.mobile_no AS customer_mobile_no,
+                    goods_driverstbl.mobile_no AS driver_mobile_no,
+                    vehiclestbl.vehicle_id,
+                    vehiclestbl.vehicle_name,
+                    vehiclestbl.image
+                FROM 
+                    vtpartner.bookings_tbl
+                INNER JOIN 
+                    vtpartner.goods_driverstbl 
+                    ON goods_driverstbl.goods_driver_id = bookings_tbl.driver_id
+                INNER JOIN 
+                    vtpartner.customers_tbl 
+                    ON customers_tbl.customer_id = bookings_tbl.customer_id
+                INNER JOIN 
+                    vtpartner.vehiclestbl 
+                    ON vehiclestbl.vehicle_id = goods_driverstbl.vehicle_id
+                WHERE bookings_tbl.booking_status!='Cancelled'
+                ORDER BY 
+                    bookings_tbl.booking_id DESC;
+            """
             else:
                 query = """
                 SELECT 
