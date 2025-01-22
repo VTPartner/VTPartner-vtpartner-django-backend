@@ -4004,14 +4004,26 @@ def all_estimations(request):
 def get_total_goods_drivers_verified_with_count(request):
     if request.method == "POST":
         try:
-            query = """
-                SELECT *, 
-                       (SELECT COUNT(*) 
-                        FROM vtpartner.goods_driverstbl 
-                        WHERE status = 1) AS total_count
-                FROM vtpartner.goods_driverstbl
-                WHERE status = 1 ORDER BY goods_driver_id DESC;
-            """
+            data = json.loads(request.body)
+            key = data.get("key")
+            if key !=None:
+                    query = """
+                    SELECT *, 
+                        (SELECT COUNT(*) 
+                            FROM vtpartner.goods_driverstbl 
+                            WHERE status = 1) AS total_count
+                    FROM vtpartner.goods_driverstbl
+                    WHERE status = 1 ORDER BY goods_driver_id DESC LIMIT 10;
+                """
+            else:
+                query = """
+                    SELECT *, 
+                        (SELECT COUNT(*) 
+                            FROM vtpartner.goods_driverstbl 
+                            WHERE status = 1) AS total_count
+                    FROM vtpartner.goods_driverstbl
+                    WHERE status = 1 ORDER BY goods_driver_id DESC;
+                """
 
             result = select_query(query)  # Assuming select_query returns a list of tuples
 
@@ -4085,14 +4097,26 @@ def get_total_goods_drivers_verified_with_count(request):
 def get_total_goods_drivers_un_verified_with_count(request):
     if request.method == "POST":
         try:
-            query = """
-                SELECT *, 
-                       (SELECT COUNT(*) 
-                        FROM vtpartner.goods_driverstbl 
-                        WHERE status = 0) AS total_count
-                FROM vtpartner.goods_driverstbl
-                WHERE status = 0 ORDER BY goods_driver_id DESC;
-            """
+            data = json.loads(request.body)
+            key = data.get("key")
+            if key !=None:
+                query = """
+                    SELECT *, 
+                        (SELECT COUNT(*) 
+                            FROM vtpartner.goods_driverstbl 
+                            WHERE status = 0) AS total_count
+                    FROM vtpartner.goods_driverstbl
+                    WHERE status = 0 ORDER BY goods_driver_id DESC LIMIT 10;
+                """
+            else:
+                query = """
+                    SELECT *, 
+                        (SELECT COUNT(*) 
+                            FROM vtpartner.goods_driverstbl 
+                            WHERE status = 0) AS total_count
+                    FROM vtpartner.goods_driverstbl
+                    WHERE status = 0 ORDER BY goods_driver_id DESC;
+                """
 
             result = select_query(query)  # Assuming select_query returns a list of tuples
 
