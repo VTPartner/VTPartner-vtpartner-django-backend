@@ -132,6 +132,12 @@ urlpatterns = [
     path('get_goods_drivers_today_earnings',views.get_goods_drivers_today_earnings,name='get_goods_drivers_today_earnings'),
     # Admin Login
     path('get_goods_drivers_current_month_earnings',views.get_goods_drivers_current_month_earnings,name='get_goods_drivers_current_month_earnings'),
+    # Admin Login
+    path('get_goods_all_ongoing_bookings_details',views.get_goods_all_ongoing_bookings_details,name='get_goods_all_ongoing_bookings_details'),
+    # Admin Login
+    path('get_goods_all_cancelled_bookings_details',views.get_goods_all_cancelled_bookings_details,name='get_goods_all_cancelled_bookings_details'),
+    # Admin Login
+    path('get_goods_all_completed_orders_details',views.get_goods_all_completed_orders_details,name='get_goods_all_completed_orders_details'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
