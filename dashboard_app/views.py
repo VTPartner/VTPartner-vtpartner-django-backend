@@ -4189,7 +4189,19 @@ def get_total_goods_drivers_un_verified_with_count(request):
 def get_total_goods_drivers_blocked_with_count(request):
     if request.method == "POST":
         try:
-            query = """
+            data = json.loads(request.body)
+            key = data.get("key")
+            if key !=None:
+                query = """
+                    SELECT *, 
+                        (SELECT COUNT(*) 
+                            FROM vtpartner.goods_driverstbl 
+                            WHERE status = 2) AS total_count
+                    FROM vtpartner.goods_driverstbl
+                    WHERE status = 2 ORDER BY goods_driver_id DESC LIMIT 10;
+                """
+            else:
+                query = """
                 SELECT *, 
                        (SELECT COUNT(*) 
                         FROM vtpartner.goods_driverstbl 
@@ -4269,7 +4281,19 @@ def get_total_goods_drivers_blocked_with_count(request):
 def get_total_goods_drivers_rejected_with_count(request):
     if request.method == "POST":
         try:
-            query = """
+            data = json.loads(request.body)
+            key = data.get("key")
+            if key !=None:
+                query = """
+                    SELECT *, 
+                        (SELECT COUNT(*) 
+                            FROM vtpartner.goods_driverstbl 
+                            WHERE status = 3) AS total_count
+                    FROM vtpartner.goods_driverstbl
+                    WHERE status = 3 ORDER BY goods_driver_id DESC LIMIT 10;
+                """
+            else:
+                query = """
                 SELECT *, 
                        (SELECT COUNT(*) 
                         FROM vtpartner.goods_driverstbl 
