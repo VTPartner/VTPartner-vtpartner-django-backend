@@ -138,6 +138,10 @@ urlpatterns = [
     path('get_goods_all_cancelled_bookings_details',views.get_goods_all_cancelled_bookings_details,name='get_goods_all_cancelled_bookings_details'),
     # Admin Login
     path('get_goods_all_completed_orders_details',views.get_goods_all_completed_orders_details,name='get_goods_all_completed_orders_details'),
+    # Admin Login
+    path('get_goods_booking_detail_with_id',views.get_goods_booking_detail_with_id,name='get_goods_booking_detail_with_id'),
+    # Admin Login
+    path('get_goods_booking_detail_history_with_id',views.get_goods_booking_detail_history_with_id,name='get_goods_booking_detail_history_with_id'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
