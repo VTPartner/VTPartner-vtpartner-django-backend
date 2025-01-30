@@ -142,6 +142,8 @@ urlpatterns = [
     path('get_goods_booking_detail_with_id',views.get_goods_booking_detail_with_id,name='get_goods_booking_detail_with_id'),
     # Admin Login
     path('get_goods_booking_detail_history_with_id',views.get_goods_booking_detail_history_with_id,name='get_goods_booking_detail_history_with_id'),
+    #Goods Driver Live Location Tracking
+    path('goods_driver_current_location',views.goods_driver_current_location,name='goods_driver_current_location'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
