@@ -5121,7 +5121,53 @@ def goods_driver_current_location(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-    
+
+@csrf_exempt 
+def get_all_goods_driver_online_current_location(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        city_id = data.get("city_id")
+        
+      
+       
+        try:
+            if city_id!=None:
+                query = """
+                select active_goods_drivertbl.goods_driver_id,active_goods_drivertbl.current_lat,active_goods_drivertbl.current_lng,driver_first_name,profile_pic,entry_time,current_status from vtpartner.active_goods_drivertbl,vtpartner.goods_driverstbl where active_goods_drivertbl.goods_driver_id=goods_driverstbl.goods_driver_id and city_id=%s
+                """
+                result = select_query(query,[city_id])  # Assuming select_query is defined elsewhere
+            else:
+                query = """
+                select active_goods_drivertbl.goods_driver_id,active_goods_drivertbl.current_lat,active_goods_drivertbl.current_lng,driver_first_name,profile_pic,entry_time,current_status from vtpartner.active_goods_drivertbl,vtpartner.goods_driverstbl where active_goods_drivertbl.goods_driver_id=goods_driverstbl.goods_driver_id
+                """
+                result = select_query(query,[])  # Assuming select_query is defined elsewhere
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "goods_driver_id": row[0],
+                    "current_lat": row[1],
+                    "current_lng": row[2],
+                    "driver_first_name": row[3],
+                    "profile_pic": row[4],
+                    "entry_time": row[5],
+                    "current_status": row[6],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+ 
 @csrf_exempt
 def delete_estimation(request):
     try:
