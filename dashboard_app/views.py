@@ -5042,58 +5042,64 @@ def get_goods_order_detail_with_id(request):
             
         try:
             query = """
-                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and orders_tbl.order_id=%s and  vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id order by order_id desc
+                select booking_id,orders_tbl.customer_id,orders_tbl.driver_id,pickup_lat,pickup_lng,destination_lat,destination_lng,distance,orders_tbl.time,total_price,base_price,booking_timing,booking_date,booking_status,driver_arrival_time,otp,gst_amount,igst_amount,goods_type_id,payment_method,orders_tbl.city_id,cancelled_reason,cancel_time,order_id,sender_name,sender_number,receiver_name,receiver_number,driver_first_name,goods_driverstbl.authtoken,customer_name,customers_tbl.authtoken,pickup_address,drop_address,customers_tbl.mobile_no,goods_driverstbl.mobile_no,vehiclestbl.vehicle_id,vehiclestbl.vehicle_name,vehiclestbl.image,vehicle_plate_no,vehicle_fuel_type,goods_driverstbl.profile_pic from vtpartner.vehiclestbl,vtpartner.orders_tbl,vtpartner.goods_driverstbl,vtpartner.customers_tbl where goods_driverstbl.goods_driver_id=orders_tbl.driver_id and customers_tbl.customer_id=orders_tbl.customer_id and order_id=%s  and vehiclestbl.vehicle_id=goods_driverstbl.vehicle_id
             """
             result = select_query(query,[order_id])  # Assuming select_query is defined elsewhere
 
             if result == []:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            # Map each row to a dictionary with appropriate keys
-            booking_details = [
-                {
-                    "booking_id": str(row[0]),
-                    "customer_id": str(row[1]),
-                    "driver_id": str(row[2]),
-                    "pickup_lat": str(row[3]),
-                    "pickup_lng": str(row[4]),
-                    "destination_lat": str(row[5]),
-                    "destination_lng": str(row[6]),
-                    "distance": str(row[7]),
-                    "total_time": str(row[8]),
-                    "total_price": str(row[9]),
-                    "base_price": str(row[10]),
-                    "booking_timing": str(row[11]),
-                    "booking_date": str(row[12]),
-                    "booking_status": str(row[13]),
-                    "driver_arrival_time": str(row[14]),
-                    "otp": str(row[15]),
-                    "gst_amount": str(row[16]),
-                    "igst_amount": str(row[17]),
-                    "goods_type_id": str(row[18]),
-                    "payment_method": str(row[19]),
-                    "city_id": str(row[20]),
-                    "order_id": str(row[21]),
-                    "sender_name": str(row[22]),
-                    "sender_number": str(row[23]),
-                    "receiver_name": str(row[24]),
-                    "receiver_number": str(row[25]),
-                    "driver_first_name": str(row[26]),
-                    "goods_driver_auth_token": str(row[27]),
-                    "customer_name": str(row[28]),
-                    "customers_auth_token": str(row[29]),
-                    "pickup_address": str(row[30]),
-                    "drop_address": str(row[31]),
-                    "customer_mobile_no": str(row[32]),
-                    "driver_mobile_no": str(row[33]),
-                    "vehicle_id": str(row[34]),
-                    "vehicle_name": str(row[35]),
-                    "vehicle_image": str(row[36]),
-                }
-                for row in result
-            ]
+            # Map the results to a list of dictionaries
+            mapped_results = []
+            for row in result:
+                # Map columns to their values
+                mapped_results.append({
+                    "booking_id": row[0],
+                    "customer_id": row[1],
+                    "driver_id": row[2],
+                    "pickup_lat": row[3],
+                    "pickup_lng": row[4],
+                    "destination_lat": row[5],
+                    "destination_lng": row[6],
+                    "distance": row[7],
+                    "total_time": row[8],
+                    "total_price": row[9],
+                    "base_price": row[10],
+                    "booking_timing": row[11],
+                    "booking_date": row[12],
+                    "booking_status": row[13],
+                    "driver_arrival_time": row[14],
+                    "otp": row[15],
+                    "gst_amount": row[16],
+                    "igst_amount": row[17],
+                    "goods_type_id": row[18],
+                    "payment_method": row[19],
+                    "city_id": row[20],
+                    "cancelled_reason": row[21],
+                    "cancel_time": row[22],
+                    "order_id": row[23],
+                    "sender_name": row[24],
+                    "sender_number": row[25],
+                    "receiver_name": row[26],
+                    "receiver_number": row[27],
+                    "driver_first_name": row[28],
+                    "goods_driver_auth_token": row[29],
+                    "customer_name": row[30],
+                    "customers_auth_token": row[31],
+                    "pickup_address": row[32],
+                    "drop_address": row[33],
+                    "customer_mobile_no": row[34],
+                    "driver_mobile_no": row[35],
+                    "vehicle_id": str(row[36]),
+                    "vehicle_name": str(row[37]),
+                    "vehicle_image": str(row[38]),
+                    "vehicle_plate_no": str(row[39]),
+                    "vehicle_fuel_type": str(row[40]),
+                    "profile_pic": str(row[41]),
 
-            return JsonResponse({"results": booking_details}, status=200)
+                })
+
+            return JsonResponse({"results": mapped_results}, status=200)
 
 
         except Exception as err:
