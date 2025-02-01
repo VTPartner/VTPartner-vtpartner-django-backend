@@ -5224,12 +5224,12 @@ def get_all_goods_driver_online_current_location(request):
         try:
             if city_id!=None:
                 query = """
-                select active_goods_drivertbl.goods_driver_id,active_goods_drivertbl.current_lat,active_goods_drivertbl.current_lng,driver_first_name,profile_pic,entry_time,current_status from vtpartner.active_goods_drivertbl,vtpartner.goods_driverstbl where active_goods_drivertbl.goods_driver_id=goods_driverstbl.goods_driver_id and city_id=%s
+                select active_goods_drivertbl.goods_driver_id,active_goods_drivertbl.current_lat,active_goods_drivertbl.current_lng,driver_first_name,profile_pic,entry_time,current_status,goods_driverstbl.mobile_no from vtpartner.active_goods_drivertbl,vtpartner.goods_driverstbl where active_goods_drivertbl.goods_driver_id=goods_driverstbl.goods_driver_id and city_id=%s
                 """
                 result = select_query(query,[city_id])  # Assuming select_query is defined elsewhere
             else:
                 query = """
-                select active_goods_drivertbl.goods_driver_id,active_goods_drivertbl.current_lat,active_goods_drivertbl.current_lng,driver_first_name,profile_pic,entry_time,current_status from vtpartner.active_goods_drivertbl,vtpartner.goods_driverstbl where active_goods_drivertbl.goods_driver_id=goods_driverstbl.goods_driver_id
+                select active_goods_drivertbl.goods_driver_id,active_goods_drivertbl.current_lat,active_goods_drivertbl.current_lng,driver_first_name,profile_pic,entry_time,current_status,goods_driverstbl.mobile_no from vtpartner.active_goods_drivertbl,vtpartner.goods_driverstbl where active_goods_drivertbl.goods_driver_id=goods_driverstbl.goods_driver_id
                 """
                 result = select_query(query,[])  # Assuming select_query is defined elsewhere
 
@@ -5246,6 +5246,7 @@ def get_all_goods_driver_online_current_location(request):
                     "profile_pic": row[4],
                     "entry_time": row[5],
                     "current_status": row[6],
+                    "mobile_no": row[7],
                 }
                 for row in result
             ]
