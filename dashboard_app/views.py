@@ -4062,7 +4062,7 @@ def get_total_goods_drivers_verified_with_count(request):
                     "noc_image": row[33],
                     "pollution_certificate_image": row[34],
                     "rc_image": row[35],
-                    "vehicle_image": row[36],
+                    "driver_vehicle_image": row[36],
                     "vehicle_plate_image": row[37],
                     "driving_license_no": row[38],
                     "vehicle_plate_no": row[39],
