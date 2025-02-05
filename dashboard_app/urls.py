@@ -148,7 +148,7 @@ urlpatterns = [
     path('goods_driver_current_location',views.goods_driver_current_location,name='goods_driver_current_location'),
     #Goods Driver All Live Location Tracking
     path('get_all_goods_driver_online_current_location',views.get_all_goods_driver_online_current_location,name='get_all_goods_driver_online_current_location'),
-    #Goods Driver All Live Location Tracking
+    #Goods Driver All verified not verified
     path('get_total_goods_drivers_with_count',views.get_total_goods_drivers_with_count,name='get_total_goods_drivers_with_count'),
     #Admin Login
     # path('login',views.login_view,name='login'),
