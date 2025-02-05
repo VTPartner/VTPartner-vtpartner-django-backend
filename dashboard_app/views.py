@@ -3998,7 +3998,102 @@ def all_estimations(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
-    
+
+
+
+@csrf_exempt
+def get_total_goods_drivers_with_count(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            key = data.get("key")
+            status = data.get("status")  # Status: 1 = Verified, 0 = Unverified, 2 = Blocked, 3 = Rejected
+            
+            if status not in [0, 1, 2, 3]:
+                return JsonResponse({"message": "Invalid status provided"}, status=400)
+
+            query = f"""
+                SELECT gd.*, 
+                    v.vehicle_name, v.weight, v.description, v.image, v.size_image,
+                    (SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = {status}) AS total_count
+                FROM vtpartner.goods_driverstbl gd
+                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
+                WHERE gd.status = {status}
+                ORDER BY gd.goods_driver_id DESC
+                {'LIMIT 10' if key is not None else ''};
+            """
+
+            result = select_query(query)  # Assuming select_query returns a list of tuples
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map the results to a list of dictionaries
+            mapped_results = []
+            for row in result:
+                mapped_results.append({
+                    "goods_driver_id": row[0],
+                    "driver_first_name": row[1],
+                    "driver_last_name": row[2],
+                    "profile_pic": row[3],
+                    "is_online": row[4],
+                    "ratings": row[5],
+                    "mobile_no": row[6],
+                    "registration_date": row[7],
+                    "time": row[8],
+                    "r_lat": row[9],
+                    "r_lng": row[10],
+                    "current_lat": row[11],
+                    "current_lng": row[12],
+                    "status": row[13],
+                    "recent_online_pic": row[14],
+                    "is_verified": row[15],
+                    "category_id": row[16],
+                    "vehicle_id": row[17],
+                    "city_id": row[18],
+                    "aadhar_no": row[19],
+                    "pan_card_no": row[20],
+                    "house_no": row[21],
+                    "city_name": row[22],
+                    "full_address": row[23],
+                    "gender": row[24],
+                    "owner_id": row[25],
+                    "aadhar_card_front": row[26],
+                    "aadhar_card_back": row[27],
+                    "pan_card_front": row[28],
+                    "pan_card_back": row[29],
+                    "license_front": row[30],
+                    "license_back": row[31],
+                    "insurance_image": row[32],
+                    "noc_image": row[33],
+                    "pollution_certificate_image": row[34],
+                    "rc_image": row[35],
+                    "driver_vehicle_image": row[36],
+                    "vehicle_plate_image": row[37],
+                    "driving_license_no": row[38],
+                    "vehicle_plate_no": row[39],
+                    "rc_no": row[40],
+                    "insurance_no": row[41],
+                    "noc_no": row[42],
+                    "vehicle_fuel_type": row[43],
+                    "authtoken": row[44],
+                    "otp_no": row[45],
+                    "vehicle_name": row[46] if row[46] else "NA",
+                    "vehicle_weight": row[47] if row[47] else "NA",
+                    "vehicle_description": row[48] if row[48] else "NA",
+                    "vehicle_image": row[49] if row[49] else "NA",
+                    "vehicle_size_image": row[50] if row[50] else "NA",
+                    "total_count": row[51],  # The total count is the last column
+                })
+
+            return JsonResponse({"drivers": mapped_results}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+ 
 
 @csrf_exempt
 def get_total_goods_drivers_verified_with_count(request):
