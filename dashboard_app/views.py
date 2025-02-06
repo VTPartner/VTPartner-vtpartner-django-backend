@@ -5421,7 +5421,8 @@ def get_goods_driver_details(request):
                 v.description AS vehicle_description, 
                 v.image AS vehicle_image, 
                 v.size_image, 
-                vt.vehicle_type_name
+                vt.vehicle_type_name,
+                gd.reason
             FROM vtpartner.goods_driverstbl gd
             LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id
             LEFT JOIN vtpartner.vehicle_types_tbl vt ON v.vehicle_type_id = vt.vehicle_type_id
@@ -5488,7 +5489,9 @@ def get_goods_driver_details(request):
                 "vehicle_description": result[0][48],
                 "vehicle_image": result[0][49],
                 "vehicle_size_image": result[0][50],
-                "vehicle_type_name": result[0][51]
+                "vehicle_type_name": result[0][51],
+                "reason": result[0][52],
+                
             }
 
             return JsonResponse({"result": driver_details}, status=200)
