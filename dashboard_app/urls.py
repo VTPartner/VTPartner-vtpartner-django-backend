@@ -150,6 +150,8 @@ urlpatterns = [
     path('get_all_goods_driver_online_current_location',views.get_all_goods_driver_online_current_location,name='get_all_goods_driver_online_current_location'),
     #Goods Driver All verified not verified
     path('get_total_goods_drivers_with_count',views.get_total_goods_drivers_with_count,name='get_total_goods_drivers_with_count'),
+    #Get Goods Driver Details
+    path('get_goods_driver_details',views.get_goods_driver_details,name='get_goods_driver_details'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]

@@ -5350,7 +5350,131 @@ def get_all_goods_driver_online_current_location(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
- 
+@csrf_exempt 
+def get_goods_driver_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        goods_driver_id = data.get("goods_driver_id")
+        
+        try:
+            if goods_driver_id is not None:
+                # Use goods_driver_id for filtering
+                query = """
+                SELECT goods_driver_id, 
+                       driver_first_name, 
+                       driver_last_name, 
+                       profile_pic, 
+                       is_online, 
+                       ratings, 
+                       mobile_no, 
+                       registration_date, 
+                       time, 
+                       r_lat, 
+                       r_lng, 
+                       current_lat, 
+                       current_lng, 
+                       status, 
+                       recent_online_pic, 
+                       is_verified, 
+                       category_id, 
+                       vehicle_id, 
+                       city_id, 
+                       aadhar_no, 
+                       pan_card_no, 
+                       house_no, 
+                       city_name, 
+                       full_address, 
+                       gender, 
+                       owner_id, 
+                       aadhar_card_front, 
+                       aadhar_card_back, 
+                       pan_card_front, 
+                       pan_card_back, 
+                       license_front, 
+                       license_back, 
+                       insurance_image, 
+                       noc_image, 
+                       pollution_certificate_image, 
+                       rc_image, 
+                       vehicle_image, 
+                       vehicle_plate_image, 
+                       driving_license_no, 
+                       vehicle_plate_no, 
+                       rc_no, 
+                       insurance_no, 
+                       noc_no, 
+                       vehicle_fuel_type, 
+                       authtoken, 
+                       otp_no 
+                FROM vtpartner.goods_driverstbl
+                WHERE goods_driver_id = %s
+                """
+                result = select_query(query, [goods_driver_id])  # Assuming select_query is defined elsewhere
+            else:
+                return JsonResponse({"message": "goods_driver_id is required"}, status=400)
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Mapping the row to a dictionary with all the column names
+            driver_details = {
+                "goods_driver_id": result[0][0],
+                "driver_first_name": result[0][1],
+                "driver_last_name": result[0][2],
+                "profile_pic": result[0][3],
+                "is_online": result[0][4],
+                "ratings": result[0][5],
+                "mobile_no": result[0][6],
+                "registration_date": result[0][7],
+                "time": result[0][8],
+                "r_lat": result[0][9],
+                "r_lng": result[0][10],
+                "current_lat": result[0][11],
+                "current_lng": result[0][12],
+                "status": result[0][13],
+                "recent_online_pic": result[0][14],
+                "is_verified": result[0][15],
+                "category_id": result[0][16],
+                "vehicle_id": result[0][17],
+                "city_id": result[0][18],
+                "aadhar_no": result[0][19],
+                "pan_card_no": result[0][20],
+                "house_no": result[0][21],
+                "city_name": result[0][22],
+                "full_address": result[0][23],
+                "gender": result[0][24],
+                "owner_id": result[0][25],
+                "aadhar_card_front": result[0][26],
+                "aadhar_card_back": result[0][27],
+                "pan_card_front": result[0][28],
+                "pan_card_back": result[0][29],
+                "license_front": result[0][30],
+                "license_back": result[0][31],
+                "insurance_image": result[0][32],
+                "noc_image": result[0][33],
+                "pollution_certificate_image": result[0][34],
+                "rc_image": result[0][35],
+                "vehicle_image": result[0][36],
+                "vehicle_plate_image": result[0][37],
+                "driving_license_no": result[0][38],
+                "vehicle_plate_no": result[0][39],
+                "rc_no": result[0][40],
+                "insurance_no": result[0][41],
+                "noc_no": result[0][42],
+                "vehicle_fuel_type": result[0][43],
+                "authtoken": result[0][44],
+                "otp_no": result[0][45]
+            }
+
+            return JsonResponse({"result": driver_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
 @csrf_exempt
 def delete_estimation(request):
     try:
