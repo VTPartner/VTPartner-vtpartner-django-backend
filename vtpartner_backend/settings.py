@@ -62,6 +62,9 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3004'
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True  # Remove this in production for security
+
+
 ROOT_URLCONF = 'vtpartner_backend.urls'
 
 TEMPLATES = [
