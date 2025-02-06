@@ -4944,7 +4944,6 @@ def get_goods_all_cancelled_bookings_details(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-
 @csrf_exempt
 def get_goods_all_completed_orders_details(request):
     if request.method == "POST":
@@ -5199,7 +5198,6 @@ def get_goods_order_detail_with_id(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-
 @csrf_exempt
 def get_goods_booking_detail_history_with_id(request):
     if request.method == "POST":
@@ -5302,7 +5300,6 @@ def goods_driver_current_location(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
-
 
 @csrf_exempt 
 def get_all_goods_driver_online_current_location(request):
