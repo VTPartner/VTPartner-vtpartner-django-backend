@@ -5474,7 +5474,7 @@ def get_goods_driver_details(request):
                 "noc_image": result[0][33],
                 "pollution_certificate_image": result[0][34],
                 "rc_image": result[0][35],
-                "vehicle_image": result[0][36],
+                "driver_vehicle_image": result[0][36],
                 "vehicle_plate_image": result[0][37],
                 "driving_license_no": result[0][38],
                 "vehicle_plate_no": result[0][39],
