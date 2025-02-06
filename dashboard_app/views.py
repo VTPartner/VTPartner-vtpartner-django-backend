@@ -3415,6 +3415,7 @@ def update_goods_driver_status(request):
         print("body::",data)
         goods_driver_id= data.get("goods_driver_id"),
         status= data.get("status"),
+        reason= data.get("reason"),
         
         
         required_fields = {
@@ -3431,18 +3432,29 @@ def update_goods_driver_status(request):
             )
 
         # Prepare the update query and values
-        query = """
-            UPDATE vtpartner.goods_driverstbl
-            SET 
-                status = %s
-               
-            WHERE goods_driver_id = %s
-        """
-
         update_values = [
             status,
             goods_driver_id,
         ]
+        
+        # Add reason to the query if it is not empty
+        if reason:
+            query = """
+                UPDATE vtpartner.goods_driverstbl
+                SET 
+                    status = %s,
+                    reason = %s
+                WHERE goods_driver_id = %s
+            """
+            update_values = [status, reason, goods_driver_id]
+        else:
+            query = """
+                UPDATE vtpartner.goods_driverstbl
+                SET 
+                    status = %s
+                WHERE goods_driver_id = %s
+            """
+
 
         row_count = update_query(query, update_values)
 
