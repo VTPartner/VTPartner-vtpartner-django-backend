@@ -4039,7 +4039,7 @@ def get_total_goods_drivers_with_count(request):
                     gd.city_name, gd.full_address, gd.gender, gd.owner_id, gd.aadhar_card_front, 
                     gd.aadhar_card_back, gd.pan_card_front, gd.pan_card_back, gd.license_front, 
                     gd.license_back, gd.insurance_image, gd.noc_image, gd.pollution_certificate_image, 
-                    gd.rc_image, gd.driver_vehicle_image, gd.vehicle_plate_image, gd.driving_license_no, 
+                    gd.rc_image, v.vehicle_image, gd.vehicle_plate_image, gd.driving_license_no, 
                     gd.vehicle_plate_no, gd.rc_no, gd.insurance_no, gd.noc_no, gd.vehicle_fuel_type, 
                     v.vehicle_name, 
                     v.image
