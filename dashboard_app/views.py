@@ -4113,23 +4113,29 @@ def get_total_goods_drivers_verified_with_count(request):
         try:
             data = json.loads(request.body)
             key = data.get("key")
+
+            # Get the total count separately
+            count_query = "SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = 1;"
+            total_count_result = select_query(count_query)
+            total_count = total_count_result[0][0] if total_count_result else 0
+
+            # Now fetch the driver data
             query = f"""
             SELECT gd.*, 
-                v.vehicle_name, v.weight, v.description, v.image,
-                (SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = 1) AS total_count
+                v.vehicle_name, v.weight, v.description, v.image, v.size_image
             FROM vtpartner.goods_driverstbl gd
             LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
             WHERE gd.status = 1 
             ORDER BY gd.goods_driver_id DESC
             {'LIMIT 10' if key is not None else ''};
-        """
+            """
 
-            result = select_query(query)  # Assuming select_query returns a list of tuples
+            result = select_query(query)
 
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            # Map the results to a list of dictionaries
+            # Map the results
             mapped_results = []
             for row in result:
                 mapped_results.append({
@@ -4183,11 +4189,11 @@ def get_total_goods_drivers_verified_with_count(request):
                     "vehicle_weight": row[47] if row[47] else "NA",
                     "vehicle_description": row[48] if row[48] else "NA",
                     "vehicle_image": row[49] if row[49] else "NA",
-                    # "vehicle_size_image": row[50] if row[50] else "NA",
-                    "total_count": row[50],  # The total count is the last column
+                    "vehicle_size_image": row[50] if row[50] else "NA",
                 })
 
-            return JsonResponse({"drivers": mapped_results}, status=200)
+            # Return the result with total count
+            return JsonResponse({"drivers": mapped_results, "total_count": total_count}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
