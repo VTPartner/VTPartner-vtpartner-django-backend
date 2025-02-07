@@ -106,7 +106,7 @@ def select_query(query, params=None):
 
             # if result == []:
             #     raise ValueError("No Data Found")  # Custom error when no results are found
-
+            print("query result::",result)
             return result
 
     except ValueError as e:
