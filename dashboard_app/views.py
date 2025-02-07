@@ -4031,9 +4031,15 @@ def get_total_goods_drivers_with_count(request):
 
             # Fetch driver details
             query = f"""
-                SELECT gd.*, v.vehicle_name, v.weight, v.description, v.image, v.size_image
+                SELECT gd.*, 
+                    COALESCE(v.vehicle_name, 'NA') AS vehicle_name, 
+                    COALESCE(v.weight, 'NA') AS vehicle_weight, 
+                    COALESCE(v.description, 'NA') AS vehicle_description, 
+                    COALESCE(v.image, 'NA') AS vehicle_image, 
+                    COALESCE(v.size_image, 'NA') AS vehicle_size_image
                 FROM vtpartner.goods_driverstbl gd
-                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
+                LEFT JOIN vtpartner.vehiclestbl v 
+                ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
                 WHERE gd.status = {status}
                 ORDER BY gd.goods_driver_id DESC
                 {'LIMIT 10' if key is not None else ''};
@@ -4094,11 +4100,11 @@ def get_total_goods_drivers_with_count(request):
                     "vehicle_fuel_type": row[43],
                     "authtoken": row[44],
                     "otp_no": row[45],
-                    "vehicle_name": row[46] if row[46] is not None else "NA",
-                    "vehicle_weight": row[47] if row[47] is not None else "NA",
-                    "vehicle_description": row[48] if row[48] is not None else "NA",
-                    "vehicle_image": row[49] if row[49] is not None else "NA",
-                    "vehicle_size_image": row[50] if row[50] is not None else "NA",
+                    "vehicle_name": row[46], 
+                    "vehicle_weight": row[47], 
+                    "vehicle_description": row[48], 
+                    "vehicle_image": row[49], 
+                    "vehicle_size_image": row[50]
                 })
 
             return JsonResponse({"drivers": mapped_results, "total_count": total_count}, status=200)
