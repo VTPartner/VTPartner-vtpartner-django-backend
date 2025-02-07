@@ -4115,7 +4115,7 @@ def get_total_goods_drivers_verified_with_count(request):
             key = data.get("key")
             query = f"""
             SELECT gd.*, 
-                v.vehicle_name, v.weight, v.description, v.image, v.size_image,
+                v.vehicle_name, v.weight, v.description, v.image
                 (SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = 1) AS total_count
             FROM vtpartner.goods_driverstbl gd
             LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
@@ -4183,8 +4183,8 @@ def get_total_goods_drivers_verified_with_count(request):
                     "vehicle_weight": row[47] if row[47] else "NA",
                     "vehicle_description": row[48] if row[48] else "NA",
                     "vehicle_image": row[49] if row[49] else "NA",
-                    "vehicle_size_image": row[50] if row[50] else "NA",
-                    "total_count": row[51],  # The total count is the last column
+                    # "vehicle_size_image": row[50] if row[50] else "NA",
+                    "total_count": row[50],  # The total count is the last column
                 })
 
             return JsonResponse({"drivers": mapped_results}, status=200)
