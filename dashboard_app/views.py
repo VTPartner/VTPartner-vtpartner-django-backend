@@ -4041,8 +4041,8 @@ def get_total_goods_drivers_with_count(request):
                     gd.license_back, gd.insurance_image, gd.noc_image, gd.pollution_certificate_image, 
                     gd.rc_image, gd.driver_vehicle_image, gd.vehicle_plate_image, gd.driving_license_no, 
                     gd.vehicle_plate_no, gd.rc_no, gd.insurance_no, gd.noc_no, gd.vehicle_fuel_type, 
-                    COALESCE(v.vehicle_name, 'NA') AS vehicle_name, 
-                    COALESCE(v.image, 'NA') AS vehicle_image
+                    v.vehicle_name, 
+                    v.image
                 FROM vtpartner.goods_driverstbl gd
                 LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
                 WHERE gd.status = {status}
