@@ -4024,22 +4024,12 @@ def get_total_goods_drivers_with_count(request):
             if status not in [0, 1, 2, 3]:
                 return JsonResponse({"message": "Invalid status provided"}, status=400)
 
-            # Fetch total count separately
-            count_query = f"SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = {status};"
-            total_count_result = select_query(count_query)
-            total_count = total_count_result[0][0] if total_count_result else 0
-
-            # Fetch driver details
             query = f"""
                 SELECT gd.*, 
-                    COALESCE(v.vehicle_name, 'NA') AS vehicle_name, 
-                    COALESCE(v.weight, 'NA') AS vehicle_weight, 
-                    COALESCE(v.description, 'NA') AS vehicle_description, 
-                    COALESCE(v.image, 'NA') AS vehicle_image, 
-                    COALESCE(v.size_image, 'NA') AS vehicle_size_image
+                    v.vehicle_name, v.weight, v.description, v.image, v.size_image,
+                    (SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = {status}) AS total_count
                 FROM vtpartner.goods_driverstbl gd
-                LEFT JOIN vtpartner.vehiclestbl v 
-                ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
+                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
                 WHERE gd.status = {status}
                 ORDER BY gd.goods_driver_id DESC
                 {'LIMIT 10' if key is not None else ''};
@@ -4051,6 +4041,7 @@ def get_total_goods_drivers_with_count(request):
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
             # Map the results to a list of dictionaries
+            print("result:::",result)
             mapped_results = []
             for row in result:
                 mapped_results.append({
@@ -4100,14 +4091,16 @@ def get_total_goods_drivers_with_count(request):
                     "vehicle_fuel_type": row[43],
                     "authtoken": row[44],
                     "otp_no": row[45],
-                    "vehicle_name": row[46], 
-                    "vehicle_weight": row[47], 
-                    "vehicle_description": row[48], 
-                    "vehicle_image": row[49], 
-                    "vehicle_size_image": row[50]
+                    "vehicle_name": row[46] if row[46] else "NA",
+                    "vehicle_weight": row[47] if row[47] else "NA",
+                    "vehicle_description": row[48] if row[48] else "NA",
+                    "vehicle_image": row[49] if row[49] else "NA",
+                    "vehicle_size_image": row[50] if row[50] else "NA",
+                    "total_count": row[51],  # The total count is the last column
                 })
+                print("mapped_results::",mapped_results)
 
-            return JsonResponse({"drivers": mapped_results, "total_count": total_count}, status=200)
+            return JsonResponse({"drivers": mapped_results}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
