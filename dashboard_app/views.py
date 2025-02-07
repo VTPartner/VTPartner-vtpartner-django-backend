@@ -4024,10 +4024,14 @@ def get_total_goods_drivers_with_count(request):
             if status not in [0, 1, 2, 3]:
                 return JsonResponse({"message": "Invalid status provided"}, status=400)
 
+            # Fetch total count separately
+            count_query = f"SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = {status};"
+            total_count_result = select_query(count_query)
+            total_count = total_count_result[0][0] if total_count_result else 0
+
+            # Fetch driver details
             query = f"""
-                SELECT gd.*, 
-                    v.vehicle_name, v.weight, v.description, v.image, v.size_image,
-                    (SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = {status}) AS total_count
+                SELECT gd.*, v.vehicle_name, v.weight, v.description, v.image, v.size_image
                 FROM vtpartner.goods_driverstbl gd
                 LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
                 WHERE gd.status = {status}
@@ -4090,15 +4094,14 @@ def get_total_goods_drivers_with_count(request):
                     "vehicle_fuel_type": row[43],
                     "authtoken": row[44],
                     "otp_no": row[45],
-                    "vehicle_name": row[46] if row[46] else "NA",
-                    "vehicle_weight": row[47] if row[47] else "NA",
-                    "vehicle_description": row[48] if row[48] else "NA",
-                    "vehicle_image": row[49] if row[49] else "NA",
-                    "vehicle_size_image": row[50] if row[50] else "NA",
-                    "total_count": row[51],  # The total count is the last column
+                    "vehicle_name": row[46] if row[46] is not None else "NA",
+                    "vehicle_weight": row[47] if row[47] is not None else "NA",
+                    "vehicle_description": row[48] if row[48] is not None else "NA",
+                    "vehicle_image": row[49] if row[49] is not None else "NA",
+                    "vehicle_size_image": row[50] if row[50] is not None else "NA",
                 })
 
-            return JsonResponse({"drivers": mapped_results}, status=200)
+            return JsonResponse({"drivers": mapped_results, "total_count": total_count}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
