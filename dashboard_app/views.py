@@ -4092,8 +4092,8 @@ def get_total_goods_drivers_with_count(request):
                     "authtoken": row[44],
                     "otp_no": row[45],
                     "vehicle_name": row[46] if row[46] else "NA",
-                    "vehicle_image": row[49] if row[49] else "NA",
-                    "total_count": row[51],  # The total count is the last column
+                    "vehicle_image": row[47] if row[47] else "NA",
+                    "total_count": row[48],  # The total count is the last column
                 })
                 print("mapped_results::",mapped_results)
 
