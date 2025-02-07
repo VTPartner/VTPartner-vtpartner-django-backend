@@ -4020,14 +4020,29 @@ def get_total_goods_drivers_with_count(request):
             data = json.loads(request.body)
             key = data.get("key")
             status = data.get("status")  # Status: 1 = Verified, 0 = Unverified, 2 = Blocked, 3 = Rejected
-            
+
             if status not in [0, 1, 2, 3]:
                 return JsonResponse({"message": "Invalid status provided"}, status=400)
 
+            # Fetch total count separately
+            count_query = f"SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = {status};"
+            total_count_result = select_query(count_query)
+            total_count = total_count_result[0][0] if total_count_result else 0
+
+            # Fetch driver details with explicit column selection
             query = f"""
-                SELECT gd.*, 
-                    v.vehicle_name, v.image,
-                    (SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = {status}) AS total_count
+                SELECT gd.goods_driver_id, gd.driver_first_name, gd.driver_last_name, 
+                    gd.profile_pic, gd.is_online, gd.ratings, gd.mobile_no, 
+                    gd.registration_date, gd.time, gd.r_lat, gd.r_lng, gd.current_lat, gd.current_lng, 
+                    gd.status, gd.recent_online_pic, gd.is_verified, gd.category_id, 
+                    gd.vehicle_id, gd.city_id, gd.aadhar_no, gd.pan_card_no, gd.house_no, 
+                    gd.city_name, gd.full_address, gd.gender, gd.owner_id, gd.aadhar_card_front, 
+                    gd.aadhar_card_back, gd.pan_card_front, gd.pan_card_back, gd.license_front, 
+                    gd.license_back, gd.insurance_image, gd.noc_image, gd.pollution_certificate_image, 
+                    gd.rc_image, gd.driver_vehicle_image, gd.vehicle_plate_image, gd.driving_license_no, 
+                    gd.vehicle_plate_no, gd.rc_no, gd.insurance_no, gd.noc_no, gd.vehicle_fuel_type, 
+                    COALESCE(v.vehicle_name, 'NA') AS vehicle_name, 
+                    COALESCE(v.image, 'NA') AS vehicle_image
                 FROM vtpartner.goods_driverstbl gd
                 LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
                 WHERE gd.status = {status}
@@ -4040,8 +4055,7 @@ def get_total_goods_drivers_with_count(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            # Map the results to a list of dictionaries
-            print("result:::",result)
+            # Map results to a list of dictionaries
             mapped_results = []
             for row in result:
                 mapped_results.append({
@@ -4089,21 +4103,18 @@ def get_total_goods_drivers_with_count(request):
                     "insurance_no": row[41],
                     "noc_no": row[42],
                     "vehicle_fuel_type": row[43],
-                    "authtoken": row[44],
-                    "otp_no": row[45],
-                    "vehicle_name": row[46] if row[46] else "NA",
-                    "vehicle_image": row[47] if row[47] else "NA",
-                    "total_count": row[48],  # The total count is the last column
+                    "vehicle_name": row[44],
+                    "vehicle_image": row[45]
                 })
-                print("mapped_results::",mapped_results)
 
-            return JsonResponse({"drivers": mapped_results}, status=200)
+            return JsonResponse({"drivers": mapped_results, "total_count": total_count}, status=200)
 
         except Exception as err:
             print("Error executing query:", err)
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
  
 
 @csrf_exempt
