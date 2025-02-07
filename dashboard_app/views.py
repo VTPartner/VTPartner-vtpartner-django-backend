@@ -4115,7 +4115,7 @@ def get_total_goods_drivers_verified_with_count(request):
             key = data.get("key")
             query = f"""
             SELECT gd.*, 
-                v.vehicle_name, v.weight, v.description, v.image
+                v.vehicle_name, v.weight, v.description, v.image,
                 (SELECT COUNT(*) FROM vtpartner.goods_driverstbl WHERE status = 1) AS total_count
             FROM vtpartner.goods_driverstbl gd
             LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
