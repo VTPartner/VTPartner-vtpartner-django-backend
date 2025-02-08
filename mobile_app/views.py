@@ -5895,9 +5895,10 @@ def goods_driver_booking_accepted(request):
                         try:
 
                             query = """
-                               update vtpartner.active_goods_drivertbl set current_status='2' where goods_driver_id=%s
+                               update vtpartner.active_goods_drivertbl set current_status='2',current_booking_id=%s where goods_driver_id=%s
                                 """
                             values = [
+                                booking_id,
                                     driver_id
                                 ]
 
