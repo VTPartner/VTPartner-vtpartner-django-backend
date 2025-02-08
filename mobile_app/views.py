@@ -1675,6 +1675,44 @@ def booking_details_live_track(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def get_goods_driver_current_booking_detail(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        goods_driver_id = data.get("goods_driver_id")
+
+        # List of required fields
+        required_fields = {"goods_driver_id": goods_driver_id}
+
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        try:
+            query = """
+                SELECT current_booking_id FROM vtpartner.active_goods_drivertbl WHERE goods_driver_id = %s
+            """
+            result = select_query(query, [goods_driver_id])  # Assuming select_query is defined elsewhere
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Return only the first value directly
+            current_booking_id = result[0][0]  # Extract first index value
+
+            return JsonResponse({"current_booking_id": current_booking_id}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
 @csrf_exempt 
 def goods_order_details(request):
     if request.method == "POST":

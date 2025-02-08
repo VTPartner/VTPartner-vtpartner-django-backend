@@ -46,6 +46,8 @@ urlpatterns = [
     path('update_firebase_customer_token',views.update_firebase_customer_token,name='update_firebase_customer_token'),
     #Tracking the Booking
     path('booking_details_live_track',views.booking_details_live_track,name='booking_details_live_track'),
+    #Tracking the Booking
+    path('get_goods_driver_current_booking_detail',views.get_goods_driver_current_booking_detail,name='get_goods_driver_current_booking_detail'),
     #Customers All Bookings
     path('customers_all_bookings',views.customers_all_bookings,name='customers_all_bookings'),
     #Customers All Cab Bookings
