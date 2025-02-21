@@ -26,6 +26,9 @@ from google.oauth2 import service_account
 import google.auth.transport.requests
 import os
 from dotenv import load_dotenv
+import google.auth
+
+
 
 from PIL import Image  # Pillow library for image processing
 
@@ -35,6 +38,91 @@ from PIL import Image  # Pillow library for image processing
 #     print("missing_fields::",missing_fields)
 #     return missing_fields if missing_fields else None
 mapKey = "AIzaSyD-vFDMqcEcgyeppWvGrAuhVymvF0Dxue0"
+FIREBASE_MESSAGING_SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
+TOKEN_URI = "https://oauth2.googleapis.com/token"
+
+def get_agent_app_firebase_access_token():
+    try:
+        service_account_info = {
+            "type": "service_account",
+            "project_id": "vt-partner-agent-app",
+            "private_key_id": "e3be501cb621104602759406778871c40254d5d1",
+            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCx0JjFi/FCXXA/\nj36lm4xn4kn0hiTcTbrXTn7HbMnNmIvve84zl5kKx+1S3x/rGf3bJFcwFnYQHHae\n1MwTHpWmX/LSBaxoV8qO8AuCdHF1L4jPZMEkHhLvfZxZomKYaIJ+wwjI4n32+j2j\nFtEQ9lvt5EPbhDnQq5Z4Wml74Ty946Id4+QDr9GPe2CCSPh0GsIii7hDWyZhQRno\nG/LTTEYxDO6kURkU5yUGQh8Oq/vDGEFOomewtH5Ve9GB6g2fHN9t+ME6yODd8db1\nL69UmawOlEGxLesXMfRi5qm/da01Cyr5Wv20xsqIz9F88GYWRlClDdDrski6ChKu\nzyA+D2B/AgMBAAECggEAD9kIlKq5UPHk/DU802O+qs+XScze4ienXGMpl3qRrdpH\ntotxQFXllPlmpHkwbhK99lcR0j5ePWdcByHuIlIagl6Q1LkeuZoBeqXYUMMyDYC0\nD8/qCt8HTwMB+VcotG60GrolQUo2cdmxvqRc88cRQG2Uwq7RPFDes1FTj2/uqvnF\nVu8cbE5NKnooqD1XGv0pmu4xSBLrGKB+qX3cOYiOQqFUddTa025GT0XEJTUiWzt4\n96O9R8k+EsmI/MSjJe/Z3OMTdHbQ9BlM0hpsN07A+3tJL8WlemvmwO4ev/KfebUK\nKPX1ELBE4dxq4QJxGnT+vysYKpMiPwuOSKo76wiAqQKBgQD3yyV82PgT5zHQIsSZ\nfCfxehRMLX3NTqKRvIucxNjtN1aZcWsiwerkcdD7LLPmeWirZfv+5II/zSynDYTr\nzT2A0GR2u+hiUFBnxjZY26YS8KBffns576Rn1oVL1+JhObUx0Dmi9n3WDUS7dfxz\n6miruIdOHy7rqE+chJMG6TUJwwKBgQC3tCdmRaPo7OhvWmOo+tRUGDF2l6y8MCIt\nzBVStVBWg06AAwYw3bJpzFHI5Yz8gkaFVjuxANrQNz6Qms4PbkBTfqOo4LB7+JqZ\nxEkigQ+iqUU+PApsx5i3rr9CumqEoxZXNzzgnCDTx/dljnSTmD+XVH4gBlpkYXXb\nLdmMPK9mlQKBgGR4xUl6/BOt4X/AKTEGq3d5BXPh2il94eLvrTgyhLaigoWS/FrK\ngACCubauaH9h6PPeVTAD3WAbRCi0DZpCzNZHKQUPqej7Ia8CKpUa8pqpYI13zmUu\nat4DmGapMUw0xuhcwpH2Gg3JsX3FGEiz2h8OoiYl9LNuumD/TFI4Ct5bAoGADrl0\n8wCf+7qJgutm05OPU1JBHLVZlhfxlWQnTWLVFqodr6sOYvpSI6LJ52Vm4JJ8npFj\n5XMhFtFmxWZzH8+Bfm/HJHEmFDnAApU2G3rmyu3wa+WaHE//ULHECNAyW4FK+CCo\nU4SQKQl9Lfm2JGJurm2KUnzP3/3j2XaaWmA+2uUCgYEAq8WfftzlmefPK7lEI7Mb\nUvZYjJAos9t7AV5s9hnxN6fEihJDquYf7f6rRse1UGsxiFZZ3vePM+/FNvj0UnFj\ndxuJSqXw5RzF8bw5i9VHSY20CZ3Mnz68rcEx7NUQwjMv2cpolpiG/QJScobkj28p\nU+9IUDdNKY6lGpMW/dCyrDY=\n-----END PRIVATE KEY-----\n",
+            "client_email": "new-service-for-agent-app@vt-partner-agent-app.iam.gserviceaccount.com",
+            "token_uri": TOKEN_URI,
+        }
+
+        # Create credentials
+        credentials = service_account.Credentials.from_service_account_info(
+            service_account_info, scopes=[FIREBASE_MESSAGING_SCOPE]
+        )
+
+        # Request access token
+        request_data = {
+            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            "assertion": credentials._make_authorization_grant_assertion()
+        }
+
+        response = requests.post(TOKEN_URI, data=request_data)
+        response_json = response.json()
+
+        if "access_token" in response_json:
+            return response_json["access_token"]
+        else:
+            return None  # Handle token fetch failure
+
+    except Exception as e:
+        print(f"Error getting access token: {str(e)}")
+        return None
+
+def get_customer_app_firebase_access_token():
+    try:
+        service_account_info = {
+            "type": "service_account",
+            "project_id": "vt-partner-8317b",
+            "private_key_id": "a63b1b407cd24fb4802e9a706b071edb225038fe",
+            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCx0JjFi/FCXXA/\nj36lm4xn4kn0hiTcTbrXTn7HbMnNmIvve84zl5kKx+1S3x/rGf3bJFcwFnYQHHae\n1MwTHpWmX/LSBaxoV8qO8AuCdHF1L4jPZMEkHhLvfZxZomKYaIJ+wwjI4n32+j2j\nFtEQ9lvt5EPbhDnQq5Z4Wml74Ty946Id4+QDr9GPe2CCSPh0GsIii7hDWyZhQRno\nG/LTTEYxDO6kURkU5yUGQh8Oq/vDGEFOomewtH5Ve9GB6g2fHN9t+ME6yODd8db1\nL69UmawOlEGxLesXMfRi5qm/da01Cyr5Wv20xsqIz9F88GYWRlClDdDrski6ChKu\nzyA+D2B/AgMBAAECggEAD9kIlKq5UPHk/DU802O+qs+XScze4ienXGMpl3qRrdpH\ntotxQFXllPlmpHkwbhK99lcR0j5ePWdcByHuIlIagl6Q1LkeuZoBeqXYUMMyDYC0\nD8/qCt8HTwMB+VcotG60GrolQUo2cdmxvqRc88cRQG2Uwq7RPFDes1FTj2/uqvnF\nVu8cbE5NKnooqD1XGv0pmu4xSBLrGKB+qX3cOYiOQqFUddTa025GT0XEJTUiWzt4\n96O9R8k+EsmI/MSjJe/Z3OMTdHbQ9BlM0hpsN07A+3tJL8WlemvmwO4ev/KfebUK\nKPX1ELBE4dxq4QJxGnT+vysYKpMiPwuOSKo76wiAqQKBgQD3yyV82PgT5zHQIsSZ\nfCfxehRMLX3NTqKRvIucxNjtN1aZcWsiwerkcdD7LLPmeWirZfv+5II/zSynDYTr\nzT2A0GR2u+hiUFBnxjZY26YS8KBffns576Rn1oVL1+JhObUx0Dmi9n3WDUS7dfxz\n6miruIdOHy7rqE+chJMG6TUJwwKBgQC3tCdmRaPo7OhvWmOo+tRUGDF2l6y8MCIt\nzBVStVBWg06AAwYw3bJpzFHI5Yz8gkaFVjuxANrQNz6Qms4PbkBTfqOo4LB7+JqZ\nxEkigQ+iqUU+PApsx5i3rr9CumqEoxZXNzzgnCDTx/dljnSTmD+XVH4gBlpkYXXb\nLdmMPK9mlQKBgGR4xUl6/BOt4X/AKTEGq3d5BXPh2il94eLvrTgyhLaigoWS/FrK\ngACCubauaH9h6PPeVTAD3WAbRCi0DZpCzNZHKQUPqej7Ia8CKpUa8pqpYI13zmUu\nat4DmGapMUw0xuhcwpH2Gg3JsX3FGEiz2h8OoiYl9LNuumD/TFI4Ct5bAoGADrl0\n8wCf+7qJgutm05OPU1JBHLVZlhfxlWQnTWLVFqodr6sOYvpSI6LJ52Vm4JJ8npFj\n5XMhFtFmxWZzH8+Bfm/HJHEmFDnAApU2G3rmyu3wa+WaHE//ULHECNAyW4FK+CCo\nU4SQKQl9Lfm2JGJurm2KUnzP3/3j2XaaWmA+2uUCgYEAq8WfftzlmefPK7lEI7Mb\nUvZYjJAos9t7AV5s9hnxN6fEihJDquYf7f6rRse1UGsxiFZZ3vePM+/FNvj0UnFj\ndxuJSqXw5RzF8bw5i9VHSY20CZ3Mnz68rcEx7NUQwjMv2cpolpiG/QJScobkj28p\nU+9IUDdNKY6lGpMW/dCyrDY=\n-----END PRIVATE KEY-----\n",
+            "client_email": "new-service-for-agent-app@vt-partner-agent-app.iam.gserviceaccount.com",
+            "token_uri": TOKEN_URI,
+        }
+        service_account_info = """{
+  "type": "service_account",
+  "project_id": "vt-partner-8317b",
+  "private_key_id": "a63b1b407cd24fb4802e9a706b071edb225038fe",
+  "private_key": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC6oVFbNQZn/YF0\\nRqVZRn/Ga5dBkf88siZqitp1sKcmWY3ITnO8f8EuhFDoQ+5y1zcr80ZwHxgOOwXy\\nA6Pmg1qqvv82ALsPumtJESpEJtBkNm+dkGDTntev57xMMZNDFw/a1Yb8FD/4QAFq\\n/zzuqecsy3xq2O3QPJW1K6h9NmKOrdcU75BiJSu9XXl7DnzVR9a0Gk6znx1ECcEv\\nqoCx08QzPl2d45J4Ere81AxtH+zPyyPLXRyQcbFbEwARo7By3Cw3swG1UGwE/5Dh\\nss3Z20Aq6HGRA9LeSL4LERpZH3AzXumIPz378n/bHqD1ifE/PAI9PW1jAXIK0lnY\\nD7Yto4oDAgMBAAECggEAA8wjgSUXj8cfOrPzSlk+YVWwGrPzSxNe570Si+F/zS52\\nTZSXE0dQMXecw9UaBXkulLTbAo4Haca2rMF5NMgIcL/5JmqmY8AJzc9NGlzl0Zwv\\n8jdNWRD614fyE2TQ18Ug2/WLTRbGZHE89iXiYgLQAt/TFMN8N0f8TdbpEz8nizqi\\nZ5t0a7kUJSeGJMeJ6C0RQaFMPy8PIrBvXjvAap0q8yGSX/sir8jUzHAtX9ki5cnP\\naNUunPcfubMIq8QLF7rYXE9d+atH5NgB3gvrwcYMj6XQB4FWz44UEsCSIhnJHahE\\nUlXFSRv043us99X1AHGsFH2DF2JmA7aWWxl3Nbm6LQKBgQDWQk6qw60d7BggQghJ\\nHezz1VPhE9pHu6HZh4N49psOaF6jIwnePMZz4PbSJ/8kfcxBJxPjrLNLNoPoia7r\\nm8hnc7a7P8hIg2Tfw9w75weaO9Hps6woSQsmD+pZW5lVD2nkWSCe00sbtvUIKF/0\\n3zZQcA2NLNOTPOEVgjF7ugNnfwKBgQDe/RUJfAJl48OcjE6Ki00sQ1wxcXGlruIu\\nwGoY189Nlo5s6VSh6cz4EpT8EJ7dEXOqLGEiNUm8qXPbMW4HZ0NcfiiRIX49Ziuw\\nby4+sIlKCR//4nR/gTNMYAHSCxLg+5GUqqNyKdrv6U87yW9SA++1avk+NCpWk3dZ\\nUiin115/fQKBgQDEwVlqeY0FeGTjYqAnPOL3O8TuYYPG8eh8UXSLZbMYdQHLQAb0\\n3czEZydh8DbeNOOYRSF/p31yqVpS9fT7CjDrx5hbtgPfi0HcNwmMvOj/WsW2njeP\\nOxyQ1Ha5nmNdeG0etDY/g/tqNQYpeqI7xaskDPJ03WBhyrtMPCXi3/v2UwKBgHJO\\nc8k/247VecG3Hs/gZrgI86qYx7Qx+NoUYo7Hmgng4rOrzGmPizWjeOHZt0YFmzAh\\nvc0mWd0vVCeJqCh9Y8d3GF6FN8xLopu38pHKNyZPlSq7sBJobZ56HJTKfmv8KX13\\nF3//Oq7+/1HbiYgWYnuyEYA0h3uH7odIGXUobtWVAoGANaThdiZ2tw3/p5IZrFqP\\nA7MMgyRlos4wKhznEmXamjZ9qnD23myicwi8QMOoZ3xrP0GOTcks8etz2+NKKDQk\\ncuDQvUf5FDBTXDgveJtPBfHo8ELofPM+Iqt+ROujIkS3At+9G1EbK2zfgYE81+ks\\n+fHvPLog4BO1H/QxfIh6lts=\\n-----END PRIVATE KEY-----\\n",
+  "client_email": "firebase-adminsdk-3axcv@vt-partner-8317b.iam.gserviceaccount.com",
+  "client_id": "100919889836726549597",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-3axcv%40vt-partner-8317b.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}"""
+
+
+        # Create credentials
+        credentials = service_account.Credentials.from_service_account_info(
+            service_account_info, scopes=[FIREBASE_MESSAGING_SCOPE]
+        )
+
+        # Request access token
+        request_data = {
+            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            "assertion": credentials._make_authorization_grant_assertion()
+        }
+
+        response = requests.post(TOKEN_URI, data=request_data)
+        response_json = response.json()
+
+        if "access_token" in response_json:
+            return response_json["access_token"]
+        else:
+            return None  # Handle token fetch failure
+
+    except Exception as e:
+        print(f"Error getting access token: {str(e)}")
+        return None
+
 
 def check_missing_fields(fields):
     # Only consider a field missing if its value is None
@@ -187,6 +275,7 @@ def sendFMCMsg(deviceToken, msg, title, data,serverToken):
     deviceToken = deviceToken.replace('__colon__', ':')
     print(f"deviceToken::{deviceToken}")
     print(f"serverKey::{serverToken}")
+    serverToken = get_customer_app_firebase_access_token()
     # Validate the device token
     if not deviceToken:
         print("Invalid device token")
@@ -1402,7 +1491,9 @@ def new_goods_delivery_booking(request):
                     'intent':'driver',
                     'booking_id':str(booking_id)
                 }
-                sendFMCMsg(driver_auth_token,f'You have a new Ride Request for \nPickup Location : {pickup_address}. \n Drop Location : {drop_address}','New Ride Request',fcm_data,server_access_token)
+                serverToken = get_agent_app_firebase_access_token()
+                sendFMCMsg(driver_auth_token,f'You have a new Ride Request for \nPickup Location : {pickup_address}. \n Drop Location : {drop_address}','New Ride Request',fcm_data,serverToken)
+                #server_access_token
 
                 # Send success response
                 return JsonResponse({"result": response_value}, status=200)
@@ -2395,12 +2486,13 @@ def cancel_booking(request):
                 'intent':'driver_home',
                 'booking_id':str(booking_id)
             }
+            serverToken = get_agent_app_firebase_access_token()
             sendFMCMsg(
             driver_auth_token,
             f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
             f'Ride Canceled - [Booking ID: {str(booking_id)}]',
             fcm_data,
-            server_token
+            serverToken
             )
 
             
