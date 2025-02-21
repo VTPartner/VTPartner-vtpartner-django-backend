@@ -77,14 +77,7 @@ def get_agent_app_firebase_access_token():
 
 def get_customer_app_firebase_access_token():
     try:
-        service_account_info = {
-            "type": "service_account",
-            "project_id": "vt-partner-8317b",
-            "private_key_id": "a63b1b407cd24fb4802e9a706b071edb225038fe",
-            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCx0JjFi/FCXXA/\nj36lm4xn4kn0hiTcTbrXTn7HbMnNmIvve84zl5kKx+1S3x/rGf3bJFcwFnYQHHae\n1MwTHpWmX/LSBaxoV8qO8AuCdHF1L4jPZMEkHhLvfZxZomKYaIJ+wwjI4n32+j2j\nFtEQ9lvt5EPbhDnQq5Z4Wml74Ty946Id4+QDr9GPe2CCSPh0GsIii7hDWyZhQRno\nG/LTTEYxDO6kURkU5yUGQh8Oq/vDGEFOomewtH5Ve9GB6g2fHN9t+ME6yODd8db1\nL69UmawOlEGxLesXMfRi5qm/da01Cyr5Wv20xsqIz9F88GYWRlClDdDrski6ChKu\nzyA+D2B/AgMBAAECggEAD9kIlKq5UPHk/DU802O+qs+XScze4ienXGMpl3qRrdpH\ntotxQFXllPlmpHkwbhK99lcR0j5ePWdcByHuIlIagl6Q1LkeuZoBeqXYUMMyDYC0\nD8/qCt8HTwMB+VcotG60GrolQUo2cdmxvqRc88cRQG2Uwq7RPFDes1FTj2/uqvnF\nVu8cbE5NKnooqD1XGv0pmu4xSBLrGKB+qX3cOYiOQqFUddTa025GT0XEJTUiWzt4\n96O9R8k+EsmI/MSjJe/Z3OMTdHbQ9BlM0hpsN07A+3tJL8WlemvmwO4ev/KfebUK\nKPX1ELBE4dxq4QJxGnT+vysYKpMiPwuOSKo76wiAqQKBgQD3yyV82PgT5zHQIsSZ\nfCfxehRMLX3NTqKRvIucxNjtN1aZcWsiwerkcdD7LLPmeWirZfv+5II/zSynDYTr\nzT2A0GR2u+hiUFBnxjZY26YS8KBffns576Rn1oVL1+JhObUx0Dmi9n3WDUS7dfxz\n6miruIdOHy7rqE+chJMG6TUJwwKBgQC3tCdmRaPo7OhvWmOo+tRUGDF2l6y8MCIt\nzBVStVBWg06AAwYw3bJpzFHI5Yz8gkaFVjuxANrQNz6Qms4PbkBTfqOo4LB7+JqZ\nxEkigQ+iqUU+PApsx5i3rr9CumqEoxZXNzzgnCDTx/dljnSTmD+XVH4gBlpkYXXb\nLdmMPK9mlQKBgGR4xUl6/BOt4X/AKTEGq3d5BXPh2il94eLvrTgyhLaigoWS/FrK\ngACCubauaH9h6PPeVTAD3WAbRCi0DZpCzNZHKQUPqej7Ia8CKpUa8pqpYI13zmUu\nat4DmGapMUw0xuhcwpH2Gg3JsX3FGEiz2h8OoiYl9LNuumD/TFI4Ct5bAoGADrl0\n8wCf+7qJgutm05OPU1JBHLVZlhfxlWQnTWLVFqodr6sOYvpSI6LJ52Vm4JJ8npFj\n5XMhFtFmxWZzH8+Bfm/HJHEmFDnAApU2G3rmyu3wa+WaHE//ULHECNAyW4FK+CCo\nU4SQKQl9Lfm2JGJurm2KUnzP3/3j2XaaWmA+2uUCgYEAq8WfftzlmefPK7lEI7Mb\nUvZYjJAos9t7AV5s9hnxN6fEihJDquYf7f6rRse1UGsxiFZZ3vePM+/FNvj0UnFj\ndxuJSqXw5RzF8bw5i9VHSY20CZ3Mnz68rcEx7NUQwjMv2cpolpiG/QJScobkj28p\nU+9IUDdNKY6lGpMW/dCyrDY=\n-----END PRIVATE KEY-----\n",
-            "client_email": "new-service-for-agent-app@vt-partner-agent-app.iam.gserviceaccount.com",
-            "token_uri": TOKEN_URI,
-        }
+        
         service_account_info = """{
   "type": "service_account",
   "project_id": "vt-partner-8317b",
