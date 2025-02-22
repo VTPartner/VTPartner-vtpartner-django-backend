@@ -29,6 +29,7 @@ from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 # Load environment variables from the root directory
 load_dotenv('/root/.env_vtpartner')
+load_dotenv('/root/.env_vtpartner_customer')
 
 
 from PIL import Image  # Pillow library for image processing
@@ -38,9 +39,7 @@ from PIL import Image  # Pillow library for image processing
 #     missing_fields = [field for field, value in fields.items() if not value]
 #     print("missing_fields::",missing_fields)
 #     return missing_fields if missing_fields else None
-mapKey = "AIzaSyD-vFDMqcEcgyeppWvGrAuhVymvF0Dxue0"
-FIREBASE_MESSAGING_SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
-TOKEN_URI = "https://oauth2.googleapis.com/token"
+
 
 def get_agent_app_firebase_access_token():
     try:
@@ -75,23 +74,33 @@ def get_agent_app_firebase_access_token():
 
 def get_customer_app_firebase_access_token():
     try:
-        # Parse the JSON string into a Python dictionary
-        service_account_info = json.loads('''{
-           
-        }''')
+        # Create a service account credential dictionary
+        credentials_dict = {
+            "type": "service_account",
+            "project_id": os.getenv('CUSTOMER_FIREBASE_PROJECT_ID'),
+            "private_key_id": os.getenv('CUSTOMER_FIREBASE_PRIVATE_KEY_ID'),
+            "private_key": os.getenv('CUSTOMER_FIREBASE_PRIVATE_KEY'),
+            "client_email": os.getenv('CUSTOMER_FIREBASE_CLIENT_EMAIL'),
+            "client_id": os.getenv('CUSTOMER_FIREBASE_CLIENT_ID'),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{os.getenv('CUSTOMER_FIREBASE_CLIENT_EMAIL')}"
+        }
 
-        # Create credentials
+        # Create credentials and request token
         credentials = service_account.Credentials.from_service_account_info(
-            info=service_account_info,
-            scopes=[FIREBASE_MESSAGING_SCOPE]
+            credentials_dict,
+            scopes=['https://www.googleapis.com/auth/firebase.messaging']
         )
-
-        # Get token
-        token = credentials.get_access_token()
-        return token.access_token
+        
+        if not credentials.valid:
+            credentials.refresh(Request())
+            
+        return credentials.token
 
     except Exception as e:
-        print(f"Error getting customer app access token: {str(e)}")
+        print(f"Error getting Customer App Firebase access token: {str(e)}")
         return None
 
 def check_missing_fields(fields):
