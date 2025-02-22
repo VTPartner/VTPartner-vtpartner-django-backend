@@ -74,19 +74,31 @@ def get_agent_app_firebase_access_token():
 
 def get_customer_app_firebase_access_token():
     try:
+        # First, let's verify we can read the environment variables
+        project_id = os.getenv('CUSTOMER_FIREBASE_PROJECT_ID')
+        private_key = os.getenv('CUSTOMER_FIREBASE_PRIVATE_KEY')
+        client_email = os.getenv('CUSTOMER_FIREBASE_CLIENT_EMAIL')
+        
+        if not all([project_id, private_key, client_email]):
+            print("Missing required environment variables")
+            return None
+
         # Create a service account credential dictionary
         credentials_dict = {
             "type": "service_account",
-            "project_id": os.getenv('CUSTOMER_FIREBASE_PROJECT_ID'),
+            "project_id": project_id,
             "private_key_id": os.getenv('CUSTOMER_FIREBASE_PRIVATE_KEY_ID'),
-            "private_key": os.getenv('CUSTOMER_FIREBASE_PRIVATE_KEY'),
-            "client_email": os.getenv('CUSTOMER_FIREBASE_CLIENT_EMAIL'),
+            "private_key": private_key.replace('\\n', '\n'),  # Ensure proper newline handling
+            "client_email": client_email,
             "client_id": os.getenv('CUSTOMER_FIREBASE_CLIENT_ID'),
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{os.getenv('CUSTOMER_FIREBASE_CLIENT_EMAIL')}"
+            "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{client_email}"
         }
+
+        # Print credentials dict for debugging (remove in production)
+        print("Credentials dict:", credentials_dict)
 
         # Create credentials and request token
         credentials = service_account.Credentials.from_service_account_info(
@@ -101,8 +113,11 @@ def get_customer_app_firebase_access_token():
 
     except Exception as e:
         print(f"Error getting Customer App Firebase access token: {str(e)}")
+        # Print the full traceback for debugging
+        import traceback
+        print(traceback.format_exc())
         return None
-
+    
 def check_missing_fields(fields):
     # Only consider a field missing if its value is None
     missing_fields = [field for field, value in fields.items() if value is None]
