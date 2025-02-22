@@ -715,7 +715,7 @@ def customer_registration(request):
 
 @csrf_exempt 
 def customer_details(request):
-    access_token = get_agent_app_firebase_access_token()
+    access_token = get_customer_app_firebase_access_token()
     if access_token:
         # Use the token
         print("Access token:", access_token)
