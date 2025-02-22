@@ -121,6 +121,8 @@ urlpatterns = [
     #Goods Driver Api's URLs
     #Login
     path('goods_driver_login',views.goods_driver_login_view,name='goods_driver_login'),
+    #Goods Driver Verified all details to show edit option
+    path('get_goods_driver_details',views.get_goods_driver_details,name='get_goods_driver_details'),
     #Registration 
     path('goods_driver_registration',views.goods_driver_registration,name='goods_driver_registration'),
     #Status Verification 
