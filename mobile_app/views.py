@@ -98,7 +98,7 @@ def get_customer_app_firebase_access_token():
         }
 
         # Print credentials dict for debugging (remove in production)
-        print("Credentials dict:", credentials_dict)
+        # print("Credentials dict:", credentials_dict)
 
         # Create credentials and request token
         credentials = service_account.Credentials.from_service_account_info(
@@ -730,11 +730,7 @@ def customer_registration(request):
 
 @csrf_exempt 
 def customer_details(request):
-    access_token = get_customer_app_firebase_access_token()
-    if access_token:
-        # Use the token
-        print("Access token:", access_token)
-        pass
+    
     if request.method == "POST":
         data = json.loads(request.body)
         customer_id = data.get("customer_id")
