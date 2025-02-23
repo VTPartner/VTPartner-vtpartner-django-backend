@@ -43,6 +43,7 @@ from PIL import Image  # Pillow library for image processing
 
 
 def get_agent_app_firebase_access_token():
+    print("agent_app_token_fetched")
     try:
         # Create a service account credential dictionary
         credentials_dict = {
@@ -74,6 +75,7 @@ def get_agent_app_firebase_access_token():
         return None
 
 def get_customer_app_firebase_access_token():
+    print("customer_app_token_fetched")
     try:
         # First, let's verify we can read the environment variables
         project_id = os.getenv('CUSTOMER_FIREBASE_PROJECT_ID')
