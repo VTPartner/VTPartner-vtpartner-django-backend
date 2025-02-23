@@ -28,8 +28,9 @@ from dotenv import load_dotenv
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 # Load environment variables from the root directory
-load_dotenv('/root/.env_vtpartner')
 load_dotenv('/root/.env_vtpartner_customer')
+load_dotenv('/root/.env_vtpartner')
+
 
 
 from PIL import Image  # Pillow library for image processing

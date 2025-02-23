@@ -15,8 +15,9 @@ from dotenv import load_dotenv
 import os
 
 # Load environment variables
-load_dotenv('/root/.env_vtpartner')
 load_dotenv('/root/.env_vtpartner_customer')
+load_dotenv('/root/.env_vtpartner')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
