@@ -5680,7 +5680,10 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                         print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
                         
                         if driver_auth_token:
+                            print("beforeToken::",server_access_token)
                             server_access_token = get_agent_app_firebase_access_token()
+                            print('------------------------')
+                            print("AfterToken::",server_access_token)
                             sendFMCMsg(
                                 driver_auth_token,
                                 f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
