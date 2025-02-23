@@ -34,7 +34,7 @@ load_dotenv('/root/.env_vtpartner')
 
 
 from PIL import Image  # Pillow library for image processing
-
+mapKey = "AIzaSyAAlmEtjJOpSaJ7YVkMKwdSuMTbTx39l_o"
 # Utility function to check for missing fields
 # def check_missing_fields(fields):
 #     missing_fields = [field for field, value in fields.items() if not value]
