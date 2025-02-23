@@ -269,7 +269,7 @@ def sendFMCMsg(deviceToken, msg, title, data,serverToken):
     deviceToken = deviceToken.replace('__colon__', ':')
     print(f"deviceToken::{deviceToken}")
     print(f"serverKey::{serverToken}")
-    serverToken = get_customer_app_firebase_access_token()
+    serverToken = get_agent_app_firebase_access_token()
     # Validate the device token
     if not deviceToken:
         print("Invalid device token")
