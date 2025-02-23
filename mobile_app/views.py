@@ -1489,7 +1489,7 @@ def new_goods_delivery_booking(request):
                     'intent':'driver',
                     'booking_id':str(booking_id)
                 }
-                serverToken = get_agent_app_firebase_access_token()
+                # serverToken = get_agent_app_firebase_access_token()
                 sendFMCMsg(driver_auth_token,f'You have a new Ride Request for \nPickup Location : {pickup_address}. \n Drop Location : {drop_address}','New Ride Request',fcm_data,serverToken)
                 #server_access_token
 
@@ -2484,7 +2484,7 @@ def cancel_booking(request):
                 'intent':'driver_home',
                 'booking_id':str(booking_id)
             }
-            serverToken = get_agent_app_firebase_access_token()
+            # serverToken = get_agent_app_firebase_access_token()
             sendFMCMsg(
             driver_auth_token,
             f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
@@ -5683,10 +5683,10 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                         print(f"driver_auth_token ->{driver[1]} {driver_auth_token}")
                         
                         if driver_auth_token:
-                            print("beforeToken::",server_access_token)
-                            server_access_token = get_agent_app_firebase_access_token()
-                            print('------------------------')
-                            print("AfterToken::",server_access_token)
+                            # print("beforeToken::",server_access_token)
+                            # server_access_token = get_agent_app_firebase_access_token()
+                            # print('------------------------')
+                            # print("AfterToken::",server_access_token)
                             sendFMCMsg(
                                 driver_auth_token,
                                 f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
@@ -6058,7 +6058,7 @@ def goods_driver_booking_accepted(request):
                                 'intent':'live_tracking',
                                 'booking_id':str(booking_id)
                             }
-                            server_token = get_customer_app_firebase_access_token()
+                            # server_token = get_customer_app_firebase_access_token()
                             sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token)
 
                             # Send success response
