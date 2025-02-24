@@ -28,8 +28,8 @@ from dotenv import load_dotenv
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 # Load environment variables from the root directory
-load_dotenv('/root/.env_vtpartner_customer')
-load_dotenv('/root/.env_vtpartner')
+
+
 
 
 
@@ -46,6 +46,7 @@ def get_agent_app_firebase_access_token(request):
     print("agent_app_token_fetched")
     try:
         # Create a service account credential dictionary
+        load_dotenv('/root/.env_vtpartner')
         credentials_dict = {
             "type": "service_account",
             "project_id": os.getenv('FIREBASE_PROJECT_ID'),
@@ -83,6 +84,7 @@ def get_agent_app_firebase_access_token(request):
 def get_customer_app_firebase_access_token(request):
     print("customer_app_token_fetched")
     try:
+        load_dotenv('/root/.env_vtpartner_customer')
         project_id = os.getenv('CUSTOMER_FIREBASE_PROJECT_ID')
         private_key = os.getenv('CUSTOMER_FIREBASE_PRIVATE_KEY')
         client_email = os.getenv('CUSTOMER_FIREBASE_CLIENT_EMAIL')
@@ -354,7 +356,7 @@ def get_server_key_token():
     # Return the access token
     return credentials.token
 
-def sendFMCMsg(deviceToken, msg, title, data,serverToken):
+def sendFMCMsg(deviceToken, msg, title, data,serverToken,app_type):
     
     deviceToken = deviceToken.replace('__colon__', ':')
     print(f"deviceToken::{deviceToken}")
@@ -385,7 +387,10 @@ def sendFMCMsg(deviceToken, msg, title, data,serverToken):
     }
 
     try:
-        response = requests.post("https://fcm.googleapis.com/v1/projects/vt-partner-8317b/messages:send", headers=headers, data=json.dumps(body))
+        if app_type == "Agent":
+            response = requests.post("https://fcm.googleapis.com/v1/projects/vt-partner-agent-app/messages:send", headers=headers, data=json.dumps(body))
+        else:    
+            response = requests.post("https://fcm.googleapis.com/v1/projects/vt-partner-8317b/messages:send", headers=headers, data=json.dumps(body))
         response_data = response.json()
         print("FCM Response:")
         print(response_data)
@@ -1577,7 +1582,7 @@ def new_goods_delivery_booking(request):
                     'booking_id':str(booking_id)
                 }
                 # serverToken = get_agent_app_firebase_access_token()
-                sendFMCMsg(driver_auth_token,f'You have a new Ride Request for \nPickup Location : {pickup_address}. \n Drop Location : {drop_address}','New Ride Request',fcm_data,serverToken)
+                sendFMCMsg(driver_auth_token,f'You have a new Ride Request for \nPickup Location : {pickup_address}. \n Drop Location : {drop_address}','New Ride Request',fcm_data,server_access_token,"Agent")
                 #server_access_token
 
                 # Send success response
@@ -2577,7 +2582,8 @@ def cancel_booking(request):
             f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
             f'Ride Canceled - [Booking ID: {str(booking_id)}]',
             fcm_data,
-            serverToken
+            server_token,
+            "Agent"
             )
 
             
@@ -2675,7 +2681,8 @@ def cancel_cab_booking(request):
             f'The Cab ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
             f'Cab Ride Canceled - [Booking ID: {str(booking_id)}]',
             fcm_data,
-            server_token
+            server_token,
+            "Agent"
             )
 
             
@@ -2773,7 +2780,9 @@ def cancel_other_driver_booking(request):
             f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
             f'Driver Ride Canceled - [Booking ID: {str(booking_id)}]',
             fcm_data,
-            server_token
+            server_token,
+            "Agent"
+            
             )
 
             
@@ -2871,7 +2880,8 @@ def cancel_jcb_crane_driver_booking(request):
             f'The Jcb/Crane ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
             f'JCB Crane Ride Canceled - [Booking ID: {str(booking_id)}]',
             fcm_data,
-            server_token
+            server_token,
+            "Agent"
             )
 
             
@@ -2969,7 +2979,8 @@ def cancel_handyman_agent_booking(request):
             f'The HandyMan Service request has been canceled by the customer. \Work Location: {pickup_address}.',
             f'HandyMan Service Canceled - [Booking ID: {str(booking_id)}]',
             fcm_data,
-            server_token
+            server_token,
+            "Agent"
             )
 
             
@@ -5779,7 +5790,8 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                                 f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
                                 "New Goods Ride Request",
                                 fcm_data,
-                                server_access_token
+                                server_access_token,
+                                "Agent"
                             )
                             print(f"Notification sent to driver ID {driver[1]}")
                         else:
@@ -6146,7 +6158,7 @@ def goods_driver_booking_accepted(request):
                                 'booking_id':str(booking_id)
                             }
                             # server_token = get_customer_app_firebase_access_token()
-                            sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token)
+                            sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token,"Customer")
 
                             # Send success response
                             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
@@ -6270,7 +6282,7 @@ def update_booking_status_driver(request):
 
                     # Execute the query
                     row_count = update_query(update_drop_epoch_query, values)
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
             except Exception as err:
@@ -6452,7 +6464,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
                                         'intent':'end_live_tracking',
                                         'order_id':str(order_id)
                                     }
-                        sendFMCMsg(auth_token,body,title,data_map,server_token)
+                        sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                         try:
                             query2 = """
                             update vtpartner.active_goods_drivertbl set current_status='1' where goods_driver_id=%s
@@ -8337,7 +8349,7 @@ def cab_driver_booking_accepted(request):
                                 'intent':'cab_live_tracking',
                                 'booking_id':str(booking_id)
                             }
-                            sendFMCMsg(auth_token,'Cab Driver Accepted your Ride Request','Cab Driver Assigned',customer_data,server_token)
+                            sendFMCMsg(auth_token,'Cab Driver Accepted your Ride Request','Cab Driver Assigned',customer_data,server_token,"Customer")
 
                             # Send success response
                             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
@@ -8463,7 +8475,7 @@ def update_booking_status_cab_driver(request):
 
                     # Execute the query
                     row_count = update_query(update_drop_epoch_query, values)
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
             except Exception as err:
@@ -8562,7 +8574,7 @@ def generate_order_id_for_booking_id_cab_driver(request):
                 elif booking_status == "End Trip":
                     body = "You have reached your destination successfully"
                     title = "Cab Destination Arrived"
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
                 #Generating Order ID
@@ -9454,7 +9466,8 @@ def generate_new_cab_drivers_booking_id_get_nearby_drivers_with_fcm_token(reques
                                 f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
                                 "New Cab Ride Request",
                                 fcm_data,
-                                server_access_token
+                                server_access_token,
+                                "Agent"
                             )
                             print(f"Notification sent to cab driver ID {driver[1]}")
                         else:
@@ -10976,7 +10989,7 @@ def other_driver_booking_accepted(request):
                                 'intent':'driver_live_tracking',
                                 'booking_id':str(booking_id)
                             }
-                            sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token)
+                            sendFMCMsg(auth_token,'You have been assigned a driver','Driver Assigned',customer_data,server_token,"Customer")
 
                             # Send success response
                             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
@@ -11100,7 +11113,7 @@ def update_booking_status_other_driver(request):
 
                     # Execute the query
                     row_count = update_query(update_drop_epoch_query, values)
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
             except Exception as err:
@@ -11199,7 +11212,7 @@ def generate_order_id_for_booking_id_other_driver(request):
                 elif booking_status == "End Trip":
                     body = "Your has been successfully done."
                     title = "Service Successful"
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
                 #Generating Order ID
@@ -12406,7 +12419,8 @@ def generate_new_other_driver_booking_id_get_nearby_agents_with_fcm_token(reques
                                 f"You have a new Ride Request for \nPickup Location: {pickup_address}. \nDrop Location: {drop_address}",
                                 "New Driver Ride Request",
                                 fcm_data,
-                                server_access_token
+                                server_access_token,
+                                "Agent"
                             )
                             print(f"Notification sent to other driver ID {driver[1]}")
                         else:
@@ -13552,7 +13566,7 @@ def jcb_crane_driver_booking_accepted(request):
                                 'intent':'jcb_crane_live_tracking',
                                 'booking_id':str(booking_id)
                             }
-                            sendFMCMsg(auth_token,'You have been assigned a driver','JCB / Crane Driver Assigned',customer_data,server_token)
+                            sendFMCMsg(auth_token,'You have been assigned a driver','JCB / Crane Driver Assigned',customer_data,server_token,"Customer")
 
                             # Send success response
                             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
@@ -13676,7 +13690,7 @@ def update_booking_status_jcb_crane_driver(request):
 
                     # Execute the query
                     row_count = update_query(update_drop_epoch_query, values)
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
             except Exception as err:
@@ -13775,7 +13789,7 @@ def generate_order_id_for_booking_id_jcb_crane_driver(request):
                 elif booking_status == "End Service":
                     body = "Your JCB / Crane Service Finished Successfully"
                     title = "Service Done Successfully"
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
                 #Generating Order ID
@@ -14748,7 +14762,8 @@ def generate_new_jcb_crane_booking_id_get_nearby_agents_with_fcm_token(request):
                                 f"You have a new Work Request for \nWork Location: {pickup_address}.",
                                 "New JCB/Crane Ride Request",
                                 fcm_data,
-                                server_access_token
+                                server_access_token,
+                                "Agent"
                             )
                             print(f"Notification sent to jcb driver ID {driver[1]}")
                         else:
@@ -15725,7 +15740,7 @@ def handyman_booking_accepted(request):
                                 'intent':'handyman_live_tracking',
                                 'booking_id':str(booking_id)
                             }
-                            sendFMCMsg(auth_token,'You have been assigned a driver','Agent Assigned',customer_data,server_token)
+                            sendFMCMsg(auth_token,'You have been assigned a driver','Agent Assigned',customer_data,server_token,"Customer")
 
                             # Send success response
                             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
@@ -15849,7 +15864,7 @@ def update_booking_status_handyman(request):
 
                     # Execute the query
                     row_count = update_query(update_drop_epoch_query, values)
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
 
             except Exception as err:
@@ -15950,7 +15965,7 @@ def generate_order_id_for_booking_id_handyman(request):
                 elif booking_status == "End Service":
                     body = f"Thank you for choosing our services. Your Handy Man Service for '{service_name}' has been successfully completed."
                     title = "Handy Man Service Successfully Completed!"
-                sendFMCMsg(auth_token,body,title,data_map,server_token)
+                sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
                 #Generating Order ID
@@ -16824,7 +16839,8 @@ def generate_new_handyman_booking_id_get_nearby_agents_with_fcm_token(request):
                                 f"You have a new Work Request for \nWork Location: {pickup_address}.",
                                 "New HandyMan Ride Request",
                                 fcm_data,
-                                server_access_token
+                                server_access_token,
+                                "Agent"
                             )
                             print(f"Notification sent to handyman agent ID {driver[1]}")
                         else:
