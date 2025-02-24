@@ -41,8 +41,94 @@ mapKey = "AIzaSyAAlmEtjJOpSaJ7YVkMKwdSuMTbTx39l_o"
 #     print("missing_fields::",missing_fields)
 #     return missing_fields if missing_fields else None
 
+@csrf_exempt
+def get_agent_app_firebase_access_token(request):
+    print("agent_app_token_fetched")
+    try:
+        # Create a service account credential dictionary
+        credentials_dict = {
+            "type": "service_account",
+            "project_id": os.getenv('FIREBASE_PROJECT_ID'),
+            "private_key_id": os.getenv('FIREBASE_PRIVATE_KEY_ID'),
+            "private_key": os.getenv('FIREBASE_PRIVATE_KEY'),
+            "client_email": os.getenv('FIREBASE_CLIENT_EMAIL'),
+            "client_id": os.getenv('FIREBASE_CLIENT_ID'),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{os.getenv('FIREBASE_CLIENT_EMAIL')}"
+        }
 
-def get_agent_app_firebase_access_token():
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_dict,
+            scopes=['https://www.googleapis.com/auth/firebase.messaging']
+        )
+        
+        if not credentials.valid:
+            credentials.refresh(Request())
+            
+        return JsonResponse({
+            "status": "success",
+            "token": credentials.token
+        })
+
+    except Exception as e:
+        print(f"Error getting Firebase access token: {str(e)}")
+        return JsonResponse({
+            "status": "error",
+            "message": str(e)
+        }, status=500)
+        
+@csrf_exempt
+def get_customer_app_firebase_access_token(request):
+    print("customer_app_token_fetched")
+    try:
+        project_id = os.getenv('CUSTOMER_FIREBASE_PROJECT_ID')
+        private_key = os.getenv('CUSTOMER_FIREBASE_PRIVATE_KEY')
+        client_email = os.getenv('CUSTOMER_FIREBASE_CLIENT_EMAIL')
+        
+        if not all([project_id, private_key, client_email]):
+            return JsonResponse({
+                "status": "error",
+                "message": "Missing required environment variables"
+            }, status=500)
+
+        credentials_dict = {
+            "type": "service_account",
+            "project_id": project_id,
+            "private_key_id": os.getenv('CUSTOMER_FIREBASE_PRIVATE_KEY_ID'),
+            "private_key": private_key.replace('\\n', '\n'),
+            "client_email": client_email,
+            "client_id": os.getenv('CUSTOMER_FIREBASE_CLIENT_ID'),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{client_email}"
+        }
+
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_dict,
+            scopes=['https://www.googleapis.com/auth/firebase.messaging']
+        )
+        
+        if not credentials.valid:
+            credentials.refresh(Request())
+            
+        return JsonResponse({
+            "status": "success",
+            "token": credentials.token
+        })
+
+    except Exception as e:
+        print(f"Error getting Customer App Firebase access token: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        return JsonResponse({
+            "status": "error",
+            "message": str(e)
+        }, status=500)
+
+def get_inside_agent_app_firebase_access_token():
     print("agent_app_token_fetched")
     try:
         # Create a service account credential dictionary
@@ -74,7 +160,8 @@ def get_agent_app_firebase_access_token():
         print(f"Error getting Firebase access token: {str(e)}")
         return None
 
-def get_customer_app_firebase_access_token():
+
+def get_inside_customer_app_firebase_access_token():
     print("customer_app_token_fetched")
     try:
         # First, let's verify we can read the environment variables
