@@ -6246,7 +6246,10 @@ def update_booking_status_driver(request):
                 # Send success response
                 auth_token = get_customer_auth_token(customer_id)
                 body = title = ""
-                data_map = {}
+                data_map = {
+                    'intent':'goods_booking_live_track',
+                    'booking_id':str(booking_id)
+                }
                 if booking_status == "Driver Arrived":
                     body = "Our agent has arrived at your pickup location"
                     title = "Agent Arrived"
