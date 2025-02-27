@@ -6470,7 +6470,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
                         sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                         try:
                             query2 = """
-                            update vtpartner.active_goods_drivertbl set current_status='1' where goods_driver_id=%s
+                            update vtpartner.active_goods_drivertbl set current_status='1',current_booking_id='-1' where goods_driver_id=%s
                             """
                             values2 = [
                                     driver_id
