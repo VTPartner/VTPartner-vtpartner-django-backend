@@ -7727,7 +7727,7 @@ def cab_driver_online_status(request):
                 
         try:
             query = """
-            select is_online,status,driver_first_name,recent_online_pic,profile_pic,mobile_no from vtpartner.cab_driverstbl where cab_driver_id=%s
+            select is_online,status,driver_first_name,recent_online_pic,profile_pic,mobile_no,vehicle_name,image from vtpartner.cab_driverstbl,vtpartner.vehiclestbl where vehiclestbl.vehicle_id=cab_driverstbl.vehicle_id and cab_driver_id=%s
             """
             params = [cab_driver_id]
             result = select_query(query, params)  # Assuming select_query is defined elsewhere
@@ -7743,7 +7743,9 @@ def cab_driver_online_status(request):
                     "driver_first_name": row[2],  
                     "recent_online_pic": row[3],  
                     "profile_pic": row[4],  
-                    "mobile_no": row[5],  
+                    "mobile_no": row[5], 
+                    "vehicle_name": row[6], 
+                    "vehicle_image": row[7],   
                 }
                 for row in result
             ]
