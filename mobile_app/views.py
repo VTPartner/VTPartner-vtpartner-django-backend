@@ -1892,6 +1892,42 @@ def get_goods_driver_current_booking_detail(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+@csrf_exempt
+def get_cab_driver_current_booking_detail(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        cab_driver_id = data.get("cab_driver_id")
+
+        # List of required fields
+        required_fields = {"cab_driver_id": cab_driver_id}
+
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+
+        try:
+            query = """
+                SELECT current_booking_id FROM vtpartner.active_cab_drivertbl WHERE goods_driver_id = %s
+            """
+            result = select_query(query, [cab_driver_id])  # Assuming select_query is defined elsewhere
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Return only the first value directly
+            current_booking_id = result[0][0]  # Extract first index value
+
+            return JsonResponse({"current_booking_id": current_booking_id}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 
 @csrf_exempt 
@@ -8337,10 +8373,10 @@ def cab_driver_booking_accepted(request):
                         try:
 
                             query = """
-                               update vtpartner.active_cab_drivertbl set current_status='2' where cab_driver_id=%s
+                               update vtpartner.active_cab_drivertbl set current_status='2',current_booking_id=%s where cab_driver_id=%s
                                 """
                             values = [
-                                    driver_id
+                                    driver_id,booking_id
                                 ]
 
                             # Execute the query
@@ -8446,7 +8482,10 @@ def update_booking_status_cab_driver(request):
                 # Send success response
                 auth_token = get_customer_auth_token(customer_id)
                 body = title = ""
-                data_map = {}
+                data_map = {
+                    'intent':'cab_booking_live_track',
+                    'booking_id':str(booking_id)
+                }
                 if booking_status == "Driver Arrived":
                     body = "Our cab agent has arrived at your pickup location"
                     title = "Cab Agent Arrived"
@@ -8581,6 +8620,10 @@ def generate_order_id_for_booking_id_cab_driver(request):
                 elif booking_status == "End Trip":
                     body = "You have reached your destination successfully"
                     title = "Cab Destination Arrived"
+                    data_map = {
+                        'intent':'end_cab_live_tracking',
+                        'order_id':str(order_id)
+                            }
                 sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                 #return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
                 
@@ -8652,7 +8695,7 @@ def generate_order_id_for_booking_id_cab_driver(request):
                         order_id = ret_result[0][0]
                         try:
                             query2 = """
-                            update vtpartner.active_cab_drivertbl set current_status='1' where cab_driver_id=%s
+                            update vtpartner.active_cab_drivertbl set current_status='1',current_booking_id='-1' where cab_driver_id=%s
                             """
                             values2 = [
                                     driver_id
