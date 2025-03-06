@@ -6505,7 +6505,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
                                         'intent':'end_live_tracking',
                                         'order_id':str(order_id)
                                     }
-                        sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
+                        
                         try:
                             query2 = """
                             update vtpartner.active_goods_drivertbl set current_status='1',current_booking_id='-1' where goods_driver_id=%s
@@ -6584,6 +6584,7 @@ def generate_order_id_for_booking_id_goods_driver(request):
 
                                         # Execute the query
                                         row_count = insert_query(query5, values5)
+                                        sendFMCMsg(auth_token,body,title,data_map,server_token,"Customer")
                                         #success
                                         return JsonResponse({"message": f"{ret_result} row(s) updated","order_id":order_id}, status=200)
                                     except Exception as err:
