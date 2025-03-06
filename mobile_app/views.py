@@ -2615,6 +2615,7 @@ def cancel_booking(request):
                 'booking_id':str(booking_id)
             }
             # serverToken = get_agent_app_firebase_access_token()
+            print("sending fcm to agent cancel confirmed")
             sendFMCMsg(
             driver_auth_token,
             f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
@@ -2630,6 +2631,7 @@ def cancel_booking(request):
                 'intent':'customer_home',
                 'booking_id':str(booking_id)
             }
+            print("sending fcm to customer cancel confirmed")
             sendFMCMsg(
                 customer_auth_token,
                 f'Your ride request has been successfully canceled. \nPickup Location: {pickup_address}.',
