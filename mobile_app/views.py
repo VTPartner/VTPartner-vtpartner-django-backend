@@ -2551,7 +2551,8 @@ def cancel_booking(request):
         booking_id = data.get("booking_id")
         customer_id = data.get("customer_id")
         driver_id = data.get("driver_id")
-        server_token = data.get("server_token")
+        agent_server_token = data.get("agent_server_token")
+        customer_server_token = data.get("customer_server_token")
         pickup_address = data.get("pickup_address")
         cancel_reason = data.get("cancel_reason")
         
@@ -2560,7 +2561,8 @@ def cancel_booking(request):
         # List of required fields
         required_fields = {
             "booking_id": booking_id,
-            "server_token": server_token,
+            "agent_server_token": agent_server_token,
+            "customer_server_token": customer_server_token,
             "customer_id": customer_id,
             "driver_id": driver_id,
             "cancel_reason": cancel_reason,
@@ -2596,7 +2598,7 @@ def cancel_booking(request):
             row_count = insert_query(query2, values2)
             
             query3 = """
-            update vtpartner.active_goods_drivertbl set current_status='1' where goods_driver_id=%s
+            update vtpartner.active_goods_drivertbl set current_status='1',current_booking_id='-1' where goods_driver_id=%s
             """
             values3 = [
                     driver_id
@@ -2618,7 +2620,7 @@ def cancel_booking(request):
             f'The ride request has been canceled by the customer. \nPickup Location: {pickup_address}.',
             f'Ride Canceled - [Booking ID: {str(booking_id)}]',
             fcm_data,
-            server_token,
+            agent_server_token,
             "Agent"
             )
 
@@ -2633,7 +2635,8 @@ def cancel_booking(request):
                 f'Your ride request has been successfully canceled. \nPickup Location: {pickup_address}.',
                 'Ride Cancellation Confirmation',
                 fcm_data2,
-                server_token
+                customer_server_token,
+                "Customer"
             )
 
             
