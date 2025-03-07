@@ -7262,11 +7262,23 @@ def goods_driver_todays_earnings(request):
             if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
+            
+            query2 = """
+                SELECT COALESCE(SUM(amount), 0) AS todays_earnings, 
+                       COUNT(*) AS todays_rides 
+                FROM vtpartner.goods_driver_earningstbl 
+                WHERE driver_id = %s ;
+            """
+            result_total = select_query(query2, [driver_id])  # Assuming select_query is defined elsewhere
+            
             # Extract the first row from the result
             row = result[0]
+            row_total = result_total[0]
             earning_details = {
                 "todays_earnings": row[0],
                 "todays_rides": row[1],
+                "total_earnings":row_total[0],
+                "total_rides":row_total[1],
             }
 
             return JsonResponse({"results": [earning_details]}, status=200)
