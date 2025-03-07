@@ -6996,6 +6996,125 @@ def get_goods_driver_details(request):
 
 
 @csrf_exempt 
+def new_goods_driver_new_recharge_plan(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            driver_id = data.get("driver_id")
+            plan_id = data.get("plan_id")
+            razorpay_payment_id = data.get("razorpay_payment_id")
+            amount = data.get("amount")
+            expiry_time = data.get("expiry_time")
+            
+            # List of required fields
+            required_fields = {
+                "driver_id": driver_id,
+                "plan_id": plan_id,
+                "razorpay_payment_id": razorpay_payment_id,
+                "amount": amount,
+                "expiry_time": expiry_time,
+            }
+            
+            # Check for missing fields
+            missing_fields = check_missing_fields(required_fields)
+            
+            if missing_fields:
+                return JsonResponse(
+                    {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                    status=400
+                )
+
+            # Step 1: Insert into recharge history table
+            history_query = """
+                INSERT INTO vtpartner.goods_driver_recharge_history_tbl 
+                (recharge_plan_id, driver_id, plan_expiry_time,razorpay_payment_id)
+                VALUES (%s, %s, %s,%s)
+                RETURNING recharge_history_id;
+            """
+            history_values = [plan_id, driver_id, expiry_time,razorpay_payment_id]
+            
+            # Execute history insert and get the recharge_history_id
+            recharge_history_id = None
+            try:
+                cursor = connection.cursor()
+                cursor.execute(history_query, history_values)
+                recharge_history_id = cursor.fetchone()[0]
+                connection.commit()
+            except Exception as err:
+                connection.rollback()
+                print("Error inserting recharge history:", err)
+                return JsonResponse({"message": "Error recording recharge history"}, status=500)
+            finally:
+                cursor.close()
+
+            # Step 2: Check if current plan exists for the driver
+            check_current_plan_query = """
+                SELECT current_plan_id 
+                FROM vtpartner.goods_driver_current_recharge_plan_tbl 
+                WHERE driver_id = %s;
+            """
+            
+            current_plan_exists = False
+            try:
+                cursor = connection.cursor()
+                cursor.execute(check_current_plan_query, [driver_id])
+                result = cursor.fetchone()
+                current_plan_exists = result is not None
+            except Exception as err:
+                print("Error checking current plan:", err)
+                return JsonResponse({"message": "Error checking current plan"}, status=500)
+            finally:
+                cursor.close()
+
+            # Step 3: Update or Insert current plan
+            try:
+                cursor = connection.cursor()
+                if current_plan_exists:
+                    # Update existing plan
+                    update_query = """
+                        UPDATE vtpartner.goods_driver_current_recharge_plan_tbl 
+                        SET recharge_plan_id = %s,
+                            expiry_time = %s,
+                            last_recharge_history_id = %s
+                        WHERE driver_id = %s;
+                    """
+                    update_values = [plan_id, expiry_time, recharge_history_id, driver_id]
+                    cursor.execute(update_query, update_values)
+                else:
+                    # Insert new plan
+                    insert_query = """
+                        INSERT INTO vtpartner.goods_driver_current_recharge_plan_tbl 
+                        (recharge_plan_id, driver_id, expiry_time, last_recharge_history_id)
+                        VALUES (%s, %s, %s, %s);
+                    """
+                    insert_values = [plan_id, driver_id, expiry_time, recharge_history_id]
+                    cursor.execute(insert_query, insert_values)
+                
+                connection.commit()
+                
+                return JsonResponse({
+                    "success": True,
+                    "message": "Recharge plan updated successfully",
+                    "recharge_history_id": recharge_history_id,
+                    "plan_status": "updated" if current_plan_exists else "created"
+                }, status=200)
+
+            except Exception as err:
+                connection.rollback()
+                print("Error updating current plan:", err)
+                return JsonResponse({"message": "Error updating current plan"}, status=500)
+            finally:
+                cursor.close()
+
+        except json.JSONDecodeError:
+            return JsonResponse({"message": "Invalid JSON data"}, status=400)
+        except Exception as err:
+            print("Unexpected error:", err)
+            return JsonResponse({"message": "An unexpected error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt 
 def new_goods_driver_recharge(request):
     if request.method == "POST":
         data = json.loads(request.body)
