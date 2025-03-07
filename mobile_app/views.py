@@ -6629,6 +6629,61 @@ def generate_order_id_for_booking_id_goods_driver(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt 
+def get_goods_driver_new_recharge_plans_list(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        category_id = data.get("category_id")
+        vehicle_id = data.get("vehicle_id")
+        
+
+        # List of required fields
+        required_fields = {
+            "category_id": category_id,
+            "vehicle_id":vehicle_id
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            query = """
+               select recharge_plan_id,plan_title,plan_description,plan_days,expiry_days,plan_price from vtpartner.goods_driver_recharge_plans_tbl where category_id=%s and vehicle_id=%s
+            """
+            result = select_query(query,[category_id,vehicle_id])  
+
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with appropriate keys
+            services_details = [
+                {
+                    "recharge_plan_id": row[0],
+                    "plan_title": row[1],
+                    "plan_description": row[2],
+                    "plan_days": row[3],
+                    "expiry_days": row[4],
+                    "plan_price": row[5]
+                    
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"results": services_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt 
 def get_goods_driver_recharge_list(request):
     if request.method == "POST":
         data = json.loads(request.body)
