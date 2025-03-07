@@ -171,6 +171,8 @@ urlpatterns = [
     path('goods_driver_whole_year_earnings',views.goods_driver_whole_year_earnings,name='goods_driver_whole_year_earnings'),
     #My All Rides
     path('goods_driver_todays_earnings',views.goods_driver_todays_earnings,name='goods_driver_todays_earnings'),
+    #getting goods driver current new day wise recharge details
+    path('goods_driver_current_new_recharge_details',views.goods_driver_current_new_recharge_details,name='goods_driver_current_new_recharge_details'),
     
     
     #Cab Driver Api's URLs

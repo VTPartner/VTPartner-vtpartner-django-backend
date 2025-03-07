@@ -7519,6 +7519,61 @@ def goods_driver_todays_earnings(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def goods_driver_current_new_recharge_details(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        driver_id = data.get("driver_id")
+
+        # List of required fields
+        required_fields = {
+            "driver_id": driver_id,
+        }
+        # Check for missing fields
+        missing_fields = check_missing_fields(required_fields)
+        
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return JsonResponse(
+                {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=400
+            )
+            
+        try:
+            # Query to get today's earnings and rides count
+            query = """
+                 select current_plan_id,goods_driver_current_recharge_plan_tbl.recharge_plan_id,expiry_time,last_recharge_history_id,plan_title,plan_description,plan_days,plan_price from vtpartner.goods_driver_current_recharge_plan_tbl,vtpartner.goods_driver_recharge_plans_tbl where goods_driver_current_recharge_plan_tbl.driver_id=%s and goods_driver_current_recharge_plan_tbl.recharge_plan_id=goods_driver_recharge_plans_tbl.recharge_plan_id
+            """
+            result = select_query(query, [driver_id])  
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            
+           
+            
+            # Extract the first row from the result
+            row = result[0]
+            
+            recharge_details = {
+                "current_plan_id": row[0],
+                "recharge_plan_id": row[1],
+                "expiry_time":row[2],
+                "last_recharge_history_id":row[3],
+                "plan_title":row[4],
+                "plan_description":row[5],
+                "plan_days":row[6],
+                "plan_price":row[7],
+            }
+
+            return JsonResponse({"results": [recharge_details]}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 
 #Cab Driver Api's
 @csrf_exempt
