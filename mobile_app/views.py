@@ -6760,7 +6760,7 @@ def get_goods_driver_new_recharge_plan_history_list(request):
             
         try:
             query = """
-               select recharge_history_id,goods_driver_recharge_history_tbl.recharge_plan_id,plan_expiry_time,plan_title,plan_description,plan_days,expiry_days,plan_price from vtpartner.goods_driver_recharge_history_tbl,vtpartner.goods_driver_recharge_plans_tbl where goods_driver_recharge_history_tbl.driver_id=%s and goods_driver_recharge_history_tbl.recharge_plan_id=goods_driver_recharge_plans_tbl.recharge_plan_id
+               select recharge_history_id,goods_driver_recharge_history_tbl.recharge_plan_id,plan_expiry_time,plan_title,plan_description,plan_days,expiry_days,plan_price,recharge_time from vtpartner.goods_driver_recharge_history_tbl,vtpartner.goods_driver_recharge_plans_tbl where goods_driver_recharge_history_tbl.driver_id=%s and goods_driver_recharge_history_tbl.recharge_plan_id=goods_driver_recharge_plans_tbl.recharge_plan_id
             """
             result = select_query(query,[driver_id])  
 
@@ -6778,6 +6778,7 @@ def get_goods_driver_new_recharge_plan_history_list(request):
                     "plan_days": row[5],
                     "expiry_days": row[6],
                     "plan_price": row[7],
+                    "recharge_time": row[8],
                     
                 }
                 for row in result
