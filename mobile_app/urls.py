@@ -159,6 +159,8 @@ urlpatterns = [
     path('get_goods_driver_recharge_list',views.get_goods_driver_recharge_list,name='get_goods_driver_recharge_list'),
     #Get Goods Driver New Recharge Plan List 
     path('get_goods_driver_new_recharge_plans_list',views.get_goods_driver_new_recharge_plans_list,name='get_goods_driver_new_recharge_plans_list'),
+    #Get Goods Driver New Recharge Plan History List 
+    path('get_goods_driver_new_recharge_plan_history_list',views.get_goods_driver_new_recharge_plan_history_list,name='get_goods_driver_new_recharge_plan_history_list'),
     #Insert the Goods Driver New Recharge
     path('new_goods_driver_recharge',views.new_goods_driver_recharge,name='new_goods_driver_recharge'),
     #Insert the Goods Driver New Recharge Plans
