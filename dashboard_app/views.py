@@ -1264,6 +1264,171 @@ def edit_vehicle_price(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+
+@csrf_exempt
+def add_peak_hour_price(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            city_id = data.get('city_id')
+            vehicle_id = data.get('vehicle_id')
+            price_per_km = data.get('price_per_km')
+            start_time = data.get('start_time')
+            end_time = data.get('end_time')
+
+            required_fields = {
+                'city_id': city_id,
+                'vehicle_id': vehicle_id,
+                'price_per_km': price_per_km,
+                'start_time': start_time,
+                'end_time': end_time
+            }
+
+            missing_fields = check_missing_fields(required_fields)
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            # Check for overlapping time slots
+            query_overlap_check = """
+                SELECT COUNT(*) 
+                FROM vtpartner.vehicle_peak_hours_price_tbl 
+                WHERE city_id = %s 
+                AND vehicle_id = %s 
+                AND status = 1
+                AND ((start_time, end_time) OVERLAPS (%s::time, %s::time))
+            """
+            values_overlap_check = (city_id, vehicle_id, start_time, end_time)
+            result = select_query(query_overlap_check, values_overlap_check)
+
+            if result and result[0][0] > 0:
+                return JsonResponse({"message": "Time slot overlaps with existing peak hours"}, status=409)
+
+            query = """
+                INSERT INTO vtpartner.vehicle_peak_hours_price_tbl 
+                (city_id, vehicle_id, price_per_km, start_time, end_time) 
+                VALUES (%s, %s, %s, %s::time, %s::time)
+            """
+            values = (city_id, vehicle_id, price_per_km, start_time, end_time)
+            row_count = insert_query(query, values)
+
+            return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
+
+        except Exception as err:
+            print("Error adding peak hour price:", err)
+            return JsonResponse({"message": "Error adding peak hour price"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def edit_peak_hour_price(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            peak_price_id = data.get('peak_price_id')
+            city_id = data.get('city_id')
+            vehicle_id = data.get('vehicle_id')
+            price_per_km = data.get('price_per_km')
+            start_time = data.get('start_time')
+            end_time = data.get('end_time')
+            status = data.get('status', 1)
+
+            required_fields = {
+                'peak_price_id': peak_price_id,
+                'city_id': city_id,
+                'vehicle_id': vehicle_id,
+                'price_per_km': price_per_km,
+                'start_time': start_time,
+                'end_time': end_time
+            }
+
+            missing_fields = check_missing_fields(required_fields)
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            # Check for overlapping time slots excluding current record
+            query_overlap_check = """
+                SELECT COUNT(*) 
+                FROM vtpartner.vehicle_peak_hours_price_tbl 
+                WHERE city_id = %s 
+                AND vehicle_id = %s 
+                AND peak_price_id != %s
+                AND status = 1
+                AND ((start_time, end_time) OVERLAPS (%s::time, %s::time))
+            """
+            values_overlap_check = (city_id, vehicle_id, peak_price_id, start_time, end_time)
+            result = select_query(query_overlap_check, values_overlap_check)
+
+            if result and result[0][0] > 0:
+                return JsonResponse({"message": "Time slot overlaps with existing peak hours"}, status=409)
+
+            query = """
+                UPDATE vtpartner.vehicle_peak_hours_price_tbl 
+                SET city_id = %s,
+                    vehicle_id = %s,
+                    price_per_km = %s,
+                    start_time = %s::time,
+                    end_time = %s::time,
+                    status = %s,
+                    time_created_at = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
+                WHERE peak_price_id = %s
+            """
+            values = (city_id, vehicle_id, price_per_km, start_time, end_time, status, peak_price_id)
+            row_count = update_query(query, values)
+
+            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+
+        except Exception as err:
+            print("Error updating peak hour price:", err)
+            return JsonResponse({"message": "Error updating peak hour price"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_peak_hour_prices(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            vehicle_id = data.get('vehicle_id')
+            city_id = data.get('city_id')
+
+            query = """
+                SELECT p.*, c.city_name, c.bg_image
+                FROM vtpartner.vehicle_peak_hours_price_tbl p
+                JOIN vtpartner.available_citys_tbl c ON p.city_id = c.city_id
+                WHERE p.vehicle_id = %s
+                AND (p.city_id = %s OR %s IS NULL)
+                ORDER BY p.start_time
+            """
+            values = (vehicle_id, city_id, city_id)
+            result = select_query(query, values)
+
+            peak_hours = []
+            for row in result:
+                peak_hours.append({
+                    'peak_price_id': row[0],
+                    'city_id': row[1],
+                    'vehicle_id': row[2],
+                    'price_per_km': float(row[3]),
+                    'start_time': str(row[4]),
+                    'end_time': str(row[5]),
+                    'status': row[6],
+                    'time_created_at': float(row[7]),
+                    'city_name': row[8],
+                    'bg_image': row[9]
+                })
+
+            return JsonResponse({"peak_hours": peak_hours}, status=200)
+
+        except Exception as err:
+            print("Error fetching peak hour prices:", err)
+            return JsonResponse({"message": "Error fetching peak hour prices"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 @csrf_exempt  # Disable CSRF protection for this view
 def all_sub_categories(request):
     if request.method == "POST":
