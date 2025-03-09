@@ -21,6 +21,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import IntegrityError
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+import math
 
 from PIL import Image  # Pillow library for image processing
 
@@ -1815,7 +1816,6 @@ def get_all_coupons(request):
             return JsonResponse({"message": str(err)}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
-
 @csrf_exempt  # Disable CSRF protection for this view
 def all_sub_categories(request):
     if request.method == "POST":
