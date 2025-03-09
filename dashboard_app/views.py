@@ -1429,6 +1429,164 @@ def get_peak_hour_prices(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+
+@csrf_exempt
+def add_banner(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            banner_title = data.get('banner_title')
+            banner_description = data.get('banner_description')
+            banner_image = data.get('banner_image')
+            banner_type = data.get('banner_type')
+            start_date = data.get('start_date')
+            end_date = data.get('end_date')
+
+            required_fields = {
+                'banner_title': banner_title,
+                'banner_image': banner_image,
+                'banner_type': banner_type,
+                'start_date': start_date,
+                'end_date': end_date
+            }
+
+            missing_fields = check_missing_fields(required_fields)
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            query = """
+                INSERT INTO vtpartner.banners_tbl 
+                (banner_title, banner_description, banner_image, banner_type, start_date, end_date) 
+                VALUES (%s, %s, %s, %s, %s::timestamp, %s::timestamp)
+            """
+            values = (banner_title, banner_description, banner_image, banner_type, start_date, end_date)
+            row_count = insert_query(query, values)
+
+            return JsonResponse({"message": "Banner added successfully"}, status=200)
+
+        except Exception as err:
+            print("Error adding banner:", err)
+            return JsonResponse({"message": "Error adding banner"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def edit_banner(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            banner_id = data.get('banner_id')
+            banner_title = data.get('banner_title')
+            banner_description = data.get('banner_description')
+            banner_image = data.get('banner_image')
+            banner_type = data.get('banner_type')
+            start_date = data.get('start_date')
+            end_date = data.get('end_date')
+            status = data.get('status', 1)
+
+            required_fields = {
+                'banner_id': banner_id,
+                'banner_title': banner_title,
+                'banner_image': banner_image,
+                'banner_type': banner_type,
+                'start_date': start_date,
+                'end_date': end_date
+            }
+
+            missing_fields = check_missing_fields(required_fields)
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            query = """
+                UPDATE vtpartner.banners_tbl 
+                SET banner_title = %s,
+                    banner_description = %s,
+                    banner_image = %s,
+                    banner_type = %s,
+                    start_date = %s::timestamp,
+                    end_date = %s::timestamp,
+                    status = %s,
+                    time_created_at = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
+                WHERE banner_id = %s
+            """
+            values = (banner_title, banner_description, banner_image, banner_type, 
+                     start_date, end_date, status, banner_id)
+            row_count = update_query(query, values)
+
+            return JsonResponse({"message": "Banner updated successfully"}, status=200)
+
+        except Exception as err:
+            print("Error updating banner:", err)
+            return JsonResponse({"message": "Error updating banner"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def delete_banner(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            banner_id = data.get('banner_id')
+
+            if not banner_id:
+                return JsonResponse({"message": "Banner ID is required"}, status=400)
+
+            query = """
+                UPDATE vtpartner.banners_tbl 
+                SET status = 0,
+                    time_created_at = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
+                WHERE banner_id = %s
+            """
+            values = (banner_id,)
+            row_count = update_query(query, values)
+
+            return JsonResponse({"message": "Banner deleted successfully"}, status=200)
+
+        except Exception as err:
+            print("Error deleting banner:", err)
+            return JsonResponse({"message": "Error deleting banner"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_all_banners(request):
+    if request.method == "POST":
+        try:
+            query = """
+                SELECT banner_id, banner_title, banner_description, banner_image, 
+                       banner_type, start_date, end_date, status, time_created_at
+                FROM vtpartner.banners_tbl
+                
+                ORDER BY time_created_at DESC
+            """
+            result = select_query(query)
+
+            banners = []
+            for row in result:
+                banners.append({
+                    'banner_id': row[0],
+                    'banner_title': row[1],
+                    'banner_description': row[2],
+                    'banner_image': row[3],
+                    'banner_type': row[4],
+                    'start_date': str(row[5]),
+                    'end_date': str(row[6]),
+                    'status': row[7],
+                    'time_created_at': float(row[8])
+                })
+
+            return JsonResponse({"banners": banners}, status=200)
+
+        except Exception as err:
+            print("Error fetching banners:", err)
+            return JsonResponse({"message": "Error fetching banners"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 @csrf_exempt  # Disable CSRF protection for this view
 def all_sub_categories(request):
     if request.method == "POST":

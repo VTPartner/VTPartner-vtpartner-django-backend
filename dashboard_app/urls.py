@@ -52,6 +52,14 @@ urlpatterns = [
     path('edit_peak_hour_price',views.edit_peak_hour_price,name='edit_peak_hour_price'),
     #Adding peak hour prices
     path('add_peak_hour_price',views.add_peak_hour_price,name='add_peak_hour_price'),
+    #Adding peak hour prices 
+    path('get_all_banners',views.get_all_banners,name='get_all_banners'),
+    #Adding peak hour prices
+    path('delete_banner',views.delete_banner,name='delete_banner'),
+    #Adding peak hour prices
+    path('edit_banner',views.edit_banner,name='edit_banner'),
+    #Adding peak hour prices
+    path('add_banner',views.add_banner,name='add_banner'),
     #Admin Login
     path('all_sub_categories',views.all_sub_categories,name='all_sub_categories'),
     #Admin Login
