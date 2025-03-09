@@ -60,6 +60,16 @@ urlpatterns = [
     path('edit_banner',views.edit_banner,name='edit_banner'),
     #Adding peak hour prices
     path('add_banner',views.add_banner,name='add_banner'),
+    
+    #Adding peak hour prices
+    path('add_coupon',views.add_coupon,name='add_coupon'),
+    #Adding peak hour prices
+    path('edit_coupon',views.edit_coupon,name='edit_coupon'),
+    #Adding peak hour prices
+    path('delete_coupon',views.delete_coupon,name='delete_coupon'),
+    #Adding peak hour prices
+    path('get_all_coupons',views.get_all_coupons,name='get_all_coupons'),
+    
     #Admin Login
     path('all_sub_categories',views.all_sub_categories,name='all_sub_categories'),
     #Admin Login

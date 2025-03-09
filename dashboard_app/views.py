@@ -1587,6 +1587,235 @@ def get_all_banners(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+
+@csrf_exempt
+def add_coupon(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            required_fields = {
+                'coupon_code': data.get('coupon_code'),
+                'coupon_title': data.get('coupon_title'),
+                'category_id': data.get('category_id'),
+                'discount_type': data.get('discount_type'),
+                'discount_value': data.get('discount_value'),
+                'start_date': data.get('start_date'),
+                'end_date': data.get('end_date')
+            }
+
+            missing_fields = check_missing_fields(required_fields)
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            # Check if coupon code already exists
+            check_query = "SELECT COUNT(*) FROM vtpartner.coupons_tbl WHERE coupon_code = %s"
+            result = select_query(check_query, (data.get('coupon_code'),))
+            if result[0][0] > 0:
+                return JsonResponse({"message": "Coupon code already exists"}, status=409)
+
+            query = """
+                INSERT INTO vtpartner.coupons_tbl 
+                (coupon_code, coupon_title, coupon_description, category_id, 
+                discount_type, discount_value, min_order_value, max_discount, 
+                usage_limit, start_date, end_date) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s::timestamp, %s::timestamp)
+            """
+            values = (
+                data.get('coupon_code'),
+                data.get('coupon_title'),
+                data.get('coupon_description'),
+                data.get('category_id'),
+                data.get('discount_type'),
+                data.get('discount_value'),
+                data.get('min_order_value', 0),
+                data.get('max_discount', 0),
+                data.get('usage_limit', 0),
+                data.get('start_date'),
+                data.get('end_date')
+            )
+            insert_query(query, values)
+            return JsonResponse({"message": "Coupon added successfully"}, status=200)
+
+        except Exception as err:
+            print("Error adding coupon:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def edit_coupon(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            required_fields = {
+                'coupon_id': data.get('coupon_id'),
+                'coupon_code': data.get('coupon_code'),
+                'coupon_title': data.get('coupon_title'),
+                'category_id': data.get('category_id'),
+                'discount_type': data.get('discount_type'),
+                'discount_value': data.get('discount_value'),
+                'start_date': data.get('start_date'),
+                'end_date': data.get('end_date')
+            }
+
+            missing_fields = check_missing_fields(required_fields)
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            # Check if coupon code exists for other coupons
+            check_query = """
+                SELECT COUNT(*) FROM vtpartner.coupons_tbl 
+                WHERE coupon_code = %s AND coupon_id != %s
+            """
+            result = select_query(check_query, (data.get('coupon_code'), data.get('coupon_id')))
+            if result[0][0] > 0:
+                return JsonResponse({"message": "Coupon code already exists"}, status=409)
+
+            query = """
+                UPDATE vtpartner.coupons_tbl 
+                SET coupon_code = %s,
+                    coupon_title = %s,
+                    coupon_description = %s,
+                    category_id = %s,
+                    discount_type = %s,
+                    discount_value = %s,
+                    min_order_value = %s,
+                    max_discount = %s,
+                    usage_limit = %s,
+                    start_date = %s::timestamp,
+                    end_date = %s::timestamp,
+                    status = %s
+                WHERE coupon_id = %s
+            """
+            values = (
+                data.get('coupon_code'),
+                data.get('coupon_title'),
+                data.get('coupon_description'),
+                data.get('category_id'),
+                data.get('discount_type'),
+                data.get('discount_value'),
+                data.get('min_order_value', 0),
+                data.get('max_discount', 0),
+                data.get('usage_limit', 0),
+                data.get('start_date'),
+                data.get('end_date'),
+                data.get('status', 1),
+                data.get('coupon_id')
+            )
+            update_query(query, values)
+            return JsonResponse({"message": "Coupon updated successfully"}, status=200)
+
+        except Exception as err:
+            print("Error updating coupon:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def delete_coupon(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            coupon_id = data.get('coupon_id')
+
+            if not coupon_id:
+                return JsonResponse({"message": "Coupon ID is required"}, status=400)
+
+            query = """
+                UPDATE vtpartner.coupons_tbl 
+                SET status = 0 
+                WHERE coupon_id = %s
+            """
+            update_query(query, (coupon_id,))
+            return JsonResponse({"message": "Coupon deleted successfully"}, status=200)
+
+        except Exception as err:
+            print("Error deleting coupon:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_all_coupons(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            page = int(data.get('page', 1))
+            limit = int(data.get('limit', 10))
+            search = data.get('search', '')
+            offset = (page - 1) * limit
+
+            # Get total count for pagination
+            count_query = """
+                SELECT COUNT(*) 
+                FROM vtpartner.coupons_tbl c
+                JOIN vtpartner.categorytbl cat ON c.category_id = cat.category_id
+                WHERE c.status = 1
+                AND (
+                    c.coupon_code ILIKE %s OR 
+                    c.coupon_title ILIKE %s OR
+                    cat.category_name ILIKE %s
+                )
+            """
+            search_pattern = f'%{search}%'
+            count_result = select_query(count_query, (search_pattern, search_pattern, search_pattern))
+            total_count = count_result[0][0]
+
+            # Get paginated results
+            query = """
+                SELECT c.*, cat.category_name
+                FROM vtpartner.coupons_tbl c
+                JOIN vtpartner.categorytbl cat ON c.category_id = cat.category_id
+                WHERE c.status = 1
+                AND (
+                    c.coupon_code ILIKE %s OR 
+                    c.coupon_title ILIKE %s OR
+                    cat.category_name ILIKE %s
+                )
+                ORDER BY c.time_created_at DESC
+                LIMIT %s OFFSET %s
+            """
+            values = (search_pattern, search_pattern, search_pattern, limit, offset)
+            result = select_query(query, values)
+
+            coupons = []
+            for row in result:
+                coupons.append({
+                    'coupon_id': row[0],
+                    'coupon_code': row[1],
+                    'coupon_title': row[2],
+                    'coupon_description': row[3],
+                    'category_id': row[4],
+                    'discount_type': row[5],
+                    'discount_value': float(row[6]),
+                    'min_order_value': float(row[7]),
+                    'max_discount': float(row[8]),
+                    'usage_limit': row[9],
+                    'used_count': row[10],
+                    'start_date': str(row[11]),
+                    'end_date': str(row[12]),
+                    'status': row[13],
+                    'time_created_at': float(row[14]),
+                    'category_name': row[15]
+                })
+
+            return JsonResponse({
+                "coupons": coupons,
+                "total": total_count,
+                "page": page,
+                "total_pages": math.ceil(total_count / limit)
+            }, status=200)
+
+        except Exception as err:
+            print("Error fetching coupons:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 @csrf_exempt  # Disable CSRF protection for this view
 def all_sub_categories(request):
     if request.method == "POST":
