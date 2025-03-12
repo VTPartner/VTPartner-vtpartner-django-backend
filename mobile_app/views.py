@@ -617,52 +617,95 @@ def add_or_update_customer_address(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-@csrf_exempt
-def update_customer_details(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        customer_name = data.get("customer_name")
-        customer_id = data.get("customer_id")
-        email_id = data.get("email_id")
-        gst_no = data.get("gst_no")
-        gst_address = data.get("gst_address")
+# @csrf_exempt
+# def update_customer_details(request):
+#     if request.method == "POST":
+#         data = json.loads(request.body)
+#         customer_name = data.get("customer_name")
+#         customer_id = data.get("customer_id")
+#         email_id = data.get("email_id")
+#         gst_no = data.get("gst_no")
+#         gst_address = data.get("gst_address")
         
 
-         # List of required fields
-        required_fields = {
-            "customer_name": customer_name,
-            "customer_id": customer_id,
-            "email_id": email_id,
-            "gst_no": gst_no,
-            "gst_address": gst_address,
+#          # List of required fields
+#         required_fields = {
+#             "customer_name": customer_name,
+#             "customer_id": customer_id,
+#             "email_id": email_id,
+#             "gst_no": gst_no,
+#             "gst_address": gst_address,
             
             
-        }
-        # Check for missing fields
-         # Use the utility function to check for missing fields
-        missing_fields = check_missing_fields(required_fields)
+#         }
+#         # Check for missing fields
+#          # Use the utility function to check for missing fields
+#         missing_fields = check_missing_fields(required_fields)
         
-        # If there are missing fields, return an error response
-        if missing_fields:
-            return JsonResponse(
-            {"message": f"Missing required fields: {', '.join(missing_fields)}"},
-            status=400
-        )
+#         # If there are missing fields, return an error response
+#         if missing_fields:
+#             return JsonResponse(
+#             {"message": f"Missing required fields: {', '.join(missing_fields)}"},
+#             status=400
+#         )
         
+#         try:
+#             #Update if found
+#             query = """
+#                 UPDATE vtpartner.customers_tbl SET
+#                 customer_name=%s,email=%s,gst_no=%s,gst_address=%s
+#                 WHERE customer_id=%s
+#             """
+#             values = [customer_name,email_id,gst_no,gst_address,customer_id]
+#             row_count = update_query(query, values)
+#             # Send success response
+#             return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+#         except Exception as err:
+#             print("Error executing query:", err)
+#             return JsonResponse({"message": "An error occurred"}, status=500)
+
+#     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def get_peak_hour_prices(request):
+    if request.method == "POST":
         try:
-            #Update if found
+            data = json.loads(request.body)
+            
+            city_id = data.get('city_id')
+
             query = """
-                UPDATE vtpartner.customers_tbl SET
-                customer_name=%s,email=%s,gst_no=%s,gst_address=%s
-                WHERE customer_id=%s
+                SELECT p.*, c.city_name, c.bg_image
+                FROM vtpartner.vehicle_peak_hours_price_tbl p
+                JOIN vtpartner.available_citys_tbl c ON p.city_id = c.city_id
+                WHERE
+                (p.city_id = %s OR %s IS NULL)
+                ORDER BY p.start_time::time
             """
-            values = [customer_name,email_id,gst_no,gst_address,customer_id]
-            row_count = update_query(query, values)
-            # Send success response
-            return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)
+            values = ( city_id, city_id)
+            result = select_query(query, values)
+            print("peak hour result::"+result)
+            peak_hours = []
+            for row in result:
+                peak_hours.append({
+                    'peak_price_id': row[0],
+                    'city_id': row[1],
+                    'vehicle_id': row[2],
+                    'price_per_km': float(row[3]),
+                    'start_time': row[6],  # Changed index to match table structure
+                    'end_time': row[7],    # Changed index to match table structure
+                    'status': row[4],
+                    'time_created_at': float(row[5]),
+                    'city_name': row[8],
+                    'bg_image': row[9]
+                })
+
+            return JsonResponse({"peak_hours": peak_hours}, status=200)
+
         except Exception as err:
-            print("Error executing query:", err)
-            return JsonResponse({"message": "An error occurred"}, status=500)
+            print("Error fetching peak hour prices:", err)
+            return JsonResponse({"message": "Error fetching peak hour prices"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 

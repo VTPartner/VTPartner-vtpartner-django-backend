@@ -117,6 +117,8 @@ urlpatterns = [
     path('get_customer_details',views.get_customer_details,name='get_customer_details'),
     #Update customer details
     path('update_customer_details',views.update_customer_details,name='update_customer_details'),
+    #Update customer details
+    path('get_peak_hour_prices',views.get_peak_hour_prices,name='get_peak_hour_prices'),
     
     
     
