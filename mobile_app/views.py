@@ -4876,50 +4876,30 @@ def get_goods_driver_details(request):
                 return JsonResponse({"message": "Driver ID is required"}, status=400)
 
             query = """
-                SELECT gd.goods_driver_id, gd.driver_first_name, gd.driver_last_name,
-                       gd.profile_pic, gd.mobile_no, gd.registration_date,
-                       gd.aadhar_no, gd.pan_card_no, gd.full_address,
-                       gd.gender, gd.driving_license_no, gd.vehicle_plate_no,
-                       gd.rc_no, gd.insurance_no, gd.noc_no,
-                       gd.vehicle_fuel_type, gd.bank_name, gd.ifsc_code,
-                       gd.account_number, gd.account_name,
-                       v.vehicle_name, v.image as vehicle_image
-                FROM vtpartner.goods_driverstbl gd
-                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id
-                WHERE gd.goods_driver_id = %s
+                SELECT * FROM vtpartner.goods_driverstbl WHERE goods_driver_id = %s
             """
             
             result = select_query(query, (driver_id,))
-
+            
             if not result:
                 return JsonResponse({"message": "Driver not found"}, status=404)
-
-            # Extracting the result
-            driver = {
-                "driver_id": result[0][0],
-                "first_name": result[0][1] or 'NA',
-                "last_name": result[0][2] or 'NA',
-                "profile_pic": result[0][3] or 'NA',
-                "mobile_no": result[0][4] or 'NA',
-                "registration_date": result[0][5].strftime('%Y-%m-%d') if result[0][5] else 'NA',
-                "aadhar_no": result[0][6] or 'NA',
-                "pan_no": result[0][7] or 'NA',
-                "full_address": result[0][8] or 'NA',
-                "gender": result[0][9] or 'NA',
-                "license_no": result[0][10] or 'NA',
-                "vehicle_plate_no": result[0][11] or 'NA',
-                "rc_no": result[0][12] or 'NA',
-                "insurance_no": result[0][13] or 'NA',
-                "noc_no": result[0][14] or 'NA',
-                "vehicle_fuel_type": result[0][15] or 'NA',
-                "bank_name": result[0][16] or 'NA',
-                "ifsc_code": result[0][17] or 'NA',
-                "account_number": result[0][18] or 'NA',
-                "account_name": result[0][19] or 'NA',
-                "vehicle_name": result[0][20] or 'NA',
-                "vehicle_image": result[0][21] or 'NA'
-            }
-
+            
+            columns = [
+                "driver_id", "driver_first_name", "driver_last_name", "profile_pic", "is_online", "ratings",
+                "mobile_no", "registration_date", "time", "r_lat", "r_lng", "current_lat", "current_lng", "status",
+                "recent_online_pic", "is_verified", "category_id", "vehicle_id", "city_id", "aadhar_no", "pan_card_no",
+                "house_no", "city_name", "full_address", "gender", "owner_id", "aadhar_card_front", "aadhar_card_back",
+                "pan_card_front", "pan_card_back", "license_front", "license_back", "insurance_image", "noc_image",
+                "pollution_certificate_image", "rc_image", "vehicle_image", "vehicle_plate_image", "driving_license_no",
+                "vehicle_plate_no", "rc_no", "insurance_no", "noc_no", "vehicle_fuel_type", "authtoken", "otp_no", "reason",
+                "bank_name", "ifsc_code", "account_number", "account_name"
+            ]
+            
+            driver = {columns[i]: (result[0][i] if result[0][i] is not None else 'NA') for i in range(len(columns))}
+            
+            if isinstance(driver["registration_date"], datetime):
+                driver["registration_date"] = driver["registration_date"].strftime('%Y-%m-%d')
+            
             return JsonResponse({"driver": driver}, status=200)
 
         except Exception as err:
