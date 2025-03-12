@@ -4894,29 +4894,30 @@ def get_goods_driver_details(request):
             if not result:
                 return JsonResponse({"message": "Driver not found"}, status=404)
 
+            # Extracting the result
             driver = {
                 "driver_id": result[0][0],
-                "first_name": result[0][1],
-                "last_name": result[0][2],
-                "profile_pic": result[0][3],
-                "mobile_no": result[0][4],
-                "registration_date": result[0][5].strftime('%Y-%m-%d'),
-                "aadhar_no": result[0][6],
-                "pan_no": result[0][7],
-                "full_address": result[0][8],
-                "gender": result[0][9],
-                "license_no": result[0][10],
-                "vehicle_plate_no": result[0][11],
-                "rc_no": result[0][12],
-                "insurance_no": result[0][13],
-                "noc_no": result[0][14],
-                "vehicle_fuel_type": result[0][15],
-                "bank_name": result[0][16],
-                "ifsc_code": result[0][17],
-                "account_number": result[0][18],
-                "account_name": result[0][19],
-                "vehicle_name": result[0][20],
-                "vehicle_image": result[0][21]
+                "first_name": result[0][1] or 'NA',
+                "last_name": result[0][2] or 'NA',
+                "profile_pic": result[0][3] or 'NA',
+                "mobile_no": result[0][4] or 'NA',
+                "registration_date": result[0][5].strftime('%Y-%m-%d') if result[0][5] else 'NA',
+                "aadhar_no": result[0][6] or 'NA',
+                "pan_no": result[0][7] or 'NA',
+                "full_address": result[0][8] or 'NA',
+                "gender": result[0][9] or 'NA',
+                "license_no": result[0][10] or 'NA',
+                "vehicle_plate_no": result[0][11] or 'NA',
+                "rc_no": result[0][12] or 'NA',
+                "insurance_no": result[0][13] or 'NA',
+                "noc_no": result[0][14] or 'NA',
+                "vehicle_fuel_type": result[0][15] or 'NA',
+                "bank_name": result[0][16] or 'NA',
+                "ifsc_code": result[0][17] or 'NA',
+                "account_number": result[0][18] or 'NA',
+                "account_name": result[0][19] or 'NA',
+                "vehicle_name": result[0][20] or 'NA',
+                "vehicle_image": result[0][21] or 'NA'
             }
 
             return JsonResponse({"driver": driver}, status=200)
