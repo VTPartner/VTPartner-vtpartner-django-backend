@@ -6269,6 +6269,104 @@ def get_goods_driver_details(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def check_driver_status(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            driver_id = data.get('driver_id')
+
+            if not driver_id:
+                return JsonResponse({"message": "Driver ID is required"}, status=400)
+
+            # Check if driver has any active bookings
+            query = """
+                SELECT current_booking_id 
+                FROM vtpartner.active_goods_drivertbl 
+                WHERE goods_driver_id = %s
+            """
+            result = select_query(query, (driver_id,))
+
+            if not result:
+                return JsonResponse({"is_free": True}, status=200)
+
+            is_free = result[0][0] == -1
+            return JsonResponse({"is_free": is_free}, status=200)
+
+        except Exception as err:
+            print("Error checking driver status:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def toggle_driver_online_status(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            driver_id = data.get('driver_id')
+            new_status = data.get('online_status')  # 1 for online, 0 for offline
+            current_lat = data.get('current_lat', 0)
+            current_lng = data.get('current_lng', 0)
+
+            if not driver_id:
+                return JsonResponse({"message": "Driver ID is required"}, status=400)
+
+            if new_status == 0:
+                # Check if driver is free before going offline
+                check_query = """
+                    SELECT current_booking_id 
+                    FROM vtpartner.active_goods_drivertbl 
+                    WHERE goods_driver_id = %s
+                """
+                result = select_query(check_query, (driver_id,))
+                
+                if result and result[0][0] != -1:
+                    return JsonResponse({
+                        "message": "Driver has active bookings and cannot go offline"
+                    }, status=400)
+
+                # Delete from active drivers table
+                delete_driver_query = """
+                    DELETE FROM vtpartner.active_goods_drivertbl 
+                    WHERE goods_driver_id = %s
+                """
+                delete_values = (driver_id,)
+                delete_query(delete_driver_query, delete_values)
+
+            else:
+                # Add to active drivers table
+                insert_query = """
+                    INSERT INTO vtpartner.active_goods_drivertbl 
+                    (goods_driver_id, current_lat, current_lng) 
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (goods_driver_id) 
+                    DO UPDATE SET 
+                        current_lat = EXCLUDED.current_lat,
+                        current_lng = EXCLUDED.current_lng,
+                        entry_time = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
+                """
+                insert_values = (driver_id, current_lat, current_lng)
+                insert_query(insert_query, insert_values)
+
+            # Update driver's online status
+            update_driver_query = """
+                UPDATE vtpartner.goods_driverstbl 
+                SET is_online = %s 
+                WHERE goods_driver_id = %s
+            """
+            update_values = (new_status, driver_id)
+            update_query(update_driver_query, update_values)
+
+            return JsonResponse({
+                "message": f"Driver status updated to {'online' if new_status == 1 else 'offline'}"
+            }, status=200)
+
+        except Exception as err:
+            print("Error toggling driver status:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt
 def delete_estimation(request):

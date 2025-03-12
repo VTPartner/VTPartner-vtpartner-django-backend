@@ -181,6 +181,10 @@ urlpatterns = [
     path('get_total_goods_drivers_with_count',views.get_total_goods_drivers_with_count,name='get_total_goods_drivers_with_count'),
     #Get Goods Driver Details
     path('get_goods_driver_details',views.get_goods_driver_details,name='get_goods_driver_details'),
+    #Check Goods Driver Status
+    path('check_driver_status',views.check_driver_status,name='check_driver_status'),
+    #Change Goods Driver Status from Online to Offline and vice versa
+    path('toggle_driver_online_status',views.toggle_driver_online_status,name='toggle_driver_online_status'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
