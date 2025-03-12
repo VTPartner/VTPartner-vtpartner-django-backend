@@ -72,6 +72,9 @@ urlpatterns = [
     #Adding peak hour prices
     path('get_all_coupons',views.get_all_coupons,name='get_all_coupons'),
     
+    #Reports
+    path('get_orders_report',views.get_orders_report,name='get_orders_report'),
+    
     #Admin Login
     path('all_sub_categories',views.all_sub_categories,name='all_sub_categories'),
     #Admin Login

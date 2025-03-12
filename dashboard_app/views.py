@@ -1695,6 +1695,98 @@ def get_all_banners(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def get_orders_report(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            start_date = data.get('start_date')
+            end_date = data.get('end_date')
+
+            if not start_date or not end_date:
+                return JsonResponse({"message": "Start date and end date are required"}, status=400)
+
+            query = """
+                SELECT 
+                    booking_id, orders_tbl.customer_id, orders_tbl.driver_id,
+                    pickup_lat, pickup_lng, destination_lat, destination_lng,
+                    distance, orders_tbl.time, total_price, base_price,
+                    booking_timing, booking_date, booking_status,
+                    driver_arrival_time, otp, gst_amount, igst_amount,
+                    goods_type_id, payment_method, orders_tbl.city_id,
+                    order_id, sender_name, sender_number, receiver_name,
+                    receiver_number, driver_first_name, goods_driverstbl.authtoken,
+                    customer_name, customers_tbl.authtoken, pickup_address,
+                    drop_address, customers_tbl.mobile_no, goods_driverstbl.mobile_no,
+                    vehiclestbl.vehicle_id, vehiclestbl.vehicle_name, vehiclestbl.image 
+                FROM vtpartner.vehiclestbl, vtpartner.orders_tbl,
+                     vtpartner.goods_driverstbl, vtpartner.customers_tbl 
+                WHERE goods_driverstbl.goods_driver_id = orders_tbl.driver_id 
+                AND customers_tbl.customer_id = orders_tbl.customer_id 
+                AND vehiclestbl.vehicle_id = goods_driverstbl.vehicle_id
+                AND booking_date BETWEEN %s AND %s
+                ORDER BY order_id DESC
+            """
+            
+            result = select_query(query, (start_date, end_date))
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Calculate totals
+            total_amount = 0
+            total_orders = len(result)
+
+            mapped_results = []
+            for row in result:
+                total_amount += float(row[9] or 0)  # total_price
+                mapped_results.append({
+                    "booking_id": str(row[0]),
+                    "customer_id": str(row[1]),
+                    "driver_id": str(row[2]),
+                    "pickup_lat": str(row[3]),
+                    "pickup_lng": str(row[4]),
+                    "destination_lat": str(row[5]),
+                    "destination_lng": str(row[6]),
+                    "distance": str(row[7]),
+                    "total_time": str(row[8]),
+                    "total_price": str(row[9]),
+                    "base_price": str(row[10]),
+                    "booking_timing": str(row[11]),
+                    "booking_date": str(row[12]),
+                    "booking_status": str(row[13]),
+                    "driver_arrival_time": str(row[14]),
+                    "otp": str(row[15]),
+                    "gst_amount": str(row[16]),
+                    "igst_amount": str(row[17]),
+                    "goods_type_id": str(row[18]),
+                    "payment_method": str(row[19]),
+                    "city_id": str(row[20]),
+                    "order_id": str(row[21]),
+                    "sender_name": str(row[22]),
+                    "sender_number": str(row[23]),
+                    "receiver_name": str(row[24]),
+                    "receiver_number": str(row[25]),
+                    "driver_first_name": str(row[26]),
+                    "customer_name": str(row[28]),
+                    "pickup_address": str(row[30]),
+                    "drop_address": str(row[31]),
+                    "customer_mobile_no": str(row[32]),
+                    "driver_mobile_no": str(row[33]),
+                    "vehicle_name": str(row[35]),
+                })
+
+            return JsonResponse({
+                "results": mapped_results,
+                "total_amount": total_amount,
+                "total_orders": total_orders
+            }, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt
 def add_coupon(request):
