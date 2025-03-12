@@ -5880,6 +5880,11 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
         pickup_address = data.get("pickup_address")
         drop_address = data.get("drop_address")
         server_access_token = data.get("server_access_token")
+        
+        coupon_applied = data.get("coupon_applied")
+        coupon_id = data.get("coupon_id")
+        coupon_amount = data.get("coupon_amount")
+        before_coupon_amount = data.get("before_coupon_amount")
 
         # List of required fields
         required_fields = {
@@ -5909,6 +5914,7 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
             "pickup_address":pickup_address,
             "drop_address":drop_address,
             "server_access_token":server_access_token,
+            
         }
 
         # Check for missing fields
@@ -5938,12 +5944,13 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                     customer_id, driver_id, pickup_lat, pickup_lng, destination_lat, destination_lng, 
                     distance, time, total_price, base_price, booking_timing, booking_date, 
                     otp, gst_amount, igst_amount, 
-                    payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number,pickup_address,drop_address
+                    payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number,pickup_address,drop_address,
+                    coupon_applied,coupon_id,coupon_amount,before_coupon_amount
                 ) 
                 VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s, %s,%s, %s,%s, %s
+                    %s, %s,%s, %s,%s, %s,%s, %s,%s,%s,%s
                 ) 
                 RETURNING booking_id;
             """
@@ -5951,7 +5958,8 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
             insert_values = [
                 customer_id, '-1', pickup_lat, pickup_lng, destination_lat, destination_lng, 
                 distance, time, total_price, base_price, otp, 
-                gst_amount, igst_amount, payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number,pickup_address,drop_address
+                gst_amount, igst_amount, payment_method, city_id,sender_name,sender_number,receiver_name,receiver_number,pickup_address,drop_address,
+                coupon_applied,coupon_id,coupon_amount,before_coupon_amount
             ]
 
             # Assuming insert_query is a function that runs the query
