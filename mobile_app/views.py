@@ -7112,148 +7112,148 @@ def get_goods_driver_recharge_history_details(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
-@csrf_exempt 
-def get_goods_driver_details(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        goods_driver_id = data.get("goods_driver_id")
+# @csrf_exempt 
+# def get_goods_driver_details(request):
+#     if request.method == "POST":
+#         data = json.loads(request.body)
+#         goods_driver_id = data.get("goods_driver_id")
         
-        try:
-            if goods_driver_id is not None:
-                # Use goods_driver_id for filtering
-                query = """
-                SELECT 
-                gd.goods_driver_id, 
-                gd.driver_first_name, 
-                gd.driver_last_name, 
-                gd.profile_pic, 
-                gd.is_online, 
-                gd.ratings, 
-                gd.mobile_no, 
-                gd.registration_date, 
-                gd.time, 
-                gd.r_lat, 
-                gd.r_lng, 
-                gd.current_lat, 
-                gd.current_lng, 
-                gd.status, 
-                gd.recent_online_pic, 
-                gd.is_verified, 
-                gd.category_id, 
-                gd.vehicle_id, 
-                gd.city_id, 
-                gd.aadhar_no, 
-                gd.pan_card_no, 
-                gd.house_no, 
-                gd.city_name, 
-                gd.full_address, 
-                gd.gender, 
-                gd.owner_id, 
-                gd.aadhar_card_front, 
-                gd.aadhar_card_back, 
-                gd.pan_card_front, 
-                gd.pan_card_back, 
-                gd.license_front, 
-                gd.license_back, 
-                gd.insurance_image, 
-                gd.noc_image, 
-                gd.pollution_certificate_image, 
-                gd.rc_image, 
-                gd.vehicle_image, 
-                gd.vehicle_plate_image, 
-                gd.driving_license_no, 
-                gd.vehicle_plate_no, 
-                gd.rc_no, 
-                gd.insurance_no, 
-                gd.noc_no, 
-                gd.vehicle_fuel_type, 
-                gd.authtoken, 
-                gd.otp_no, 
-                v.vehicle_name, 
-                v.weight, 
-                v.description AS vehicle_description, 
-                v.image AS vehicle_image, 
-                v.size_image, 
-                vt.vehicle_type_name,
-                gd.reason
-            FROM vtpartner.goods_driverstbl gd
-            LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id
-            LEFT JOIN vtpartner.vehicle_types_tbl vt ON v.vehicle_type_id = vt.vehicle_type_id
-            WHERE gd.goods_driver_id = %s
+#         try:
+#             if goods_driver_id is not None:
+#                 # Use goods_driver_id for filtering
+#                 query = """
+#                 SELECT 
+#                 gd.goods_driver_id, 
+#                 gd.driver_first_name, 
+#                 gd.driver_last_name, 
+#                 gd.profile_pic, 
+#                 gd.is_online, 
+#                 gd.ratings, 
+#                 gd.mobile_no, 
+#                 gd.registration_date, 
+#                 gd.time, 
+#                 gd.r_lat, 
+#                 gd.r_lng, 
+#                 gd.current_lat, 
+#                 gd.current_lng, 
+#                 gd.status, 
+#                 gd.recent_online_pic, 
+#                 gd.is_verified, 
+#                 gd.category_id, 
+#                 gd.vehicle_id, 
+#                 gd.city_id, 
+#                 gd.aadhar_no, 
+#                 gd.pan_card_no, 
+#                 gd.house_no, 
+#                 gd.city_name, 
+#                 gd.full_address, 
+#                 gd.gender, 
+#                 gd.owner_id, 
+#                 gd.aadhar_card_front, 
+#                 gd.aadhar_card_back, 
+#                 gd.pan_card_front, 
+#                 gd.pan_card_back, 
+#                 gd.license_front, 
+#                 gd.license_back, 
+#                 gd.insurance_image, 
+#                 gd.noc_image, 
+#                 gd.pollution_certificate_image, 
+#                 gd.rc_image, 
+#                 gd.vehicle_image, 
+#                 gd.vehicle_plate_image, 
+#                 gd.driving_license_no, 
+#                 gd.vehicle_plate_no, 
+#                 gd.rc_no, 
+#                 gd.insurance_no, 
+#                 gd.noc_no, 
+#                 gd.vehicle_fuel_type, 
+#                 gd.authtoken, 
+#                 gd.otp_no, 
+#                 v.vehicle_name, 
+#                 v.weight, 
+#                 v.description AS vehicle_description, 
+#                 v.image AS vehicle_image, 
+#                 v.size_image, 
+#                 vt.vehicle_type_name,
+#                 gd.reason
+#             FROM vtpartner.goods_driverstbl gd
+#             LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id
+#             LEFT JOIN vtpartner.vehicle_types_tbl vt ON v.vehicle_type_id = vt.vehicle_type_id
+#             WHERE gd.goods_driver_id = %s
 
-                """
-                result = select_query(query, [goods_driver_id])  # Assuming select_query is defined elsewhere
-            else:
-                return JsonResponse({"message": "goods_driver_id is required"}, status=400)
+#                 """
+#                 result = select_query(query, [goods_driver_id])  # Assuming select_query is defined elsewhere
+#             else:
+#                 return JsonResponse({"message": "goods_driver_id is required"}, status=400)
 
-            if not result:
-                return JsonResponse({"message": "No Data Found"}, status=404)
+#             if not result:
+#                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            # Mapping the row to a dictionary with all the column names
-            driver_details = {
-                "goods_driver_id": result[0][0],
-                "driver_first_name": result[0][1],
-                "driver_last_name": result[0][2],
-                "profile_pic": result[0][3],
-                "is_online": result[0][4],
-                "ratings": result[0][5],
-                "mobile_no": result[0][6],
-                "registration_date": result[0][7],
-                "time": result[0][8],
-                "r_lat": result[0][9],
-                "r_lng": result[0][10],
-                "current_lat": result[0][11],
-                "current_lng": result[0][12],
-                "status": result[0][13],
-                "recent_online_pic": result[0][14],
-                "is_verified": result[0][15],
-                "category_id": result[0][16],
-                "vehicle_id": result[0][17],
-                "city_id": result[0][18],
-                "aadhar_no": result[0][19],
-                "pan_card_no": result[0][20],
-                "house_no": result[0][21],
-                "city_name": result[0][22],
-                "full_address": result[0][23],
-                "gender": result[0][24],
-                "owner_id": result[0][25],
-                "aadhar_card_front": result[0][26],
-                "aadhar_card_back": result[0][27],
-                "pan_card_front": result[0][28],
-                "pan_card_back": result[0][29],
-                "license_front": result[0][30],
-                "license_back": result[0][31],
-                "insurance_image": result[0][32],
-                "noc_image": result[0][33],
-                "pollution_certificate_image": result[0][34],
-                "rc_image": result[0][35],
-                "driver_vehicle_image": result[0][36],
-                "vehicle_plate_image": result[0][37],
-                "driving_license_no": result[0][38],
-                "vehicle_plate_no": result[0][39],
-                "rc_no": result[0][40],
-                "insurance_no": result[0][41],
-                "noc_no": result[0][42],
-                "vehicle_fuel_type": result[0][43],
-                "authtoken": result[0][44],
-                "otp_no": result[0][45],
-                "vehicle_name": result[0][46],
-                "vehicle_weight": result[0][47],
-                "vehicle_description": result[0][48],
-                "vehicle_image": result[0][49],
-                "vehicle_size_image": result[0][50],
-                "vehicle_type_name": result[0][51],
-                "reason": result[0][52],
+#             # Mapping the row to a dictionary with all the column names
+#             driver_details = {
+#                 "goods_driver_id": result[0][0],
+#                 "driver_first_name": result[0][1],
+#                 "driver_last_name": result[0][2],
+#                 "profile_pic": result[0][3],
+#                 "is_online": result[0][4],
+#                 "ratings": result[0][5],
+#                 "mobile_no": result[0][6],
+#                 "registration_date": result[0][7],
+#                 "time": result[0][8],
+#                 "r_lat": result[0][9],
+#                 "r_lng": result[0][10],
+#                 "current_lat": result[0][11],
+#                 "current_lng": result[0][12],
+#                 "status": result[0][13],
+#                 "recent_online_pic": result[0][14],
+#                 "is_verified": result[0][15],
+#                 "category_id": result[0][16],
+#                 "vehicle_id": result[0][17],
+#                 "city_id": result[0][18],
+#                 "aadhar_no": result[0][19],
+#                 "pan_card_no": result[0][20],
+#                 "house_no": result[0][21],
+#                 "city_name": result[0][22],
+#                 "full_address": result[0][23],
+#                 "gender": result[0][24],
+#                 "owner_id": result[0][25],
+#                 "aadhar_card_front": result[0][26],
+#                 "aadhar_card_back": result[0][27],
+#                 "pan_card_front": result[0][28],
+#                 "pan_card_back": result[0][29],
+#                 "license_front": result[0][30],
+#                 "license_back": result[0][31],
+#                 "insurance_image": result[0][32],
+#                 "noc_image": result[0][33],
+#                 "pollution_certificate_image": result[0][34],
+#                 "rc_image": result[0][35],
+#                 "driver_vehicle_image": result[0][36],
+#                 "vehicle_plate_image": result[0][37],
+#                 "driving_license_no": result[0][38],
+#                 "vehicle_plate_no": result[0][39],
+#                 "rc_no": result[0][40],
+#                 "insurance_no": result[0][41],
+#                 "noc_no": result[0][42],
+#                 "vehicle_fuel_type": result[0][43],
+#                 "authtoken": result[0][44],
+#                 "otp_no": result[0][45],
+#                 "vehicle_name": result[0][46],
+#                 "vehicle_weight": result[0][47],
+#                 "vehicle_description": result[0][48],
+#                 "vehicle_image": result[0][49],
+#                 "vehicle_size_image": result[0][50],
+#                 "vehicle_type_name": result[0][51],
+#                 "reason": result[0][52],
                 
-            }
+#             }
 
-            return JsonResponse({"result": driver_details}, status=200)
+#             return JsonResponse({"result": driver_details}, status=200)
 
-        except Exception as err:
-            print("Error executing query:", err)
-            return JsonResponse({"message": "Internal Server Error"}, status=500)
+#         except Exception as err:
+#             print("Error executing query:", err)
+#             return JsonResponse({"message": "Internal Server Error"}, status=500)
 
-    return JsonResponse({"message": "Method not allowed"}, status=405)
+#     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 
 @csrf_exempt 
