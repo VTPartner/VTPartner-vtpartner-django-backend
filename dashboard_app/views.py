@@ -2015,6 +2015,8 @@ def get_all_coupons(request):
             return JsonResponse({"message": str(err)}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
 @csrf_exempt  # Disable CSRF protection for this view
 def all_sub_categories(request):
     if request.method == "POST":

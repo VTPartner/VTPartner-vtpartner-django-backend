@@ -18,6 +18,8 @@ urlpatterns = [
     path('login',views.login_view,name='login'),
     #New Customer Registration
     path('customer_registration',views.customer_registration,name='customer_registration'),
+    #All Coupons
+    path('all_coupons',views.all_coupons,name='all_coupons'),
     #Get Customer Details
     path('customer_details',views.customer_details,name='customer_details'),
     #Get Customer Reward Points Details

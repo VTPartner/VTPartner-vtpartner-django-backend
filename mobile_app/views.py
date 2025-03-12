@@ -686,21 +686,21 @@ def get_peak_hour_prices(request):
             values = ( city_id, city_id)
             result = select_query(query, values)
             # Print raw results
-            print("\n=== Raw Query Results ===")
-            print(f"Number of rows: {len(result)}")
-            for row in result:
-                print("\nRow data:")
-                print(f"Peak Price ID: {row[0]}")
-                print(f"City ID: {row[1]}")
-                print(f"Vehicle ID: {row[2]}")
-                print(f"Price per KM: {float(row[3])}")
-                print(f"Status: {row[4]}")
-                print(f"Time Created: {float(row[5])}")
-                print(f"Start Time: {row[6]}")
-                print(f"End Time: {row[7]}")
-                print(f"City Name: {row[8]}")
-                print(f"BG Image: {row[9]}")
-                print("-" * 50)
+            # print("\n=== Raw Query Results ===")
+            # print(f"Number of rows: {len(result)}")
+            # for row in result:
+            #     print("\nRow data:")
+            #     print(f"Peak Price ID: {row[0]}")
+            #     print(f"City ID: {row[1]}")
+            #     print(f"Vehicle ID: {row[2]}")
+            #     print(f"Price per KM: {float(row[3])}")
+            #     print(f"Status: {row[4]}")
+            #     print(f"Time Created: {float(row[5])}")
+            #     print(f"Start Time: {row[6]}")
+            #     print(f"End Time: {row[7]}")
+            #     print(f"City Name: {row[8]}")
+            #     print(f"BG Image: {row[9]}")
+            #     print("-" * 50)
                 
             peak_hours = []
             for row in result:
@@ -881,6 +881,73 @@ def customer_registration(request):
     except Exception as err:
         print("Error executing add new faq query", err)
         return JsonResponse({"message": "Error executing add new faq query"}, status=500)
+
+@csrf_exempt  # Disable CSRF protection for this view
+def all_coupons(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get('category_id')
+
+            # List of required fields
+            required_fields = {
+                'category_id': category_id,
+            }
+
+            # Check for missing fields
+            missing_fields = check_missing_fields(required_fields)  # Assuming this function is defined
+
+            if missing_fields:
+                return JsonResponse({
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status=400)
+
+            # Query to get all coupons
+            query = """
+                SELECT coupon_id, coupon_code, coupon_title, coupon_description, category_id, 
+                       discount_type, discount_value, min_order_value, max_discount, usage_limit, 
+                       used_count, start_date, end_date, status, time_created_at
+                FROM vtpartner.coupons_tbl 
+                WHERE category_id = %s 
+                ORDER BY coupon_id DESC
+            """
+            values = (category_id,)
+            result = select_query(query, values)  # Assuming select_query is defined
+
+            if not result:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary
+            coupons_details = [
+                {
+                    "coupon_id": row[0],
+                    "coupon_code": row[1],
+                    "coupon_title": row[2],
+                    "coupon_description": row[3],
+                    "category_id": row[4],
+                    "discount_type": row[5],
+                    "discount_value": row[6],
+                    "min_order_value": row[7],
+                    "max_discount": row[8],
+                    "usage_limit": row[9],
+                    "used_count": row[10],
+                    "start_date": row[11],
+                    "end_date": row[12],
+                    "status": row[13],
+                    "time_created_at": row[14],
+                }
+                for row in result
+            ]
+
+            return JsonResponse({"coupons_details": coupons_details}, status=200)
+
+        except Exception as err:
+            print("Error executing query:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
 
 @csrf_exempt 
 def customer_details(request):
