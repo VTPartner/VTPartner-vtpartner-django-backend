@@ -1493,6 +1493,7 @@ def get_all_customers(request):
                     pincode
                 FROM vtpartner.customers_tbl
                 WHERE status = 1
+                AND customer_name !='NA'
                 AND (
                     LOWER(customer_name) LIKE %s OR 
                     LOWER(mobile_no) LIKE %s OR
