@@ -685,7 +685,23 @@ def get_peak_hour_prices(request):
             """
             values = ( city_id, city_id)
             result = select_query(query, values)
-            print("peak hour result::"+result.len())
+            # Print raw results
+            print("\n=== Raw Query Results ===")
+            print(f"Number of rows: {len(result)}")
+            for row in result:
+                print("\nRow data:")
+                print(f"Peak Price ID: {row[0]}")
+                print(f"City ID: {row[1]}")
+                print(f"Vehicle ID: {row[2]}")
+                print(f"Price per KM: {float(row[3])}")
+                print(f"Status: {row[4]}")
+                print(f"Time Created: {float(row[5])}")
+                print(f"Start Time: {row[6]}")
+                print(f"End Time: {row[7]}")
+                print(f"City Name: {row[8]}")
+                print(f"BG Image: {row[9]}")
+                print("-" * 50)
+                
             peak_hours = []
             for row in result:
                 peak_hours.append({
