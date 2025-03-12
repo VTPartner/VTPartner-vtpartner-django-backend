@@ -685,7 +685,7 @@ def get_peak_hour_prices(request):
             """
             values = ( city_id, city_id)
             result = select_query(query, values)
-            print("peak hour result::"+result)
+            print("peak hour result::"+result.len())
             peak_hours = []
             for row in result:
                 peak_hours.append({
