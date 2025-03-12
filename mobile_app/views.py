@@ -4876,30 +4876,88 @@ def get_goods_driver_details(request):
                 return JsonResponse({"message": "Driver ID is required"}, status=400)
 
             query = """
-                SELECT * FROM vtpartner.goods_driverstbl WHERE goods_driver_id = %s
+                SELECT gd.goods_driver_id, gd.driver_first_name, gd.driver_last_name,
+                       gd.profile_pic, gd.is_online, gd.ratings, gd.mobile_no, 
+                       gd.registration_date, gd.time, gd.r_lat, gd.r_lng, 
+                       gd.current_lat, gd.current_lng, gd.status, gd.recent_online_pic, 
+                       gd.is_verified, gd.category_id, gd.vehicle_id, gd.city_id, 
+                       gd.aadhar_no, gd.pan_card_no, gd.house_no, gd.city_name, 
+                       gd.full_address, gd.gender, gd.owner_id, gd.aadhar_card_front, 
+                       gd.aadhar_card_back, gd.pan_card_front, gd.pan_card_back, 
+                       gd.license_front, gd.license_back, gd.insurance_image, 
+                       gd.noc_image, gd.pollution_certificate_image, gd.rc_image, 
+                       gd.vehicle_image, gd.vehicle_plate_image, gd.driving_license_no, 
+                       gd.vehicle_plate_no, gd.rc_no, gd.insurance_no, gd.noc_no, 
+                       gd.vehicle_fuel_type, gd.authtoken, gd.otp_no, gd.reason, 
+                       gd.bank_name, gd.ifsc_code, gd.account_number, gd.account_name, 
+                       v.vehicle_name, v.image as vehicle_image
+                FROM vtpartner.goods_driverstbl gd
+                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id
+                WHERE gd.goods_driver_id = %s
             """
             
             result = select_query(query, (driver_id,))
-            
+
             if not result:
                 return JsonResponse({"message": "Driver not found"}, status=404)
-            
-            columns = [
-                "driver_id", "driver_first_name", "driver_last_name", "profile_pic", "is_online", "ratings",
-                "mobile_no", "registration_date", "time", "r_lat", "r_lng", "current_lat", "current_lng", "status",
-                "recent_online_pic", "is_verified", "category_id", "vehicle_id", "city_id", "aadhar_no", "pan_card_no",
-                "house_no", "city_name", "full_address", "gender", "owner_id", "aadhar_card_front", "aadhar_card_back",
-                "pan_card_front", "pan_card_back", "license_front", "license_back", "insurance_image", "noc_image",
-                "pollution_certificate_image", "rc_image", "vehicle_image", "vehicle_plate_image", "driving_license_no",
-                "vehicle_plate_no", "rc_no", "insurance_no", "noc_no", "vehicle_fuel_type", "authtoken", "otp_no", "reason",
-                "bank_name", "ifsc_code", "account_number", "account_name"
-            ]
-            
-            driver = {columns[i]: (result[0][i] if result[0][i] is not None else 'NA') for i in range(len(columns))}
-            
-            if isinstance(driver["registration_date"], datetime):
-                driver["registration_date"] = driver["registration_date"].strftime('%Y-%m-%d')
-            
+
+            # Extracting the result
+            driver = {
+                "driver_id": result[0][0],
+                "first_name": result[0][1] or 'NA',
+                "last_name": result[0][2] or 'NA',
+                "profile_pic": result[0][3] or 'NA',
+                "is_online": result[0][4],
+                "ratings": result[0][5] or '0',
+                "mobile_no": result[0][6] or 'NA',
+                "registration_date": result[0][7].strftime('%Y-%m-%d') if result[0][7] else 'NA',
+                "time": result[0][8] or 0,
+                "r_lat": result[0][9] or 0,
+                "r_lng": result[0][10] or 0,
+                "current_lat": result[0][11] or 0,
+                "current_lng": result[0][12] or 0,
+                "status": result[0][13],
+                "recent_online_pic": result[0][14] or 'NA',
+                "is_verified": result[0][15],
+                "category_id": result[0][16],
+                "vehicle_id": result[0][17],
+                "city_id": result[0][18],
+                "aadhar_no": result[0][19] or 'NA',
+                "pan_no": result[0][20] or 'NA',
+                "house_no": result[0][21] or 'NA',
+                "city_name": result[0][22] or 'NA',
+                "full_address": result[0][23] or 'NA',
+                "gender": result[0][24] or 'NA',
+                "owner_id": result[0][25],
+                "aadhar_card_front": result[0][26] or 'NA',
+                "aadhar_card_back": result[0][27] or 'NA',
+                "pan_card_front": result[0][28] or 'NA',
+                "pan_card_back": result[0][29] or 'NA',
+                "license_front": result[0][30] or 'NA',
+                "license_back": result[0][31] or 'NA',
+                "insurance_image": result[0][32] or 'NA',
+                "noc_image": result[0][33] or 'NA',
+                "pollution_certificate_image": result[0][34] or 'NA',
+                "rc_image": result[0][35] or 'NA',
+                "vehicle_image": result[0][36] or 'NA',
+                "vehicle_plate_image": result[0][37] or 'NA',
+                "license_no": result[0][38] or 'NA',
+                "vehicle_plate_no": result[0][39] or 'NA',
+                "rc_no": result[0][40] or 'NA',
+                "insurance_no": result[0][41] or 'NA',
+                "noc_no": result[0][42] or 'NA',
+                "vehicle_fuel_type": result[0][43] or 'NA',
+                "authtoken": result[0][44] or 'NA',
+                "otp_no": result[0][45] or '0',
+                "reason": result[0][46] or 'NA',
+                "bank_name": result[0][47] or 'NA',
+                "ifsc_code": result[0][48] or 'NA',
+                "account_number": result[0][49] or 'NA',
+                "account_name": result[0][50] or 'NA',
+                "vehicle_name": result[0][51] or 'NA',
+                "vehicle_image": result[0][52] or 'NA'
+            }
+
             return JsonResponse({"driver": driver}, status=200)
 
         except Exception as err:
