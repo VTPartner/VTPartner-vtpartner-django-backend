@@ -6336,7 +6336,7 @@ def toggle_driver_online_status(request):
 
             else:
                 # Add to active drivers table
-                insert_query = """
+                insert_driver_query = """
                     INSERT INTO vtpartner.active_goods_drivertbl 
                     (goods_driver_id, current_lat, current_lng) 
                     VALUES (%s, %s, %s)
@@ -6347,7 +6347,7 @@ def toggle_driver_online_status(request):
                         entry_time = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
                 """
                 insert_values = (driver_id, current_lat, current_lng)
-                insert_query(insert_query, insert_values)
+                insert_query(insert_driver_query, insert_values)
 
             # Update driver's online status
             update_driver_query = """
