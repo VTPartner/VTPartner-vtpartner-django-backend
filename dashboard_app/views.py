@@ -1291,16 +1291,25 @@ def add_peak_hour_price(request):
                     "message": f"Missing required fields: {', '.join(missing_fields)}"
                 }, status=400)
 
-            # Check for overlapping time slots
+            # Check for overlapping time slots using text comparison
             query_overlap_check = """
                 SELECT COUNT(*) 
                 FROM vtpartner.vehicle_peak_hours_price_tbl 
                 WHERE city_id = %s 
                 AND vehicle_id = %s 
                 AND status = 1
-                AND ((start_time, end_time) OVERLAPS (%s::time, %s::time))
+                AND (
+                    (start_time <= %s AND end_time > %s)
+                    OR (start_time < %s AND end_time >= %s)
+                    OR (%s <= start_time AND %s > start_time)
+                )
             """
-            values_overlap_check = (city_id, vehicle_id, start_time, end_time)
+            values_overlap_check = (
+                city_id, vehicle_id, 
+                end_time, start_time,  # First condition
+                end_time, end_time,    # Second condition
+                start_time, end_time   # Third condition
+            )
             result = select_query(query_overlap_check, values_overlap_check)
 
             if result and result[0][0] > 0:
@@ -1309,7 +1318,7 @@ def add_peak_hour_price(request):
             query = """
                 INSERT INTO vtpartner.vehicle_peak_hours_price_tbl 
                 (city_id, vehicle_id, price_per_km, start_time, end_time) 
-                VALUES (%s, %s, %s, %s::time, %s::time)
+                VALUES (%s, %s, %s, %s, %s)
             """
             values = (city_id, vehicle_id, price_per_km, start_time, end_time)
             row_count = insert_query(query, values)
@@ -1358,9 +1367,18 @@ def edit_peak_hour_price(request):
                 AND vehicle_id = %s 
                 AND peak_price_id != %s
                 AND status = 1
-                AND ((start_time, end_time) OVERLAPS (%s::time, %s::time))
+                AND (
+                    (start_time <= %s AND end_time > %s)
+                    OR (start_time < %s AND end_time >= %s)
+                    OR (%s <= start_time AND %s > start_time)
+                )
             """
-            values_overlap_check = (city_id, vehicle_id, peak_price_id, start_time, end_time)
+            values_overlap_check = (
+                city_id, vehicle_id, peak_price_id,
+                end_time, start_time,  # First condition
+                end_time, end_time,    # Second condition
+                start_time, end_time   # Third condition
+            )
             result = select_query(query_overlap_check, values_overlap_check)
 
             if result and result[0][0] > 0:
@@ -1371,8 +1389,8 @@ def edit_peak_hour_price(request):
                 SET city_id = %s,
                     vehicle_id = %s,
                     price_per_km = %s,
-                    start_time = %s::time,
-                    end_time = %s::time,
+                    start_time = %s,
+                    end_time = %s,
                     status = %s,
                     time_created_at = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
                 WHERE peak_price_id = %s
@@ -1402,7 +1420,7 @@ def get_peak_hour_prices(request):
                 JOIN vtpartner.available_citys_tbl c ON p.city_id = c.city_id
                 WHERE p.vehicle_id = %s
                 AND (p.city_id = %s OR %s IS NULL)
-                ORDER BY p.start_time
+                ORDER BY p.start_time::time
             """
             values = (vehicle_id, city_id, city_id)
             result = select_query(query, values)
@@ -1414,10 +1432,10 @@ def get_peak_hour_prices(request):
                     'city_id': row[1],
                     'vehicle_id': row[2],
                     'price_per_km': float(row[3]),
-                    'start_time': str(row[4]),
-                    'end_time': str(row[5]),
-                    'status': row[6],
-                    'time_created_at': float(row[7]),
+                    'start_time': row[6],  # Changed index to match table structure
+                    'end_time': row[7],    # Changed index to match table structure
+                    'status': row[4],
+                    'time_created_at': float(row[5]),
                     'city_name': row[8],
                     'bg_image': row[9]
                 })
@@ -1429,7 +1447,6 @@ def get_peak_hour_prices(request):
             return JsonResponse({"message": "Error fetching peak hour prices"}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
-
 
 @csrf_exempt
 def add_banner(request):
