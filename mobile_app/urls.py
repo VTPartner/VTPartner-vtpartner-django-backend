@@ -183,6 +183,8 @@ urlpatterns = [
     path('goods_driver_current_new_recharge_details',views.goods_driver_current_new_recharge_details,name='goods_driver_current_new_recharge_details'),
     #getting goods driver faq 
     path('get_faqs_by_category',views.get_faqs_by_category,name='get_faqs_by_category'),
+    #getting all banners
+    path('get_all_banners',views.get_all_banners,name='get_all_banners'),
     
     
     #Cab Driver Api's URLs

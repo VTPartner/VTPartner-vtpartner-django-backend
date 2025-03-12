@@ -7819,6 +7819,42 @@ def get_faqs_by_category(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def get_all_banners(request):
+    if request.method == "POST":
+        try:
+            query = """
+                SELECT banner_id, banner_title, banner_description, banner_image, 
+                       banner_type, start_date, end_date, status, time_created_at
+                FROM vtpartner.banners_tbl
+                
+                ORDER BY time_created_at DESC
+            """
+            result = select_query(query)
+
+            banners = []
+            for row in result:
+                banners.append({
+                    'banner_id': row[0],
+                    'banner_title': row[1],
+                    'banner_description': row[2],
+                    'banner_image': row[3],
+                    'banner_type': row[4],
+                    'start_date': str(row[5]),
+                    'end_date': str(row[6]),
+                    'status': row[7],
+                    'time_created_at': float(row[8])
+                })
+
+            return JsonResponse({"banners": banners}, status=200)
+
+        except Exception as err:
+            print("Error fetching banners:", err)
+            return JsonResponse({"message": "Error fetching banners"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
 #Cab Driver Api's
 @csrf_exempt
 def cab_driver_login_view(request):
