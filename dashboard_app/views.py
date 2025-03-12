@@ -1449,6 +1449,95 @@ def get_peak_hour_prices(request):
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
 @csrf_exempt
+def get_all_customers(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            page = int(data.get('page', 1))
+            limit = int(data.get('limit', 10))
+            search = data.get('search', '').lower()
+            offset = (page - 1) * limit
+
+            # Get total count for pagination with search
+            count_query = """
+                SELECT COUNT(*) 
+                FROM vtpartner.customers_tbl
+                WHERE status = 1
+                AND (
+                    LOWER(customer_name) LIKE %s OR 
+                    LOWER(mobile_no) LIKE %s OR
+                    LOWER(email) LIKE %s OR
+                    LOWER(gst_no) LIKE %s
+                )
+            """
+            search_pattern = f'%{search}%'
+            count_result = select_query(count_query, 
+                (search_pattern, search_pattern, search_pattern, search_pattern))
+            total_count = count_result[0][0]
+
+            # Get paginated results
+            query = """
+                SELECT 
+                    customer_id,
+                    customer_name,
+                    profile_pic,
+                    mobile_no,
+                    email,
+                    registration_date,
+                    time,
+                    status,
+                    full_address,
+                    gst_no,
+                    gst_address,
+                    purpose,
+                    pincode
+                FROM vtpartner.customers_tbl
+                WHERE status = 1
+                AND (
+                    LOWER(customer_name) LIKE %s OR 
+                    LOWER(mobile_no) LIKE %s OR
+                    LOWER(email) LIKE %s OR
+                    LOWER(gst_no) LIKE %s
+                )
+                ORDER BY time DESC
+                LIMIT %s OFFSET %s
+            """
+            values = (search_pattern, search_pattern, search_pattern, 
+                     search_pattern, limit, offset)
+            result = select_query(query, values)
+
+            customers = []
+            for row in result:
+                customers.append({
+                    'customer_id': row[0],
+                    'customer_name': row[1],
+                    'profile_pic': row[2],
+                    'mobile_no': row[3],
+                    'email': row[4],
+                    'registration_date': str(row[5]),
+                    'time_created_at': float(row[6]),
+                    'status': row[7],
+                    'full_address': row[8],
+                    'gst_no': row[9],
+                    'gst_address': row[10],
+                    'purpose': row[11],
+                    'pincode': row[12]
+                })
+
+            return JsonResponse({
+                "customers": customers,
+                "total": total_count,
+                "page": page,
+                "total_pages": math.ceil(total_count / limit)
+            }, status=200)
+
+        except Exception as err:
+            print("Error fetching customers:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
 def add_banner(request):
     if request.method == "POST":
         try:

@@ -46,6 +46,8 @@ urlpatterns = [
     path('add_vehicle_price',views.add_vehicle_price,name='add_vehicle_price'),
     #Admin Login
     path('edit_vehicle_price',views.edit_vehicle_price,name='edit_vehicle_price'),
+    #Getting All Customers
+    path('get_all_customers',views.get_all_customers,name='get_all_customers'),
     #Getting Peak Hours Prices
     path('get_peak_hour_prices',views.get_peak_hour_prices,name='get_peak_hour_prices'),
     #Editing peak hour prices
