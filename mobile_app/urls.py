@@ -113,6 +113,10 @@ urlpatterns = [
     path('get_all_sub_services',views.get_all_sub_services,name='get_all_sub_services'),
     #Generate New Booking Id For Goods Delivery booking with send notification to all driver for specific vehicle id
     path('generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token',views.generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token,name='generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token'),
+    #Getting customer details
+    path('get_customer_details',views.get_customer_details,name='get_customer_details'),
+    #Update customer details
+    path('update_customer_details',views.update_customer_details,name='update_customer_details'),
     
     
     
@@ -123,6 +127,10 @@ urlpatterns = [
     
     
     #Goods Driver Api's URLs
+    #Login
+    path('get_goods_driver_details',views.get_goods_driver_details,name='get_goods_driver_details'),
+    #Login
+    path('update_goods_driver_details',views.update_goods_driver_details,name='update_goods_driver_details'),
     #Login
     path('goods_driver_login',views.goods_driver_login_view,name='goods_driver_login'),
     #Goods Driver Verified all details to show edit option
@@ -173,6 +181,8 @@ urlpatterns = [
     path('goods_driver_todays_earnings',views.goods_driver_todays_earnings,name='goods_driver_todays_earnings'),
     #getting goods driver current new day wise recharge details
     path('goods_driver_current_new_recharge_details',views.goods_driver_current_new_recharge_details,name='goods_driver_current_new_recharge_details'),
+    #getting goods driver faq 
+    path('get_faqs_by_category',views.get_faqs_by_category,name='get_faqs_by_category'),
     
     
     #Cab Driver Api's URLs

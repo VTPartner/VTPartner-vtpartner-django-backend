@@ -4735,6 +4735,113 @@ def get_all_sub_services(request):
 
 
 #Goods Driver Api's
+
+@csrf_exempt
+def get_goods_driver_details(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            driver_id = data.get('driver_id')
+
+            if not driver_id:
+                return JsonResponse({"message": "Driver ID is required"}, status=400)
+
+            query = """
+                SELECT gd.goods_driver_id, gd.driver_first_name, gd.driver_last_name,
+                       gd.profile_pic, gd.mobile_no, gd.registration_date,
+                       gd.aadhar_no, gd.pan_card_no, gd.full_address,
+                       gd.gender, gd.driving_license_no, gd.vehicle_plate_no,
+                       gd.rc_no, gd.insurance_no, gd.noc_no,
+                       gd.vehicle_fuel_type, gd.bank_name, gd.ifsc_code,
+                       gd.account_number, gd.account_name,
+                       v.vehicle_name, v.image as vehicle_image
+                FROM vtpartner.goods_driverstbl gd
+                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id
+                WHERE gd.goods_driver_id = %s
+            """
+            
+            result = select_query(query, (driver_id,))
+
+            if not result:
+                return JsonResponse({"message": "Driver not found"}, status=404)
+
+            driver = {
+                "driver_id": result[0][0],
+                "first_name": result[0][1],
+                "last_name": result[0][2],
+                "profile_pic": result[0][3],
+                "mobile_no": result[0][4],
+                "registration_date": result[0][5].strftime('%Y-%m-%d'),
+                "aadhar_no": result[0][6],
+                "pan_no": result[0][7],
+                "full_address": result[0][8],
+                "gender": result[0][9],
+                "license_no": result[0][10],
+                "vehicle_plate_no": result[0][11],
+                "rc_no": result[0][12],
+                "insurance_no": result[0][13],
+                "noc_no": result[0][14],
+                "vehicle_fuel_type": result[0][15],
+                "bank_name": result[0][16],
+                "ifsc_code": result[0][17],
+                "account_number": result[0][18],
+                "account_name": result[0][19],
+                "vehicle_name": result[0][20],
+                "vehicle_image": result[0][21]
+            }
+
+            return JsonResponse({"driver": driver}, status=200)
+
+        except Exception as err:
+            print("Error fetching driver details:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def update_goods_driver_details(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            driver_id = data.get('driver_id')
+            
+            if not driver_id:
+                return JsonResponse({"message": "Driver ID is required"}, status=400)
+
+            update_fields = {
+                'driver_first_name': data.get('first_name'),
+                'driver_last_name': data.get('last_name'),
+                'bank_name': data.get('bank_name'),
+                'ifsc_code': data.get('ifsc_code'),
+                'account_number': data.get('account_number'),
+                'account_name': data.get('account_name')
+            }
+
+            # Remove None values
+            update_fields = {k: v for k, v in update_fields.items() if v is not None}
+
+            if not update_fields:
+                return JsonResponse({"message": "No fields to update"}, status=400)
+
+            query = """
+                UPDATE vtpartner.goods_driverstbl 
+                SET {} 
+                WHERE goods_driver_id = %s
+            """.format(
+                ", ".join(f"{key} = %s" for key in update_fields.keys())
+            )
+
+            values = (*update_fields.values(), driver_id)
+            update_query(query, values)
+
+            return JsonResponse({"message": "Driver details updated successfully"}, status=200)
+
+        except Exception as err:
+            print("Error updating driver details:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
 @csrf_exempt
 def goods_driver_login_view(request):
     if request.method == "POST":
@@ -5848,6 +5955,104 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
         except Exception as err:
             print("Error executing query:", err)
             return JsonResponse({"message": "An error occurred"}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def get_customer_details(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            customer_id = data.get('customer_id')
+
+            if not customer_id:
+                return JsonResponse({"message": "Customer ID is required"}, status=400)
+
+            query = """
+                SELECT customer_id, customer_name, profile_pic, mobile_no, 
+                       email, full_address, gst_no, gst_address, purpose, 
+                       pincode, bank_name, ifsc_code, account_number, account_name
+                FROM vtpartner.customers_tbl 
+                WHERE customer_id = %s AND status = 1
+            """
+            
+            result = select_query(query, (customer_id,))
+
+            if not result:
+                return JsonResponse({"message": "Customer not found"}, status=404)
+
+            customer = {
+                "customer_id": result[0][0],
+                "customer_name": result[0][1],
+                "profile_pic": result[0][2],
+                "mobile_no": result[0][3],
+                "email": result[0][4],
+                "full_address": result[0][5],
+                "gst_no": result[0][6],
+                "gst_address": result[0][7],
+                "purpose": result[0][8],
+                "pincode": result[0][9],
+                "bank_name": result[0][10],
+                "ifsc_code": result[0][11],
+                "account_number": result[0][12],
+                "account_name": result[0][13]
+            }
+
+            return JsonResponse({"customer": customer}, status=200)
+
+        except Exception as err:
+            print("Error fetching customer details:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def update_customer_details(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            customer_id = data.get('customer_id')
+            
+            if not customer_id:
+                return JsonResponse({"message": "Customer ID is required"}, status=400)
+
+            update_fields = {
+                'customer_name': data.get('customer_name'),
+                'email': data.get('email'),
+                'full_address': data.get('full_address'),
+                'gst_no': data.get('gst_no'),
+                'gst_address': data.get('gst_address'),
+                'purpose': data.get('purpose'),
+                'pincode': data.get('pincode'),
+                'bank_name': data.get('bank_name'),
+                'ifsc_code': data.get('ifsc_code'),
+                'account_number': data.get('account_number'),
+                'account_name': data.get('account_name')
+            }
+
+            # Remove None values
+            update_fields = {k: v for k, v in update_fields.items() if v is not None}
+
+            if not update_fields:
+                return JsonResponse({"message": "No fields to update"}, status=400)
+
+            query = """
+                UPDATE vtpartner.customers_tbl 
+                SET {} 
+                WHERE customer_id = %s
+            """.format(
+                ", ".join(f"{key} = %s" for key in update_fields.keys())
+            )
+
+            values = (*update_fields.values(), customer_id)
+            update_query(query, values)
+
+            return JsonResponse({"message": "Customer details updated successfully"}, status=200)
+
+        except Exception as err:
+            print("Error updating customer details:", err)
+            return JsonResponse({"message": str(err)}, status=500)
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
@@ -7574,6 +7779,45 @@ def goods_driver_current_new_recharge_details(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def get_faqs_by_category(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get('category_id')
+
+            if category_id is None:
+                return JsonResponse({"message": "Category ID is required"}, status=400)
+
+            query = """
+                SELECT faqid, question, answer, time_at, category_id
+                FROM vtpartner.faqtbl
+                WHERE category_id = %s
+                ORDER BY time_at DESC
+            """
+            
+            result = select_query(query, (category_id,))
+
+            if not result:
+                return JsonResponse({"message": "No FAQs found for this category"}, status=404)
+
+            faqs = []
+            for row in result:
+                faqs.append({
+                    "faq_id": row[0],
+                    "question": row[1],
+                    "answer": row[2],
+                    "time_at": row[3],
+                    "category_id": row[4]
+                })
+
+            return JsonResponse({"faqs": faqs}, status=200)
+
+        except Exception as err:
+            print("Error fetching FAQs:", err)
+            return JsonResponse({"message": str(err)}, status=500)
+
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 
 #Cab Driver Api's
 @csrf_exempt
