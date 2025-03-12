@@ -6782,7 +6782,11 @@ def generate_order_id_for_booking_id_goods_driver(request):
                         pickup_address, 
                         drop_address,
                         pickup_time,
-                        drop_time
+                        drop_time,
+                        coupon_applied,
+                        coupon_id,
+                        coupon_amount,
+                        before_coupon_amount
                     )
                     SELECT 
                         customer_id, 
@@ -6813,7 +6817,11 @@ def generate_order_id_for_booking_id_goods_driver(request):
                         pickup_address, 
                         drop_address,
                         pickup_time,
-                        drop_time
+                        drop_time,
+                        coupon_applied,
+                        coupon_id,
+                        coupon_amount,
+                        before_coupon_amount
                     FROM vtpartner.bookings_tbl
                     WHERE booking_id = %s
                     RETURNING order_id;
