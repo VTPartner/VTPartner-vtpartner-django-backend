@@ -5950,7 +5950,7 @@ def generate_new_goods_drivers_booking_id_get_nearby_drivers_with_fcm_token(requ
                 VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
                     EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), CURRENT_DATE,  %s, %s, %s, 
-                    %s, %s,%s, %s,%s, %s,%s, %s,%s,%s,%s
+                    %s, %s,%s, %s,%s, %s,%s, %s,%s,%s,%s,%s
                 ) 
                 RETURNING booking_id;
             """
