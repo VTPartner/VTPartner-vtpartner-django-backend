@@ -201,6 +201,12 @@ urlpatterns = [
     path('get_offline_drivers',views.get_offline_drivers,name='get_offline_drivers'),
     #
     path('get_driver_recharge_history',views.get_driver_recharge_history,name='get_driver_recharge_history'),
+    #
+    path('get_driver_wallet_balance',views.get_driver_wallet_balance,name='get_driver_wallet_balance'),
+    #
+    path('get_wallet_transactions',views.get_wallet_transactions,name='get_wallet_transactions'),
+    #
+    path('add_wallet_transaction',views.add_wallet_transaction,name='add_wallet_transaction'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
