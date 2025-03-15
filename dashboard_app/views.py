@@ -6793,7 +6793,7 @@ def get_offline_drivers(request):
                     gd.mobile_no LIKE %s OR
                     CAST(gd.goods_driver_id AS TEXT) LIKE %s
                 )
-                ORDER BY gd.last_seen_at DESC
+                ORDER BY gd.goods_driver_id DESC
                 OFFSET %s LIMIT %s
             """
             
