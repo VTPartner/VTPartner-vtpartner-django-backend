@@ -6979,7 +6979,7 @@ def get_driver_wallet_balance(request):
                     d.driver_first_name,
                     d.mobile_no
                 FROM vtpartner.goods_driver_wallet w
-                JOIN vtpartner.goods_driver_tbl d ON w.driver_id = d.goods_driver_id
+                JOIN vtpartner.goods_driverstbl d ON w.driver_id = d.goods_driver_id
                 WHERE w.driver_id = %s
             """
             
