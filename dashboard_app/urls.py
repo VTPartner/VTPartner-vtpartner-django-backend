@@ -185,6 +185,12 @@ urlpatterns = [
     path('check_driver_status',views.check_driver_status,name='check_driver_status'),
     #Change Goods Driver Status from Online to Offline and vice versa
     path('toggle_driver_online_status',views.toggle_driver_online_status,name='toggle_driver_online_status'),
+    #
+    path('get_recharge_plans',views.get_recharge_plans,name='get_recharge_plans'),
+    #
+    path('add_recharge_plan',views.add_recharge_plan,name='add_recharge_plan'),
+    #
+    path('update_recharge_plan',views.update_recharge_plan,name='update_recharge_plan'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]

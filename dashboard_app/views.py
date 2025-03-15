@@ -492,6 +492,7 @@ def add_new_allowed_city(request):
 
     return JsonResponse({"message": "Method not allowed"}, status=405)
 
+
 @csrf_exempt
 def all_allowed_pincodes(request):
     if request.method == "POST":
@@ -6461,3 +6462,165 @@ def delete_enquiry(request):
     except Exception as err:
         print("Error executing deleting query enquirytbl", err)
         return JsonResponse({"message": "Error executing deleting query"}, status=500)
+
+@csrf_exempt
+def get_recharge_plans(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get("category_id")
+            page = data.get("page", 1)
+            limit = data.get("limit", 10)
+            search = data.get("search", "")
+            
+            offset = (page - 1) * limit
+            
+            query = """
+                SELECT 
+                    recharge_plan_id, plan_title, plan_description, 
+                    plan_days, plan_epoch, expiry_days, plan_price,
+                    category_id, vehicle_id
+                FROM vtpartner.goods_driver_recharge_plans_tbl
+                WHERE category_id = %s
+                AND (
+                    LOWER(plan_title) LIKE LOWER(%s) OR
+                    LOWER(plan_description) LIKE LOWER(%s)
+                )
+                ORDER BY plan_epoch DESC
+                LIMIT %s OFFSET %s
+            """
+            
+            count_query = """
+                SELECT COUNT(*) FROM vtpartner.goods_driver_recharge_plans_tbl
+                WHERE category_id = %s
+                AND (
+                    LOWER(plan_title) LIKE LOWER(%s) OR
+                    LOWER(plan_description) LIKE LOWER(%s)
+                )
+            """
+            
+            search_pattern = f"%{search}%"
+            
+            # Get total count
+            count_result = select_query(count_query, [category_id, search_pattern, search_pattern])
+            total_count = count_result[0][0] if count_result else 0
+            
+            # Get plans
+            result = select_query(query, [category_id, search_pattern, search_pattern, limit, offset])
+            
+            plans = []
+            for row in result:
+                plans.append({
+                    "recharge_plan_id": row[0],
+                    "plan_title": row[1],
+                    "plan_description": row[2],
+                    "plan_days": row[3],
+                    "plan_epoch": row[4],
+                    "expiry_days": row[5],
+                    "plan_price": row[6],
+                    "category_id": row[7],
+                    "vehicle_id": row[8]
+                })
+            
+            return JsonResponse({
+                "plans": plans,
+                "total_pages": math.ceil(total_count / limit)
+            }, status=200)
+            
+        except Exception as err:
+            print("Error fetching recharge plans:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+    
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def add_recharge_plan(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            required_fields = {
+                "plan_title": data.get("plan_title"),
+                "plan_description": data.get("plan_description"),
+                "plan_days": data.get("plan_days"),
+                "expiry_days": data.get("expiry_days"),
+                "plan_price": data.get("plan_price"),
+                "category_id": data.get("category_id"),
+                "vehicle_id": data.get("vehicle_id", 1)
+            }
+            
+            missing_fields = check_missing_fields(required_fields)
+            if missing_fields:
+                return JsonResponse({"message": f"Missing fields: {', '.join(missing_fields)}"}, status=400)
+            
+            query = """
+                INSERT INTO vtpartner.goods_driver_recharge_plans_tbl
+                (plan_title, plan_description, plan_days, expiry_days, plan_price, category_id, vehicle_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            
+            params = [
+                data["plan_title"],
+                data["plan_description"],
+                data["plan_days"],
+                data["expiry_days"],
+                data["plan_price"],
+                data["category_id"],
+                data["vehicle_id"]
+            ]
+            
+            row_count = insert_query(query, params)
+            return JsonResponse({"message": f"{row_count} plan added successfully"}, status=200)
+            
+        except Exception as err:
+            print("Error adding recharge plan:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+    
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def update_recharge_plan(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            required_fields = {
+                "recharge_plan_id": data.get("recharge_plan_id"),
+                "plan_title": data.get("plan_title"),
+                "plan_description": data.get("plan_description"),
+                "plan_days": data.get("plan_days"),
+                "expiry_days": data.get("expiry_days"),
+                "plan_price": data.get("plan_price"),
+                "category_id": data.get("category_id"),
+                "vehicle_id": data.get("vehicle_id")
+            }
+            
+            missing_fields = check_missing_fields(required_fields)
+            if missing_fields:
+                return JsonResponse({"message": f"Missing fields: {', '.join(missing_fields)}"}, status=400)
+            
+            query = """
+                UPDATE vtpartner.goods_driver_recharge_plans_tbl
+                SET plan_title = %s, plan_description = %s, plan_days = %s,
+                    expiry_days = %s, plan_price = %s, category_id = %s,
+                    vehicle_id = %s, plan_epoch = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)
+                WHERE recharge_plan_id = %s
+            """
+            
+            params = [
+                data["plan_title"],
+                data["plan_description"],
+                data["plan_days"],
+                data["expiry_days"],
+                data["plan_price"],
+                data["category_id"],
+                data["vehicle_id"],
+                data["recharge_plan_id"]
+            ]
+            
+            row_count = update_query(query, params)
+            return JsonResponse({"message": f"{row_count} plan updated successfully"}, status=200)
+            
+        except Exception as err:
+            print("Error updating recharge plan:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+    
+    return JsonResponse({"message": "Method not allowed"}, status=405)
