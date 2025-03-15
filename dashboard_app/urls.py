@@ -199,6 +199,8 @@ urlpatterns = [
     path('update_goods_type',views.update_goods_type,name='update_goods_type'),
     #
     path('get_offline_drivers',views.get_offline_drivers,name='get_offline_drivers'),
+    #
+    path('get_driver_recharge_history',views.get_driver_recharge_history,name='get_driver_recharge_history'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
