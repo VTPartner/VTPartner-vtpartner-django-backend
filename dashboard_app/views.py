@@ -6624,3 +6624,124 @@ def update_recharge_plan(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
     
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_all_goods_types(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            page = data.get("page", 1)
+            limit = data.get("limit", 10)
+            search = data.get("search", "")
+            
+            offset = (page - 1) * limit
+            
+            query = """
+                SELECT goods_type_id, goods_type_name
+                FROM vtpartner.goods_type_tbl
+                WHERE LOWER(goods_type_name) LIKE LOWER(%s)
+                ORDER BY goods_type_id DESC
+                LIMIT %s OFFSET %s
+            """
+            
+            count_query = """
+                SELECT COUNT(*) FROM vtpartner.goods_type_tbl
+                WHERE LOWER(goods_type_name) LIKE LOWER(%s)
+            """
+            
+            search_pattern = f"%{search}%"
+            
+            # Get total count
+            count_result = select_query(count_query, [search_pattern])
+            total_count = count_result[0][0] if count_result else 0
+            
+            # Get goods types
+            result = select_query(query, [search_pattern, limit, offset])
+            
+            goods_types = [
+                {
+                    "goods_type_id": row[0],
+                    "goods_type_name": row[1]
+                }
+                for row in result
+            ]
+            
+            return JsonResponse({
+                "goods_types": goods_types,
+                "total_pages": ceil(total_count / limit)
+            }, status=200)
+            
+        except Exception as err:
+            print("Error fetching goods types:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+    
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def add_goods_type(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            goods_type_name = data.get("goods_type_name")
+            
+            if not goods_type_name:
+                return JsonResponse({"message": "Goods type name is required"}, status=400)
+            
+            # Check if goods type already exists
+            check_query = """
+                SELECT COUNT(*) FROM vtpartner.goods_type_tbl
+                WHERE LOWER(goods_type_name) = LOWER(%s)
+            """
+            result = select_query(check_query, [goods_type_name])
+            if result[0][0] > 0:
+                return JsonResponse({"message": "Goods type already exists"}, status=400)
+            
+            query = """
+                INSERT INTO vtpartner.goods_type_tbl (goods_type_name)
+                VALUES (%s)
+            """
+            
+            row_count = insert_query(query, [goods_type_name])
+            return JsonResponse({"message": "Goods type added successfully"}, status=200)
+            
+        except Exception as err:
+            print("Error adding goods type:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+    
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def update_goods_type(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            goods_type_id = data.get("goods_type_id")
+            goods_type_name = data.get("goods_type_name")
+            
+            if not all([goods_type_id, goods_type_name]):
+                return JsonResponse({"message": "All fields are required"}, status=400)
+            
+            # Check if name already exists for different ID
+            check_query = """
+                SELECT COUNT(*) FROM vtpartner.goods_type_tbl
+                WHERE LOWER(goods_type_name) = LOWER(%s)
+                AND goods_type_id != %s
+            """
+            result = select_query(check_query, [goods_type_name, goods_type_id])
+            if result[0][0] > 0:
+                return JsonResponse({"message": "Goods type already exists"}, status=400)
+            
+            query = """
+                UPDATE vtpartner.goods_type_tbl
+                SET goods_type_name = %s
+                WHERE goods_type_id = %s
+            """
+            
+            row_count = update_query(query, [goods_type_name, goods_type_id])
+            return JsonResponse({"message": "Goods type updated successfully"}, status=200)
+            
+        except Exception as err:
+            print("Error updating goods type:", err)
+            return JsonResponse({"message": "Internal Server Error"}, status=500)
+    
+    return JsonResponse({"message": "Method not allowed"}, status=405)

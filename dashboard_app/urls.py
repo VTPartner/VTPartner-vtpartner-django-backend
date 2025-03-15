@@ -191,6 +191,12 @@ urlpatterns = [
     path('add_recharge_plan',views.add_recharge_plan,name='add_recharge_plan'),
     #
     path('update_recharge_plan',views.update_recharge_plan,name='update_recharge_plan'),
+    #
+    path('get_all_goods_types',views.get_all_goods_types,name='get_all_goods_types'),
+    #
+    path('add_goods_type',views.add_goods_type,name='add_goods_type'),
+    #
+    path('update_goods_type',views.update_goods_type,name='update_goods_type'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
