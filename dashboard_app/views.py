@@ -6899,11 +6899,13 @@ def get_driver_recharge_history(request):
                     rh.recharge_time,
                     rh.recharge_date,
                     rh.razorpay_payment_id,
-                    rp.plan_name,
-                    rp.plan_amount,
-                    rp.plan_validity_days
+                    rp.plan_title,
+                    rp.plan_description,
+                    rp.plan_days,
+                    rp.plan_price,
+                    rp.expiry_days
                 FROM vtpartner.goods_driver_recharge_history_tbl rh
-                LEFT JOIN vtpartner.recharge_plans_tbl rp 
+                LEFT JOIN vtpartner.goods_driver_recharge_plans_tbl rp 
                 ON rh.recharge_plan_id = rp.recharge_plan_id
                 WHERE rh.driver_id = %s
                 ORDER BY rh.recharge_time DESC
@@ -6923,11 +6925,13 @@ def get_driver_recharge_history(request):
                 "driver_id": row[2],
                 "plan_expiry_time": row[3],
                 "recharge_time": row[4],
-                "recharge_date": row[5],
+                "recharge_date": str(row[5]),  # Convert date to string
                 "razorpay_payment_id": row[6],
-                "plan_name": row[7],
-                "plan_amount": row[8],
-                "plan_validity_days": row[9]
+                "plan_title": row[7],
+                "plan_description": row[8],
+                "plan_days": row[9],
+                "plan_price": row[10],
+                "expiry_days": row[11]
             } for row in result]
             
             return JsonResponse({
