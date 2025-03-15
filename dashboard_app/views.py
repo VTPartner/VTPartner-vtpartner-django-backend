@@ -6668,7 +6668,7 @@ def get_all_goods_types(request):
             
             return JsonResponse({
                 "goods_types": goods_types,
-                "total_pages": ceil(total_count / limit)
+                "total_pages": math.ceil(total_count / limit)
             }, status=200)
             
         except Exception as err:
