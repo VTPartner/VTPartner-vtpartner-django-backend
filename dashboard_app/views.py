@@ -6756,16 +6756,24 @@ def get_offline_drivers(request):
             search = data.get("search", "")
             
             query = """
-                SELECT gd.*, v.vehicle_name, v.vehicle_plate_no, v.vehicle_fuel_type
+                SELECT 
+                    gd.goods_driver_id,
+                    gd.current_lat,
+                    gd.current_lng,
+                    gd.driver_first_name,
+                    gd.profile_pic,
+                    gd.last_seen_at as entry_time,
+                    0 as current_status,
+                    gd.mobile_no
                 FROM vtpartner.goods_driverstbl gd
-                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id
-                WHERE gd.is_online = 0 AND gd.status = 1
+                WHERE gd.is_online = 0 
+                AND gd.status = 1
                 AND (
                     LOWER(gd.driver_first_name) LIKE LOWER(%s) OR
                     gd.mobile_no LIKE %s OR
                     CAST(gd.goods_driver_id AS TEXT) LIKE %s
                 )
-                ORDER BY gd.goods_driver_id DESC
+                ORDER BY gd.last_seen_at DESC
             """
             
             search_pattern = f"%{search}%"
@@ -6773,15 +6781,32 @@ def get_offline_drivers(request):
             
             result = select_query(query, params)
             
+            if result == []:
+                return JsonResponse({"message": "No Data Found"}, status=404)
+
+            # Map each row to a dictionary with the same structure as online drivers
+            drivers_details = [
+                {
+                    "goods_driver_id": row[0],
+                    "current_lat": row[1],
+                    "current_lng": row[2],
+                    "driver_first_name": row[3],
+                    "profile_pic": row[4],
+                    "entry_time": row[5],
+                    "current_status": row[6],
+                    "mobile_no": row[7],
+                }
+                for row in result
+            ]
+
             return JsonResponse({
-                "status": "success",
-                "drivers": result
-            })
+                "results": drivers_details
+            }, status=200)
             
         except Exception as e:
+            print("Error fetching offline drivers:", e)
             return JsonResponse({
-                "status": "error",
-                "message": str(e)
+                "message": "Internal Server Error"
             }, status=500)
     
     return JsonResponse({"message": "Method not allowed"}, status=405)
