@@ -6755,17 +6755,37 @@ def get_offline_drivers(request):
             limit = data.get("limit", 10)
             search = data.get("search", "")
             
+            # Count query for pagination
+            count_query = """
+                SELECT COUNT(*)
+                FROM vtpartner.goods_driverstbl gd
+                WHERE gd.is_online = 0 AND gd.status = 1
+                AND (
+                    LOWER(gd.driver_first_name) LIKE LOWER(%s) OR
+                    gd.mobile_no LIKE %s OR
+                    CAST(gd.goods_driver_id AS TEXT) LIKE %s
+                )
+            """
+            
+            # Main query with all fields
             query = """
                 SELECT 
-                    gd.goods_driver_id,
-                    gd.current_lat,
-                    gd.current_lng,
-                    gd.driver_first_name,
-                    gd.profile_pic,
-                    gd.last_seen_at as entry_time,
-                    0 as current_status,
-                    gd.mobile_no
+                    gd.goods_driver_id, gd.driver_first_name, gd.driver_last_name, 
+                    gd.profile_pic, gd.is_online, gd.ratings, gd.mobile_no, 
+                    gd.registration_date, gd.time, gd.r_lat, gd.r_lng, gd.current_lat, 
+                    gd.current_lng, gd.status, gd.recent_online_pic, gd.is_verified, 
+                    gd.category_id, gd.vehicle_id, gd.city_id, gd.aadhar_no, 
+                    gd.pan_card_no, gd.house_no, gd.city_name, gd.full_address, 
+                    gd.gender, gd.owner_id, gd.aadhar_card_front, gd.aadhar_card_back, 
+                    gd.pan_card_front, gd.pan_card_back, gd.license_front, 
+                    gd.license_back, gd.insurance_image, gd.noc_image, 
+                    gd.pollution_certificate_image, gd.rc_image, gd.vehicle_image, 
+                    gd.vehicle_plate_image, gd.driving_license_no, gd.vehicle_plate_no, 
+                    gd.rc_no, gd.insurance_no, gd.noc_no, gd.vehicle_fuel_type,
+                    v.vehicle_name,
+                    v.image as vehicle_type_image
                 FROM vtpartner.goods_driverstbl gd
+                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id AND gd.category_id = 1
                 WHERE gd.is_online = 0 
                 AND gd.status = 1
                 AND (
@@ -6774,33 +6794,82 @@ def get_offline_drivers(request):
                     CAST(gd.goods_driver_id AS TEXT) LIKE %s
                 )
                 ORDER BY gd.last_seen_at DESC
+                OFFSET %s LIMIT %s
             """
             
             search_pattern = f"%{search}%"
             params = [search_pattern, search_pattern, search_pattern]
             
-            result = select_query(query, params)
+            # Get total count
+            total_count_result = select_query(count_query, params)
+            total_count = total_count_result[0][0] if total_count_result else 0
             
-            if result == []:
+            # Calculate offset
+            offset = (page - 1) * limit
+            query_params = params + [offset, limit]
+            
+            result = select_query(query, query_params)
+            
+            if not result:
                 return JsonResponse({"message": "No Data Found"}, status=404)
 
-            # Map each row to a dictionary with the same structure as online drivers
-            drivers_details = [
+            # Map results to match the same structure
+            drivers = [
                 {
                     "goods_driver_id": row[0],
-                    "current_lat": row[1],
-                    "current_lng": row[2],
-                    "driver_first_name": row[3],
-                    "profile_pic": row[4],
-                    "entry_time": row[5],
-                    "current_status": row[6],
-                    "mobile_no": row[7],
+                    "driver_first_name": row[1],
+                    "driver_last_name": row[2],
+                    "profile_pic": row[3],
+                    "is_online": row[4],
+                    "ratings": row[5],
+                    "mobile_no": row[6],
+                    "registration_date": row[7],
+                    "time": row[8],
+                    "r_lat": row[9],
+                    "r_lng": row[10],
+                    "current_lat": row[11],
+                    "current_lng": row[12],
+                    "status": row[13],
+                    "recent_online_pic": row[14],
+                    "is_verified": row[15],
+                    "category_id": row[16],
+                    "vehicle_id": row[17],
+                    "city_id": row[18],
+                    "aadhar_no": row[19],
+                    "pan_card_no": row[20],
+                    "house_no": row[21],
+                    "city_name": row[22],
+                    "full_address": row[23],
+                    "gender": row[24],
+                    "owner_id": row[25],
+                    "aadhar_card_front": row[26],
+                    "aadhar_card_back": row[27],
+                    "pan_card_front": row[28],
+                    "pan_card_back": row[29],
+                    "license_front": row[30],
+                    "license_back": row[31],
+                    "insurance_image": row[32],
+                    "noc_image": row[33],
+                    "pollution_certificate_image": row[34],
+                    "rc_image": row[35],
+                    "driver_vehicle_image": row[36],
+                    "vehicle_plate_image": row[37],
+                    "driving_license_no": row[38],
+                    "vehicle_plate_no": row[39],
+                    "rc_no": row[40],
+                    "insurance_no": row[41],
+                    "noc_no": row[42],
+                    "vehicle_fuel_type": row[43],
+                    "vehicle_name": row[44],
+                    "vehicle_image": row[45]
                 }
                 for row in result
             ]
 
             return JsonResponse({
-                "results": drivers_details
+                "drivers": drivers,
+                "total_count": total_count,
+                "total_pages": ceil(total_count / limit)
             }, status=200)
             
         except Exception as e:
