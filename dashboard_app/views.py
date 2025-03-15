@@ -682,7 +682,8 @@ def all_services(request):
                     category_type, 
                     epoch, 
                     description,
-                    website_background_image 
+                    website_background_image,
+                    attach_vehicle_background_image
                 FROM 
                     vtpartner.categorytbl
                 JOIN 
@@ -708,6 +709,7 @@ def all_services(request):
                     "epoch": row[5],
                     "description": row[6],
                     "website_background_image": row[7],
+                    "attach_vehicle_background_image": row[8],
                 }
                 for row in result
             ]
@@ -730,6 +732,7 @@ def add_service(request):
             category_image = data.get("category_image")
             description = data.get("description")
             website_background_image = data.get("website_background_image")
+            attach_vehicle_background_image = data.get("attach_vehicle_background_image")
 
             # List of required fields
             required_fields = {
@@ -738,6 +741,7 @@ def add_service(request):
                 "category_image": category_image,
                 "description": description,
                 "website_background_image": website_background_image,
+                "attach_vehicle_background_image": attach_vehicle_background_image,
             }
 
             # Check for missing fields
@@ -756,10 +760,10 @@ def add_service(request):
 
             # If not duplicate, proceed to insert
             query = """
-                INSERT INTO vtpartner.categorytbl (category_name, category_type_id, category_image, description,website_background_image)
-                VALUES (%s, %s, %s, %s,%s)
+                INSERT INTO vtpartner.categorytbl (category_name, category_type_id, category_image, description,website_background_image,attach_vehicle_background_image)
+                VALUES (%s, %s, %s, %s,%s,%s)
             """
-            row_count = insert_query(query, [category_name, category_type_id, category_image, description,website_background_image])  
+            row_count = insert_query(query, [category_name, category_type_id, category_image, description,website_background_image,attach_vehicle_background_image])  
 
             return JsonResponse({"message": f"{row_count} row(s) inserted"}, status=200)
 
@@ -782,6 +786,7 @@ def edit_service(request):
             category_image = data.get("category_image")
             description = data.get("description")
             website_background_image = data.get("website_background_image")
+            attach_vehicle_background_image = data.get("attach_vehicle_background_image")
             
             
 
@@ -793,6 +798,7 @@ def edit_service(request):
                 "category_image": category_image,
                 "description": description,
                 "website_background_image": website_background_image,
+                "attach_vehicle_background_image": attach_vehicle_background_image,
             }
 
             # Check for missing fields
@@ -815,10 +821,10 @@ def edit_service(request):
             query = """
                 UPDATE vtpartner.categorytbl 
                 SET category_name = %s, category_type_id = %s, category_image = %s, 
-                    epoch = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), description = %s, website_background_image = %s 
+                    epoch = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), description = %s, website_background_image = %s,attach_vehicle_background_image = %s 
                 WHERE category_id = %s
             """
-            row_count = update_query(query, [category_name, category_type_id, category_image, description,website_background_image, category_id])  # Assuming update_query is defined
+            row_count = update_query(query, [category_name, category_type_id, category_image, description,website_background_image,attach_vehicle_background_image, category_id])  # Assuming update_query is defined
 
             if row_count > 0:
                 return JsonResponse({"message": f"{row_count} row(s) updated"}, status=200)

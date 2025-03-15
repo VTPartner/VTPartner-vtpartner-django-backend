@@ -158,7 +158,7 @@ def all_services(request):
         try:
             # SQL query
             query = """
-                SELECT category_id, category_name, category_type_id, category_image, category_type, epoch, description,website_background_image
+                SELECT category_id, category_name, category_type_id, category_image, category_type, epoch, description,website_background_image,attach_vehicle_background_image
                 FROM vtpartner.categorytbl
                 JOIN vtpartner.category_type_tbl ON category_type_tbl.cat_type_id = categorytbl.category_type_id
                 ORDER BY category_id ASC
@@ -181,6 +181,7 @@ def all_services(request):
                     "epoch": row[5],
                     "description": row[6],
                     "website_background_image": row[7],
+                    "attach_vehicle_background_image": row[8],
                 }
                 for row in result
             ]
