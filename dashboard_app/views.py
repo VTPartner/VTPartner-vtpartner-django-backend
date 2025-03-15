@@ -7176,3 +7176,24 @@ def get_customer_wallet_balance(request):
             return JsonResponse({
                 "message": "Internal Server Error"
             }, status=500)
+            
+@csrf_exempt
+def create_razorpay_order(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            amount = data.get("amount")  # amount in paise
+            
+            # Just create and return the order details
+            return JsonResponse({
+                'status': 'success',
+                'order_id': 'order_' + str(int(time.time())),  # Generate your own order ID
+                'amount': amount
+            })
+            
+        except Exception as e:
+            print("Error:", e)
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)

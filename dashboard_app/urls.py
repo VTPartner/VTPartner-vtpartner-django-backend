@@ -209,6 +209,8 @@ urlpatterns = [
     path('add_wallet_transaction',views.add_wallet_transaction,name='add_wallet_transaction'),
     #
     path('get_customer_wallet_balance',views.get_customer_wallet_balance,name='get_customer_wallet_balance'),
+    #
+    path('create_razorpay_order',views.create_razorpay_order,name='create_razorpay_order'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
