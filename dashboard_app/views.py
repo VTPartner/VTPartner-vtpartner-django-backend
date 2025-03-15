@@ -7126,3 +7126,53 @@ def add_wallet_transaction(request):
             }, status=500)
     
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_customer_wallet_balance(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            customer_id = data.get("customer_id")
+            
+            query = """
+                SELECT 
+                    w.wallet_id,
+                    w.customer_id,
+                    w.current_balance,
+                    w.last_updated,
+                    c.customer_name,
+                    c.mobile_no,
+                    c.email
+                FROM vtpartner.customer_wallet w
+                JOIN vtpartner.customers_tbl c ON w.customer_id = c.customer_id
+                WHERE w.customer_id = %s
+            """
+            
+            result = select_query(query, [customer_id])
+            
+            if not result:
+                return JsonResponse({
+                    "message": "No wallet found",
+                    "wallet": None
+                }, status=200)
+            
+            wallet = {
+                "wallet_id": result[0][0],
+                "customer_id": result[0][1],
+                "current_balance": float(result[0][2]),
+                "last_updated": result[0][3],
+                "customer_name": result[0][4],
+                "mobile_no": result[0][5],
+                "email": result[0][6]
+            }
+            
+            return JsonResponse({
+                "status": "success",
+                "wallet": wallet
+            }, status=200)
+            
+        except Exception as e:
+            print("Error:", e)
+            return JsonResponse({
+                "message": "Internal Server Error"
+            }, status=500)

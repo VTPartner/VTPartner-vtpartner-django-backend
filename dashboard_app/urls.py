@@ -207,6 +207,8 @@ urlpatterns = [
     path('get_wallet_transactions',views.get_wallet_transactions,name='get_wallet_transactions'),
     #
     path('add_wallet_transaction',views.add_wallet_transaction,name='add_wallet_transaction'),
+    #
+    path('get_customer_wallet_balance',views.get_customer_wallet_balance,name='get_customer_wallet_balance'),
     #Admin Login
     # path('login',views.login_view,name='login'),
 ]
