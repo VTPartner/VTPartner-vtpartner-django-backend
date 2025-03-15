@@ -6745,3 +6745,43 @@ def update_goods_type(request):
             return JsonResponse({"message": "Internal Server Error"}, status=500)
     
     return JsonResponse({"message": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def get_offline_drivers(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            page = data.get("page", 1)
+            limit = data.get("limit", 10)
+            search = data.get("search", "")
+            
+            query = """
+                SELECT gd.*, v.vehicle_name, v.vehicle_plate_no, v.vehicle_fuel_type
+                FROM vtpartner.goods_driver_tbl gd
+                LEFT JOIN vtpartner.vehicle_tbl v ON gd.vehicle_id = v.vehicle_id
+                WHERE gd.is_online = 0 AND gd.status = 1
+                AND (
+                    LOWER(gd.driver_first_name) LIKE LOWER(%s) OR
+                    gd.mobile_no LIKE %s OR
+                    CAST(gd.goods_driver_id AS TEXT) LIKE %s
+                )
+                ORDER BY gd.goods_driver_id DESC
+            """
+            
+            search_pattern = f"%{search}%"
+            params = [search_pattern, search_pattern, search_pattern]
+            
+            result = select_query(query, params)
+            
+            return JsonResponse({
+                "status": "success",
+                "drivers": result
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                "status": "error",
+                "message": str(e)
+            }, status=500)
+    
+    return JsonResponse({"message": "Method not allowed"}, status=405)
