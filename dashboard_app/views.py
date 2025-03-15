@@ -6758,7 +6758,7 @@ def get_offline_drivers(request):
             query = """
                 SELECT gd.*, v.vehicle_name, v.vehicle_plate_no, v.vehicle_fuel_type
                 FROM vtpartner.goods_driverstbl gd
-                LEFT JOIN vtpartner.vehicle_tbl v ON gd.vehicle_id = v.vehicle_id
+                LEFT JOIN vtpartner.vehiclestbl v ON gd.vehicle_id = v.vehicle_id
                 WHERE gd.is_online = 0 AND gd.status = 1
                 AND (
                     LOWER(gd.driver_first_name) LIKE LOWER(%s) OR
