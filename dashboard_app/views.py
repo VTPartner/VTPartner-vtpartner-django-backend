@@ -340,7 +340,9 @@ def all_allowed_cities(request):
                 time, 
                 pincode_until, 
                 description, 
-                status 
+                status,
+                base_price,
+                outstation_distance 
             FROM 
                 vtpartner.available_citys_tbl 
             ORDER BY 
@@ -362,6 +364,8 @@ def all_allowed_cities(request):
                     "pincode_until": row[5],
                     "description": row[6],
                     "status": row[7],
+                    "base_price": row[8],
+                    "outstation_distance": row[9]
                 }
                 for row in result
             ]
@@ -386,6 +390,8 @@ def update_allowed_city(request):
             description = data.get("description")
             bg_image = data.get("bg_image")
             status = data.get("status")
+            base_price = data.get("base_price")
+            outstation_distance = data.get("outstation_distance")
 
             # List of required fields
             required_fields = {
@@ -396,6 +402,8 @@ def update_allowed_city(request):
                 "description": description,
                 "bg_image": bg_image,
                 "status": status,
+                "base_price": base_price,
+                "outstation_distance": outstation_distance,
             }
 
             # Check for missing fields
@@ -414,7 +422,7 @@ def update_allowed_city(request):
                 SET city_name = %s, pincode = %s, bg_image = %s, 
                     pincode_until = %s, description = %s, 
                     time = EXTRACT(EPOCH FROM CURRENT_TIMESTAMP), 
-                    status = %s 
+                    status = %s,base_price = %s, outstation_distance = %s  
                 WHERE city_id = %s
             """
             params = [
@@ -424,6 +432,8 @@ def update_allowed_city(request):
                 pincode_until,
                 description,
                 status,
+                base_price,
+                outstation_distance,
                 city_id,
             ]
 
@@ -447,6 +457,8 @@ def add_new_allowed_city(request):
             pincode_until = data.get('pincode_until')
             description = data.get('description')
             bg_image = data.get('bg_image')
+            base_price = data.get('base_price')
+            outstation_distance = data.get('outstation_distance')
 
             # List of required fields
             required_fields = {
@@ -455,6 +467,8 @@ def add_new_allowed_city(request):
                 'pincode_until': pincode_until,
                 'description': description,
                 'bg_image': bg_image,
+                'base_price': base_price,
+                'outstation_distance': outstation_distance,
             }
 
             # Check for missing fields
@@ -464,10 +478,10 @@ def add_new_allowed_city(request):
 
             # Prepare the insert query
             query = """
-                INSERT INTO vtpartner.available_citys_tbl (city_name, pincode, bg_image, pincode_until, description)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO vtpartner.available_citys_tbl (city_name, pincode, bg_image, pincode_until, description, base_price, outstation_distance)
+                VALUES (%s, %s, %s, %s, %s,%s, %s)
             """
-            params = [city_name, pincode, bg_image, pincode_until, description]
+            params = [city_name, pincode, bg_image, pincode_until, description,base_price, outstation_distance]
             row_count = insert_query(query, params)
 
             return JsonResponse({"message": f"{row_count} rows inserted"}, status=200)
