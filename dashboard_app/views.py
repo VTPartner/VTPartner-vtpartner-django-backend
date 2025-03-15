@@ -6869,7 +6869,7 @@ def get_offline_drivers(request):
             return JsonResponse({
                 "drivers": drivers,
                 "total_count": total_count,
-                "total_pages": ceil(total_count / limit)
+                "total_pages": math.ceil(total_count / limit)
             }, status=200)
             
         except Exception as e:
