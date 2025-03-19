@@ -15,9 +15,9 @@ from dotenv import load_dotenv
 import os
 
 # Load environment variables
-load_dotenv('/root/.env_vtpartner_customer')
-load_dotenv('/root/.env_vtpartner')
-load_dotenv('/root/.env_aws')
+load_dotenv('/home/ubuntu/.env_vtpartner_customer')
+load_dotenv('/home/ubuntu/.env_vtpartner')
+load_dotenv('/home/ubuntu/.env_aws')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
