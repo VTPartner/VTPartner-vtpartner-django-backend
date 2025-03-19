@@ -193,8 +193,14 @@ def upload_images2(uploaded_image):
 def upload_image(request):
     if request.method == 'POST':
         try:
+            if 'image' not in request.FILES:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No file provided'
+                }, status=400)
+
             file = request.FILES['image']
-            
+
             # Initialize S3 client
             s3_client = boto3.client(
                 's3',
@@ -205,17 +211,15 @@ def upload_image(request):
 
             # Generate unique filename
             file_extension = os.path.splitext(file.name)[1]
-            from datetime import datetime
             unique_filename = f"uploads/{datetime.now().strftime('%Y%m%d_%H%M%S')}{file_extension}"
 
-            # Upload file to S3
+            # Upload file to S3 without ACL
             s3_client.upload_fileobj(
                 file,
                 settings.AWS_STORAGE_BUCKET_NAME,
                 unique_filename,
                 ExtraArgs={
-                    'ContentType': file.content_type,
-                    'ACL': 'public-read'  # Make file publicly accessible
+                    'ContentType': file.content_type
                 }
             )
 
@@ -238,7 +242,7 @@ def upload_image(request):
         'success': False,
         'error': 'Invalid request method'
     }, status=400)
-    
+       
 @csrf_exempt
 def upload_images(request):
     if request.method == "POST":
