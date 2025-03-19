@@ -23,6 +23,10 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import math
 from django.db import transaction
+from storages.backends.s3boto3 import S3Boto3Storage
+from django.conf import settings
+import boto3
+from botocore.exceptions import ClientError
 
 from PIL import Image  # Pillow library for image processing
 
@@ -174,17 +178,66 @@ def upload_images2(uploaded_image):
     print(f'Uploaded Image URL: {image_url}')
     return image_url
 
+# @csrf_exempt
+# def upload_image(request):
+#     if request.method == 'POST':
+#         file = request.FILES['image']  # Assuming the file is named 'image' in the form data
+#         fs = FileSystemStorage()
+#         filename = fs.save(file.name, file)
+#         file_url = fs.url(filename)
+#         print("file_url::",file_url)
+#         return JsonResponse({'image_url': file_url})
+#     else:
+#         return JsonResponse({'error': 'Invalid request'})
 @csrf_exempt
 def upload_image(request):
     if request.method == 'POST':
-        file = request.FILES['image']  # Assuming the file is named 'image' in the form data
-        fs = FileSystemStorage()
-        filename = fs.save(file.name, file)
-        file_url = fs.url(filename)
-        print("file_url::",file_url)
-        return JsonResponse({'image_url': file_url})
-    else:
-        return JsonResponse({'error': 'Invalid request'})
+        try:
+            file = request.FILES['image']
+            
+            # Initialize S3 client
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_S3_REGION_NAME
+            )
+
+            # Generate unique filename
+            file_extension = os.path.splitext(file.name)[1]
+            from datetime import datetime
+            unique_filename = f"uploads/{datetime.now().strftime('%Y%m%d_%H%M%S')}{file_extension}"
+
+            # Upload file to S3
+            s3_client.upload_fileobj(
+                file,
+                settings.AWS_STORAGE_BUCKET_NAME,
+                unique_filename,
+                ExtraArgs={
+                    'ContentType': file.content_type,
+                    'ACL': 'public-read'  # Make file publicly accessible
+                }
+            )
+
+            # Generate file URL
+            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{unique_filename}"
+            
+            return JsonResponse({
+                'success': True,
+                'image_url': file_url,
+                'message': 'File uploaded successfully'
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Invalid request method'
+    }, status=400)
     
 @csrf_exempt
 def upload_images(request):
