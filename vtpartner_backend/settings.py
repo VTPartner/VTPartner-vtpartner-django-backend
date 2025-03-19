@@ -17,6 +17,7 @@ import os
 # Load environment variables
 load_dotenv('/root/.env_vtpartner_customer')
 load_dotenv('/root/.env_vtpartner')
+load_dotenv('/root/.env_aws')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -162,6 +163,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # MEDIA_ROOT = '/var/www/vtpartner/media/'
 #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
 
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = 'kaps-storeage-bucket'
 AWS_S3_SIGNATURE_NAME = 's3v4',
 AWS_S3_REGION_NAME = 'us-east-1'
