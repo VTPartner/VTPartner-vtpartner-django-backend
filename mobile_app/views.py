@@ -730,16 +730,17 @@ def get_peak_hour_prices(request):
             data = json.loads(request.body)
             
             city_id = data.get('city_id')
+            category_id = data.get('category_id',1)
 
             query = """
                 SELECT p.*, c.city_name, c.bg_image
                 FROM vtpartner.vehicle_peak_hours_price_tbl p
                 JOIN vtpartner.available_citys_tbl c ON p.city_id = c.city_id
                 WHERE
-                (p.city_id = %s OR %s IS NULL)
+                (p.city_id = %s OR %s IS NULL) AND category_id=%s
                 ORDER BY p.start_time::time
             """
-            values = ( city_id, city_id)
+            values = ( city_id, city_id,category_id)
             result = select_query(query, values)
             # Print raw results
             # print("\n=== Raw Query Results ===")
