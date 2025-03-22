@@ -120,7 +120,7 @@ def fare_result(request):
                 SELECT vtpartner.vehiclestbl.vehicle_id, vehicle_name, weight, size_image, starting_price_per_km
                 FROM vtpartner.vehicle_city_wise_price_tbl
                 JOIN vtpartner.vehiclestbl ON vtpartner.vehicle_city_wise_price_tbl.vehicle_id = vtpartner.vehiclestbl.vehicle_id
-                WHERE category_id = %s AND city_id = %s
+                WHERE category_id = %s AND city_id = %s AND price_type_id='1' 
                 ORDER BY weight ASC
             """
             values = [category_id, city_id]
